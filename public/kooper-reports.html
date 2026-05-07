@@ -39,7 +39,7 @@
   .chip-warn { background: rgba(255,212,0,0.2); color: #876300; border-color: rgba(255,212,0,0.5); }
   .chip-outline-light { background: transparent; color: #FFFFFF; border-color: rgba(255,255,255,0.25); }
 
-  .audience-tab { padding: 0.625rem 1rem; border-radius: 12px; font-weight: 500; font-size: 0.875rem; cursor: pointer; transition: all 0.15s ease; border: 1px solid #D4D4D4; background: #FFFFFF; color: #2A2A2A; display: inline-flex; align-items: center; gap: 0.5rem; }
+  .audience-tab { padding: 0.625rem 1rem; border-radius: 12px; font-weight: 500; font-size: 0.875rem; cursor: pointer; transition: all 0.15s ease; border: 1px solid #D4D4D4; background: #FFFFFF; color: #2A2A2A; display: inline-flex; align-items: center; gap: 0.5rem; white-space: nowrap; flex-shrink: 0; }
   .audience-tab:hover { border-color: #0A0A0A; }
   .audience-tab.active { background: #0A0A0A; color: #FFFFFF; border-color: #0A0A0A; }
   .audience-tab.active .tab-count { background: #FFD400; color: #0A0A0A; }
@@ -80,7 +80,7 @@
   .pulse-dot::after { content: ''; position: absolute; inset: -4px; border-radius: 999px; background: #10B981; opacity: 0.4; animation: pulse-out 1.6s ease-out infinite; }
   @keyframes pulse-out { 0% { transform: scale(0.6); opacity: 0.6; } 100% { transform: scale(1.8); opacity: 0; } }
 
-  .saf-pill { display: inline-flex; align-items: center; padding: 0.125rem 0.5rem; border-radius: 999px; font-size: 0.625rem; font-weight: 600; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.04em; text-transform: uppercase; }
+  .saf-pill { display: inline-flex; align-items: center; padding: 0.125rem 0.5rem; border-radius: 999px; font-size: 0.625rem; font-weight: 600; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap; }
   .saf-safe { background: rgba(229,72,77,0.1); color: #B42318; }
   .saf-effective { background: rgba(16,185,129,0.1); color: #047857; }
   .saf-caring { background: rgba(255,212,0,0.2); color: #876300; }
@@ -215,7 +215,7 @@
         </div>
         <span class="source-pill on-dark">⊕ all apps</span>
       </div>
-      <div class="grid grid-cols-5 gap-2 mt-5 pt-5 border-t border-white/10">
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-2 mt-5 pt-5 border-t border-white/10">
         <div class="text-center"><div class="saf-pill saf-safe">Safe</div><div class="font-mono font-semibold text-lg mt-1">98%</div></div>
         <div class="text-center"><div class="saf-pill saf-effective">Effective</div><div class="font-mono font-semibold text-lg mt-1">100%</div></div>
         <div class="text-center"><div class="saf-pill saf-caring">Caring</div><div class="font-mono font-semibold text-lg mt-1">100%</div></div>
