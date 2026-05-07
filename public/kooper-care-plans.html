@@ -71,6 +71,8 @@
 
   .fab { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 50; background: #FFD400; color: #0A0A0A; height: 52px; padding: 0 1.25rem; border-radius: 999px; display: flex; align-items: center; gap: 0.5rem; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.2); cursor: pointer; transition: all 0.2s ease; border: 2px solid #0A0A0A; font-weight: 600; font-size: 0.875rem; }
   .fab:hover { background: #F5B400; transform: translateY(-2px); }
+  /* Compact FAB on narrow screens so it doesn't sit over content. */
+  @media (max-width: 640px) { .fab { bottom: 1rem; right: 1rem; height: 48px; padding: 0 1rem; font-size: 0.8125rem; } }
 
   .scroll-stack { max-height: calc(100vh - 12rem); overflow-y: auto; }
   @media (max-width: 1023px) { .scroll-stack { max-height: none; } }
@@ -670,37 +672,39 @@
         <h3 class="font-display text-xl lg:text-2xl font-semibold mt-3 mb-2">Edward's care plan is inspector-ready.</h3>
         <p class="text-kapture-mist text-sm leading-relaxed">Every domain in this plan declares its alignment to the 5 CQC SAF quality statements. The evidence pack pulls from 38 reviewed elements + linked risk + safety plan + holistic profile, all watermarked with Sister Anne's identity and timestamped to the second.</p>
       </div>
-      <div class="grid grid-cols-5 gap-2">
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
         <div class="bg-kapture-coal border border-kapture-ash rounded-lg p-3 text-center">
-          <div class="cqc-pill cqc-safe mx-auto mb-1">Safe</div>
+          <div class="cqc-pill cqc-safe mx-auto mb-1 whitespace-nowrap">Safe</div>
           <div class="font-mono text-lg font-semibold">98%</div>
         </div>
         <div class="bg-kapture-coal border border-kapture-ash rounded-lg p-3 text-center">
-          <div class="cqc-pill cqc-effective mx-auto mb-1">Effective</div>
+          <div class="cqc-pill cqc-effective mx-auto mb-1 whitespace-nowrap">Effective</div>
           <div class="font-mono text-lg font-semibold">100%</div>
         </div>
         <div class="bg-kapture-coal border border-kapture-ash rounded-lg p-3 text-center">
-          <div class="cqc-pill cqc-caring mx-auto mb-1">Caring</div>
+          <div class="cqc-pill cqc-caring mx-auto mb-1 whitespace-nowrap">Caring</div>
           <div class="font-mono text-lg font-semibold">100%</div>
         </div>
         <div class="bg-kapture-coal border border-kapture-ash rounded-lg p-3 text-center">
-          <div class="cqc-pill cqc-responsive mx-auto mb-1">Resp.</div>
+          <div class="cqc-pill cqc-responsive mx-auto mb-1 whitespace-nowrap">Responsive</div>
           <div class="font-mono text-lg font-semibold">96%</div>
         </div>
         <div class="bg-kapture-coal border border-kapture-ash rounded-lg p-3 text-center">
-          <div class="cqc-pill cqc-wellled mx-auto mb-1">Well-led</div>
+          <div class="cqc-pill cqc-wellled mx-auto mb-1 whitespace-nowrap">Well-led</div>
           <div class="font-mono text-lg font-semibold">100%</div>
         </div>
       </div>
-      <div class="lg:col-span-2 flex flex-wrap items-center gap-3 pt-3 border-t border-kapture-ash mt-2">
-        <button onclick="kooperToast('Compiling CQC evidence pack — Edward + linked risk + safety plan + holistic profile')" class="btn-yellow text-sm">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-          Compile evidence pack
-        </button>
-        <button onclick="kooperToast('Generates printable PDF of full plan')" class="btn-secondary text-sm border-white text-white hover:bg-white hover:text-kapture-black">
-          Print full plan
-        </button>
-        <span class="text-xs text-kapture-mist ml-auto">Last pack generated <span class="font-mono">04 May 2026</span> · 2 days ago</span>
+      <div class="lg:col-span-2 pt-3 border-t border-kapture-ash mt-2">
+        <div class="flex flex-wrap items-center gap-3 pr-20 sm:pr-24 lg:pr-0">
+          <button onclick="kooperToast('Compiling CQC evidence pack — Edward + linked risk + safety plan + holistic profile')" class="btn-yellow text-sm">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            Compile evidence pack
+          </button>
+          <button onclick="kooperToast('Generates printable PDF of full plan')" class="btn-secondary text-sm border-white text-white hover:bg-white hover:text-kapture-black">
+            Print full plan
+          </button>
+          <span class="text-xs text-kapture-mist lg:ml-auto block w-full lg:w-auto mt-1 lg:mt-0">Last pack generated <span class="font-mono">04 May 2026</span> · 2 days ago</span>
+        </div>
       </div>
     </div>
   </section>

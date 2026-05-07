@@ -43,7 +43,7 @@
 
   .h-display { font-family: 'Space Grotesk', sans-serif; font-weight: 600; letter-spacing: -0.015em; }
 
-  .tab { padding: 0.625rem 1rem; border-radius: 12px; font-weight: 500; font-size: 0.875rem; cursor: pointer; transition: all 0.15s ease; border: 1px solid #D4D4D4; background: #FFFFFF; color: #2A2A2A; display: inline-flex; align-items: center; gap: 0.5rem; }
+  .tab { padding: 0.625rem 1rem; border-radius: 12px; font-weight: 500; font-size: 0.875rem; cursor: pointer; transition: all 0.15s ease; border: 1px solid #D4D4D4; background: #FFFFFF; color: #2A2A2A; display: inline-flex; align-items: center; gap: 0.5rem; white-space: nowrap; flex-shrink: 0; }
   .tab:hover { border-color: #0A0A0A; }
   .tab.active { background: #0A0A0A; color: #FFFFFF; border-color: #0A0A0A; }
   .tab.active .tab-count { background: #FFD400; color: #0A0A0A; }
@@ -89,8 +89,14 @@
   .view-switch button.on { background: #0A0A0A; color: #FFD400; }
 
   /* Worker view shell */
-  .worker-shell { background: #FFFFFF; border: 1px solid #ECEAE3; border-radius: 18px; padding: 1.75rem; }
+  .worker-shell { background: #FFFFFF; border: 1px solid #ECEAE3; border-radius: 18px; padding: 1.25rem; }
+  @media (min-width: 640px) { .worker-shell { padding: 1.75rem; } }
   .worker-week { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 0.75rem; }
+  /* Below 700px the 7-column grid squeezes shifts unreadably — switch to a horizontal scroll with comfortable per-day width. */
+  @media (max-width: 700px) {
+    .worker-week { display: flex; gap: 0.625rem; overflow-x: auto; padding-bottom: 0.5rem; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; }
+    .worker-week > .worker-day { min-width: 96px; max-width: 96px; flex-shrink: 0; scroll-snap-align: start; }
+  }
   .worker-day { background: #FAFAF7; border: 1px solid #ECEAE3; border-radius: 12px; padding: 0.75rem; min-height: 110px; cursor: pointer; transition: all 0.15s ease; }
   .worker-day:hover { border-color: #0A0A0A; }
   .worker-day .dow { font-family: 'JetBrains Mono', monospace; font-size: 0.625rem; letter-spacing: 0.08em; text-transform: uppercase; color: #6B7280; margin-bottom: 0.25rem; }
@@ -498,12 +504,12 @@
         <div id="wvMeta" class="text-xs text-[#6B7280]">Nurse · FT · Draycott Demo House</div>
       </div>
     </div>
-    <div class="flex items-center gap-3 text-xs">
-      <div class="text-right">
+    <div class="flex flex-wrap items-center gap-x-5 gap-y-2 text-xs w-full sm:w-auto">
+      <div class="sm:text-right">
         <div class="text-[#6B7280] font-mono text-[0.625rem] uppercase tracking-[0.1em]">This week</div>
         <div id="wvHours" class="font-display font-semibold text-base">36h scheduled</div>
       </div>
-      <div class="text-right">
+      <div class="sm:text-right">
         <div class="text-[#6B7280] font-mono text-[0.625rem] uppercase tracking-[0.1em]">Holiday balance</div>
         <div id="wvHolidays" class="font-display font-semibold text-base">12 days remaining</div>
       </div>
@@ -512,7 +518,7 @@
 
   <!-- Week view -->
   <div class="worker-shell mb-5">
-    <div class="flex items-baseline justify-between mb-3">
+    <div class="flex flex-wrap items-baseline justify-between gap-2 mb-3">
       <h3 class="font-display font-semibold">Your week · 6 May → 12 May</h3>
       <div class="flex items-center gap-2 text-xs text-[#6B7280]">
         <button onclick="kooperToast('Previous week')" class="hover:text-black">←</button>
