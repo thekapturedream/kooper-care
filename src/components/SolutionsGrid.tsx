@@ -70,7 +70,7 @@ export function SolutionsGrid() {
   );
 }
 
-type TileProps = (typeof SOLUTIONS)[number];
+type TileProps = (typeof SOLUTIONS)[number] & { dark?: boolean };
 
 function Tile({ slug, title, body, price, icon, dark }: TileProps) {
   if (dark) {

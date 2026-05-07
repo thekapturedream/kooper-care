@@ -82,7 +82,7 @@ export function HowItWorks() {
   );
 }
 
-type StepProps = (typeof STEPS)[number];
+type StepProps = (typeof STEPS)[number] & { yellow?: boolean };
 function Step({ n, title, body, yellow }: StepProps) {
   if (yellow) {
     return (

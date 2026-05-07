@@ -193,7 +193,7 @@ function CoreCard() {
   );
 }
 
-type AddonProps = (typeof ADDON_MODULES)[number];
+type AddonProps = (typeof ADDON_MODULES)[number] & { note?: string };
 
 function AddonCard({ n, title, icon, body, price, note }: AddonProps) {
   return (

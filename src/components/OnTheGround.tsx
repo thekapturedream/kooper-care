@@ -53,7 +53,7 @@ export function OnTheGround() {
   );
 }
 
-type QuoteProps = (typeof QUOTES)[number];
+type QuoteProps = (typeof QUOTES)[number] & { dark?: boolean };
 
 function Quote({ name, role, org, initials, body, dark }: QuoteProps) {
   if (dark) {
