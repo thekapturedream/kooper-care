@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>kooper · care plans — Edward Banda</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = { theme: { extend: { colors: { kapture: { black:'#0A0A0A',ink:'#111111',coal:'#1A1A1A',ash:'#2A2A2A',smoke:'#3A3A3A',mist:'#9A9A9A',fog:'#D4D4D4',paper:'#F5F5F5',white:'#FFFFFF',yellow:'#FFD400',amber:'#F5B400'}, status:{critical:'#E5484D',warning:'#FFD400',ok:'#10B981',neutral:'#D4D4D4'}}, fontFamily:{display:['Space Grotesk','sans-serif'],sans:['Inter','sans-serif'],mono:['JetBrains Mono','monospace']}}}};
+</script>
+<style>
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Inter', sans-serif; background: #F5F5F5; color: #0A0A0A; -webkit-font-smoothing: antialiased; }
+  .font-display { font-family: 'Space Grotesk', sans-serif; }
+  .font-mono { font-family: 'JetBrains Mono', monospace; }
+  .surface { background: #FFFFFF; border: 1px solid #D4D4D4; border-radius: 12px; }
+  .btn-primary { background: #0A0A0A; color: #FFFFFF; border: 1px solid #0A0A0A; padding: 0.5rem 1rem; border-radius: 10px; font-weight: 500; transition: all 0.15s ease; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; }
+  .btn-primary:hover { background: transparent; color: #0A0A0A; }
+  .btn-secondary { background: transparent; color: #0A0A0A; border: 1px solid #0A0A0A; padding: 0.5rem 1rem; border-radius: 10px; font-weight: 500; transition: all 0.15s ease; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; }
+  .btn-secondary:hover { background: #0A0A0A; color: #FFFFFF; }
+  .btn-yellow { background: #FFD400; color: #0A0A0A; border: 1px solid #FFD400; padding: 0.5rem 1rem; border-radius: 10px; font-weight: 600; transition: all 0.15s ease; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; }
+  .btn-yellow:hover { background: #F5B400; }
+  .chip { display: inline-flex; align-items: center; gap: 0.375rem; padding: 0.25rem 0.625rem; border-radius: 999px; font-size: 0.75rem; font-weight: 500; line-height: 1; background: #F5F5F5; color: #2A2A2A; border: 1px solid #D4D4D4; }
+  .chip-yellow { background: #FFD400; color: #0A0A0A; border-color: #FFD400; }
+  .chip-dark { background: #0A0A0A; color: #FFFFFF; border-color: #0A0A0A; }
+  .chip-ok { background: rgba(16,185,129,0.1); color: #047857; border-color: rgba(16,185,129,0.25); }
+  .chip-warning { background: rgba(255,212,0,0.2); color: #876300; border-color: rgba(255,212,0,0.5); }
+  .chip-critical { background: rgba(229,72,77,0.1); color: #B42318; border-color: rgba(229,72,77,0.25); }
+  .chip-outline-light { background: transparent; color: #FFFFFF; border-color: rgba(255,255,255,0.25); }
+  .nav-link { padding: 0.5rem 0.75rem; font-size: 0.875rem; font-weight: 500; color: #FFFFFF; opacity: 0.75; border-radius: 8px; transition: all 0.15s ease; text-decoration: none; }
+  .nav-link:hover { opacity: 1; background: #1A1A1A; }
+  .nav-link-active { opacity: 1; background: #1A1A1A; color: #FFD400; }
+  .status-strip { width: 4px; border-radius: 4px; flex-shrink: 0; }
+  .status-strip-ok { background: #10B981; }
+  .status-strip-warning { background: #FFD400; }
+  .status-strip-critical { background: #E5484D; }
+  .status-strip-neutral { background: #D4D4D4; }
+
+  .category-item { display: flex; align-items: center; gap: 0.625rem; padding: 0.625rem 0.875rem; border-radius: 8px; cursor: pointer; transition: all 0.15s ease; font-size: 0.875rem; color: #1A1A1A; user-select: none; }
+  .category-item:hover { background: #F5F5F5; }
+  .category-item.active { background: #0A0A0A; color: #FFFFFF; font-weight: 500; }
+  .category-item.active:hover { background: #1A1A1A; }
+  .category-item.active .progress-text { color: #FFD400; }
+  .progress-text { color: #9A9A9A; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; }
+  .category-divider { height: 1px; background: #ECEAE3; margin: 0.625rem 0.875rem; }
+
+  .domain-card { background: #FFFFFF; border: 1px solid #D4D4D4; border-radius: 12px; transition: all 0.15s ease; cursor: pointer; overflow: hidden; }
+  .domain-card:hover { border-color: #0A0A0A; box-shadow: 0 6px 20px -6px rgba(0,0,0,0.1); }
+  .domain-card.active { border-color: #0A0A0A; border-width: 2px; box-shadow: 0 6px 20px -6px rgba(0,0,0,0.12); }
+
+  .diff-add { background: rgba(16,185,129,0.1); color: #047857; padding: 0 0.25rem; border-radius: 3px; }
+  .diff-del { background: rgba(229,72,77,0.1); color: #B42318; padding: 0 0.25rem; border-radius: 3px; text-decoration: line-through; }
+
+  .cqc-pill { display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.125rem 0.5rem; border-radius: 999px; font-size: 0.625rem; font-weight: 600; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.04em; text-transform: uppercase; }
+  .cqc-safe { background: rgba(229,72,77,0.1); color: #B42318; }
+  .cqc-effective { background: rgba(16,185,129,0.1); color: #047857; }
+  .cqc-caring { background: rgba(255,212,0,0.2); color: #876300; }
+  .cqc-responsive { background: rgba(10,10,10,0.06); color: #1A1A1A; }
+  .cqc-wellled { background: rgba(123,58,237,0.1); color: #5B21B6; }
+
+  .field-input { width: 100%; padding: 0.625rem 0.875rem; background: #FFFFFF; border: 1px solid #D4D4D4; border-radius: 10px; font-size: 0.875rem; color: #1A1A1A; transition: border-color 0.15s ease; }
+  .field-input:focus { outline: none; border-color: #0A0A0A; }
+  .field-textarea { width: 100%; padding: 0.75rem 0.875rem; background: #FFFFFF; border: 1px solid #D4D4D4; border-radius: 10px; font-size: 0.9375rem; color: #1A1A1A; line-height: 1.55; transition: border-color 0.15s ease; resize: vertical; min-height: 80px; }
+  .field-textarea:focus { outline: none; border-color: #0A0A0A; }
+
+  .score-bar { height: 6px; background: #D4D4D4; border-radius: 3px; overflow: hidden; }
+  .score-bar-fill { height: 100%; background: #0A0A0A; transition: width 0.4s ease; }
+
+  .fab { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 50; background: #FFD400; color: #0A0A0A; height: 52px; padding: 0 1.25rem; border-radius: 999px; display: flex; align-items: center; gap: 0.5rem; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.2); cursor: pointer; transition: all 0.2s ease; border: 2px solid #0A0A0A; font-weight: 600; font-size: 0.875rem; }
+  .fab:hover { background: #F5B400; transform: translateY(-2px); }
+
+  .scroll-stack { max-height: calc(100vh - 12rem); overflow-y: auto; }
+  @media (max-width: 1023px) { .scroll-stack { max-height: none; } }
+  .scroll-stack::-webkit-scrollbar { width: 6px; }
+  .scroll-stack::-webkit-scrollbar-thumb { background: #D4D4D4; border-radius: 3px; }
+  .scroll-stack::-webkit-scrollbar-track { background: transparent; }
+
+  /* ============================================================
+     EDITORIAL TYPOGRAPHY — InDesign / Affinity Publisher rhythm
+     ============================================================ */
+  .editorial { background: #FAFAF7; padding: 2.5rem 2.75rem 3rem; border-radius: 18px; border: 1px solid #ECEAE3; }
+  @media (max-width: 1023px) { .editorial { padding: 1.75rem 1.5rem 2rem; } }
+
+  .ed-masthead { display: flex; align-items: center; justify-content: space-between; padding-bottom: 1rem; border-bottom: 2px solid #0A0A0A; margin-bottom: 2rem; }
+  .ed-masthead .vol { font-family: 'JetBrains Mono', monospace; font-size: 0.6875rem; letter-spacing: 0.14em; text-transform: uppercase; color: #6B7280; }
+
+  .ed-kicker { font-family: 'JetBrains Mono', monospace; font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #876300; margin-bottom: 0.625rem; display: inline-flex; align-items: center; gap: 0.5rem; }
+  .ed-kicker::before { content: ''; width: 24px; height: 2px; background: #FFD400; display: inline-block; }
+
+  .ed-h1 { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: clamp(2.5rem, 4.2vw, 3.5rem); line-height: 1.02; letter-spacing: -0.02em; color: #0A0A0A; margin-bottom: 0.5rem; }
+  .ed-deck { font-family: 'Source Serif 4', serif; font-weight: 400; font-style: italic; font-size: clamp(1.125rem, 1.4vw, 1.25rem); line-height: 1.45; color: #3A3A3A; max-width: 38ch; }
+
+  .ed-byline { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: #6B7280; padding: 0.875rem 0; border-top: 1px solid #ECEAE3; border-bottom: 1px solid #ECEAE3; margin: 1.5rem 0 2rem; display: flex; flex-wrap: wrap; gap: 0.625rem 1.25rem; }
+  .ed-byline strong { color: #0A0A0A; font-weight: 600; }
+
+  .ed-prose { font-family: 'Source Serif 4', serif; font-size: 1.0625rem; line-height: 1.7; color: #1A1A1A; }
+  .ed-prose p { margin-bottom: 1.1em; }
+  .ed-prose p + p { text-indent: 1.2em; }
+  .ed-prose p.no-indent + p, .ed-prose p:first-of-type + p { text-indent: 0; }
+
+  /* drop cap removed by direction — keep class inert */
+
+  .ed-h2 { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: clamp(1.625rem, 2.4vw, 1.875rem); line-height: 1.15; letter-spacing: -0.012em; color: #0A0A0A; margin: 0.25rem 0 0.5rem; }
+  .ed-meta { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: #6B7280; margin-bottom: 1.25rem; display: flex; flex-wrap: wrap; gap: 0.5rem 1rem; align-items: center; }
+
+  .ed-label { font-family: 'JetBrains Mono', monospace; font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #6B7280; margin: 1.25rem 0 0.375rem; padding-left: 0.75rem; border-left: 2px solid #FFD400; }
+
+  .ed-pull { font-family: 'Source Serif 4', serif; font-weight: 500; font-style: italic; font-size: 1.375rem; line-height: 1.4; color: #0A0A0A; padding: 1.25rem 1.5rem; margin: 1.75rem 0; border-left: 3px solid #FFD400; background: linear-gradient(90deg, rgba(255,212,0,0.08) 0%, rgba(255,212,0,0) 100%); }
+  .ed-pull cite { display: block; margin-top: 0.625rem; font-size: 0.8125rem; font-style: normal; font-family: 'JetBrains Mono', monospace; font-weight: 500; color: #6B7280; letter-spacing: 0.04em; }
+
+  .ed-sidenote { background: #FFFFFF; border: 1px solid #ECEAE3; border-radius: 12px; padding: 1.25rem; margin: 1.5rem 0; }
+  .ed-sidenote .sn-head { font-family: 'JetBrains Mono', monospace; font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #876300; margin-bottom: 0.625rem; }
+
+  .ed-stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem 1.5rem; margin: 1.25rem 0 1.5rem; padding: 1rem 0; border-top: 1px solid #ECEAE3; border-bottom: 1px solid #ECEAE3; }
+  .ed-stat .stat-label { font-family: 'JetBrains Mono', monospace; font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #6B7280; margin-bottom: 0.25rem; }
+  .ed-stat .stat-value { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 1.375rem; color: #0A0A0A; line-height: 1.1; }
+  .ed-stat .stat-foot { font-family: 'Source Serif 4', serif; font-size: 0.8125rem; color: #6B7280; margin-top: 0.125rem; font-style: italic; }
+
+  .ed-list { font-family: 'Source Serif 4', serif; font-size: 1rem; line-height: 1.7; color: #1A1A1A; padding-left: 0; list-style: none; }
+  .ed-list li { padding: 0.375rem 0 0.375rem 1.5rem; position: relative; border-bottom: 1px dotted #ECEAE3; }
+  .ed-list li:last-child { border-bottom: 0; }
+  .ed-list li::before { content: '·'; position: absolute; left: 0.5rem; top: 0.375rem; color: #FFD400; font-weight: 700; font-size: 1.5rem; line-height: 1; }
+
+  .ed-divider { display: flex; align-items: center; justify-content: center; gap: 0.875rem; margin: 3.5rem 0; color: #D4D4D4; }
+  .ed-divider::before, .ed-divider::after { content: ''; flex: 1; height: 1px; background: #ECEAE3; }
+  .ed-divider .glyph { font-family: 'JetBrains Mono', monospace; font-size: 0.875rem; letter-spacing: 0.4em; color: #6B7280; }
+
+  .ed-actions { display: flex; align-items: center; gap: 0.5rem; opacity: 0; transition: opacity 0.15s ease; }
+  .ed-section:hover .ed-actions, .ed-section:focus-within .ed-actions { opacity: 1; }
+  .ed-icon-btn { width: 30px; height: 30px; border-radius: 50%; background: #FFFFFF; border: 1px solid #D4D4D4; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.15s ease; color: #6B7280; }
+  .ed-icon-btn:hover { background: #0A0A0A; color: #FFD400; border-color: #0A0A0A; }
+
+  .saf-row { display: flex; flex-wrap: wrap; gap: 0.375rem; align-items: center; padding-top: 1rem; margin-top: 1rem; border-top: 1px solid #ECEAE3; font-family: 'JetBrains Mono', monospace; font-size: 0.6875rem; color: #6B7280; }
+
+  .ed-section { position: relative; scroll-margin-top: 8rem; }
+  /* Each new domain section gets generous breathing room above its kicker */
+  .ed-section + .ed-section, .ed-divider + .ed-section { margin-top: 0.5rem; }
+  .ed-section .ed-kicker { margin-top: 0.5rem; margin-bottom: 0.625rem; }
+  .ed-section .ed-h2 + .ed-meta { margin-top: 0.625rem; }
+  .ed-section.active::before { content: ''; position: absolute; left: -1.25rem; top: 0.625rem; bottom: 0.625rem; width: 3px; background: #FFD400; border-radius: 3px; }
+  @media (max-width: 1023px) { .ed-section.active::before { left: -0.5rem; } }
+  /* override domain-card hover for editorial sections — keep reading clean */
+  .ed-section.domain-card:hover { box-shadow: none; transform: none; border: none; }
+  .ed-section.domain-card { box-shadow: none !important; }
+</style>
+</head>
+<body class="min-h-screen">
+
+<!-- ============================================== -->
+<!-- TOP NAV                                          -->
+<!-- ============================================== -->
+<nav class="bg-kapture-black text-white sticky top-0 z-50">
+  <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16 gap-4">
+      <a href="kooper-care-landing.html" class="flex items-center gap-3 shrink-0" title="Back to landing">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="28" height="28" fill="none" aria-label="kooper" role="img" class="shrink-0 text-white"><path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" d="M255.75 133.125c67.679 0 122.625 54.946 122.625 122.625S323.429 378.375 255.75 378.375 133.125 323.429 133.125 255.75s54.946-122.625 122.625-122.625m0-132.75c18.832 0 34.121 15.289 34.121 34.121s-15.289 34.121-34.121 34.121-34.121-15.289-34.121-34.121S236.918.375 255.75.375M75.173 75.173c13.316-13.316 34.938-13.316 48.254 0s13.316 34.938 0 48.254-34.938 13.316-48.254 0-13.316-34.938 0-48.254M511.125 255.75c0 18.832-15.289 34.121-34.121 34.121s-34.121-15.289-34.121-34.121 15.289-34.121 34.121-34.121 34.121 15.289 34.121 34.121M255.75 442.883c18.832 0 34.121 15.289 34.121 34.121s-15.289 34.121-34.121 34.121-34.121-15.289-34.121-34.121 15.289-34.121 34.121-34.121m132.323-54.81c13.316-13.316 34.938-13.316 48.254 0s13.316 34.938 0 48.254-34.938 13.316-48.254 0-13.316-34.938 0-48.254M68.617 255.75c0 18.832-15.289 34.121-34.121 34.121S.375 274.582.375 255.75s15.289-34.121 34.121-34.121 34.121 15.289 34.121 34.121m54.81 132.323c13.316 13.316 13.316 34.938 0 48.254s-34.938 13.316-48.254 0-13.316-34.938 0-48.254 34.938-13.316 48.254 0"/><path fill="#FFD400" fill-rule="evenodd" clip-rule="evenodd" d="M436.327 75.173c13.316 13.316 13.316 34.938 0 48.254s-34.938 13.316-48.254 0-13.316-34.938 0-48.254 34.938-13.316 48.254 0"/></svg>
+        <span class="hidden sm:flex items-center gap-2 font-display lowercase tracking-wide text-base">
+          <span class="font-semibold">kooper</span>
+          <span class="text-white/40">·</span>
+          <span class="font-medium">care plans</span>
+        </span>
+      </a>
+
+      <div class="hidden lg:flex items-center gap-1">
+        <a href="kooper-care-landing.html" class="nav-link">Home</a>
+        <a href="kooper-care-dashboards.html" class="nav-link">Dashboard</a>
+        <a href="kooper-care-plans.html" class="nav-link nav-link-active">Care plans</a>
+        <a href="kooper-clinical.html" class="nav-link">Clinical</a>
+        <a href="kooper-recording-demo.html" class="nav-link">Recording</a>
+        <a href="kooper-reports.html" class="nav-link">Reports</a>
+      </div>
+
+      <div class="flex items-center gap-2 shrink-0">
+        <button onclick="kooperToast('Cmd+K search lives inside the live build')" class="hidden md:inline-flex items-center gap-2 px-3 py-1.5 bg-kapture-coal text-kapture-mist rounded-lg text-xs hover:bg-kapture-ash transition">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <span>Find</span>
+          <span class="font-mono text-[0.6875rem] bg-kapture-ash px-1.5 py-0.5 rounded">⌘K</span>
+        </button>
+        <div class="hidden md:flex items-center gap-2 pl-3 border-l border-kapture-ash">
+          <div class="w-8 h-8 rounded-full bg-kapture-ash flex items-center justify-center font-mono text-xs">SA</div>
+          <div class="text-xs">
+            <div class="font-medium">Sister Anne</div>
+            <div class="text-kapture-mist">Nurse · Draycott</div>
+          </div>
+        </div>
+        <a href="kooper-sign-in.html" class="hidden md:inline-flex p-1.5 rounded text-kapture-mist hover:text-white hover:bg-kapture-coal transition" title="Sign out" aria-label="Sign out">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ============================================== -->
+<!-- BUNDLE CONTEXT STRIP                             -->
+<!-- ============================================== -->
+<div class="bg-kapture-coal text-kapture-fog text-xs">
+  <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-2 flex items-center justify-between gap-3 flex-wrap">
+    <div class="flex items-center gap-2 flex-wrap">
+      <span class="chip chip-yellow text-[0.625rem]">Care Plans Pro bundle</span>
+      <span class="text-kapture-mist hidden sm:inline">includes</span>
+      <span class="font-mono text-[0.6875rem] flex items-center gap-1.5 flex-wrap">
+        <span>care plans</span><span class="text-kapture-mist">+</span>
+        <span>risk</span><span class="text-kapture-mist">+</span>
+        <span>safety plan</span><span class="text-kapture-mist">+</span>
+        <span>holistic profile</span>
+      </span>
+    </div>
+    <div class="text-kapture-mist text-[0.6875rem] hidden md:block">
+      <span class="font-mono">£1.40</span> / user / mo · <span class="text-status-ok">save £0.45 vs à la carte</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- RESIDENT CONTEXT BAR                             -->
+<!-- ============================================== -->
+<div class="bg-white border-b border-kapture-fog sticky top-16 z-40">
+  <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-3 flex-wrap">
+    <div class="flex items-center gap-3">
+      <a href="kooper-care-dashboards.html" class="text-kapture-mist hover:text-kapture-black transition" title="Back to dashboard">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+      </a>
+      <div class="w-10 h-10 rounded-xl bg-kapture-coal text-white flex items-center justify-center font-display text-sm font-semibold shrink-0">EB</div>
+      <div>
+        <div class="flex items-center gap-2 flex-wrap">
+          <h1 class="font-display font-semibold text-kapture-black">Mr Edward Banda</h1>
+          <span class="chip chip-ok text-[0.6875rem]">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+            NHS verified
+          </span>
+        </div>
+        <div class="text-xs text-kapture-smoke flex items-center gap-2 flex-wrap">
+          <span>Eddie</span>
+          <span class="text-kapture-fog">·</span>
+          <span>Age <span class="font-mono">78</span></span>
+          <span class="text-kapture-fog">·</span>
+          <span>Room <span class="font-mono">12</span></span>
+          <span class="text-kapture-fog">·</span>
+          <span>NHS <span class="font-mono">485 777 3456</span></span>
+        </div>
+      </div>
+    </div>
+    <div class="flex items-center gap-2 flex-wrap">
+      <span class="chip chip-warning text-[0.6875rem]">
+        <span class="w-1.5 h-1.5 rounded-full bg-status-warning"></span>
+        2 reviews due
+      </span>
+      <span class="chip text-[0.6875rem]"><span class="font-mono">38</span> of 62 reviewed</span>
+      <button onclick="kooperToast('Switch resident — opens resident picker')" class="btn-secondary text-xs py-1.5 hidden sm:inline-flex">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m17 3 4 4-4 4"/><path d="M21 7H9"/><path d="m7 21-4-4 4-4"/><path d="M3 17h12"/></svg>
+        Switch resident
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- WORKSPACE — THREE PANE                           -->
+<!-- ============================================== -->
+<div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-32">
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+
+    <!-- ============================================== -->
+    <!-- LEFT PANE — Categories tree                     -->
+    <!-- ============================================== -->
+    <aside class="lg:col-span-3">
+      <div class="surface p-4 lg:sticky lg:top-44 scroll-stack">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="font-display text-sm font-semibold text-kapture-black uppercase tracking-wider">Categories</h2>
+          <span class="font-mono text-xs text-kapture-mist">62 domains</span>
+        </div>
+
+        <nav class="space-y-1">
+          <div class="category-item active" onclick="selectCategory(this, 'mental-health')">
+            <div class="status-strip status-strip-warning h-5"></div>
+            <span class="flex-1">Mental Health</span>
+            <span class="progress-text">20/22</span>
+          </div>
+          <div class="category-item" onclick="selectCategory(this, 'physical')">
+            <div class="status-strip status-strip-warning h-5"></div>
+            <span class="flex-1">Physical</span>
+            <span class="progress-text">14/22</span>
+          </div>
+          <div class="category-item" onclick="selectCategory(this, 'social')">
+            <div class="status-strip status-strip-ok h-5"></div>
+            <span class="flex-1">Social</span>
+            <span class="progress-text">13/13</span>
+          </div>
+          <div class="category-divider" aria-hidden="true"></div>
+          <div class="category-item" onclick="selectCategory(this, 'end-of-life')">
+            <div class="status-strip status-strip-neutral h-5"></div>
+            <span class="flex-1">End of Life</span>
+            <span class="progress-text">0/5</span>
+            <span class="text-[0.625rem] font-mono text-kapture-mist ml-1">future</span>
+          </div>
+        </nav>
+
+        <!-- Overall progress -->
+        <div class="mt-5 pt-4 border-t border-kapture-fog">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-medium text-kapture-mist uppercase tracking-wider">Plan progress</span>
+            <span class="font-mono text-xs font-semibold text-kapture-black">61%</span>
+          </div>
+          <div class="score-bar"><div class="score-bar-fill" style="width:61%"></div></div>
+          <p class="text-[0.6875rem] text-kapture-smoke mt-2 leading-relaxed">38 of 62 domains have current evidence. 2 reviews due in the next 7 days.</p>
+        </div>
+
+        <!-- Linked apps -->
+        <div class="mt-5 pt-4 border-t border-kapture-fog">
+          <div class="text-xs font-medium text-kapture-mist uppercase tracking-wider mb-3">Linked from this plan</div>
+          <div class="space-y-1.5 text-xs">
+            <a href="#" onclick="event.preventDefault(); kooperToast('Opens kooper · risk for Edward')" class="flex items-center justify-between p-2 rounded hover:bg-kapture-paper">
+              <span class="flex items-center gap-2"><span class="font-mono">kooper · risk</span></span>
+              <span class="chip chip-warning text-[0.625rem]">3 active</span>
+            </a>
+            <a href="#" onclick="event.preventDefault(); kooperToast('Opens kooper · safety plan')" class="flex items-center justify-between p-2 rounded hover:bg-kapture-paper">
+              <span class="flex items-center gap-2"><span class="font-mono">kooper · safety plan</span></span>
+              <span class="chip chip-ok text-[0.625rem]">Current</span>
+            </a>
+            <a href="#" onclick="event.preventDefault(); kooperToast('Opens holistic profile')" class="flex items-center justify-between p-2 rounded hover:bg-kapture-paper">
+              <span class="flex items-center gap-2"><span class="font-mono">holistic profile</span></span>
+              <span class="chip text-[0.625rem]">Edward</span>
+            </a>
+          </div>
+        </div>
+
+        <button onclick="kooperToast('Custom domain creator — for needs not in the standard 62')" class="btn-secondary w-full text-xs py-2 mt-5">+ Add custom domain</button>
+      </div>
+    </aside>
+
+    <!-- ============================================== -->
+    <!-- CENTRE PANE — Domain cards                      -->
+    <!-- ============================================== -->
+    <main class="lg:col-span-6">
+      <article class="editorial">
+
+        <!-- Masthead -->
+        <header class="ed-masthead">
+          <span class="vol">kooper · care plans</span>
+          <span class="vol">Vol. 4 · No. 12 · 12 Mar 2026</span>
+        </header>
+
+        <!-- Title block -->
+        <div class="mb-2">
+          <div class="ed-kicker" id="centerKicker">MENTAL HEALTH DOMAINS</div>
+          <h1 class="ed-h1" id="centerCategoryTitle">Mental Health</h1>
+          <p class="ed-deck" id="centerCategorySub">Twenty-two domains that hold the inner life — memory, attention, judgement, mood, mind, story. Twenty in current review. Two due before next Wednesday.</p>
+        </div>
+
+        <!-- Byline -->
+        <div class="ed-byline">
+          <span><strong>Plan</strong> v4 · current</span>
+          <span><strong>Review lead</strong> Sister Anne</span>
+          <span><strong>Resident</strong> Mr Edward Banda</span>
+          <span><strong>Last edit</strong> 12 Mar 2026, 14:08</span>
+        </div>
+
+        <!-- Action bar -->
+        <div class="flex items-center gap-2 mb-6 flex-wrap">
+          <button onclick="cycleFilter(this)" class="chip">Filter: all</button>
+          <button onclick="markAllReviewed()" class="btn-yellow text-xs py-1.5">Mark all reviewed</button>
+          <button onclick="openHistory('Psychological')" class="btn-secondary text-xs py-1.5">View history</button>
+          <span class="ml-auto chip text-[0.6875rem]">2 reviews due ↗</span>
+        </div>
+
+        <!-- ============================================== -->
+        <!-- LEAD DOMAIN — Mental state                       -->
+        <!-- ============================================== -->
+        <section class="ed-section domain-card active" data-domain="Mental state" style="background:transparent; border:none; padding:0; cursor:default;">
+          <div class="flex items-baseline justify-between gap-3 flex-wrap">
+            <div>
+              <div class="ed-kicker">Lead domain · review due 17 May</div>
+              <h2 class="ed-h2">Mental state</h2>
+            </div>
+            <div class="ed-actions">
+              <button class="ed-icon-btn" title="History" aria-label="History"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg></button>
+              <button class="ed-icon-btn" title="Edit" aria-label="Edit"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+            </div>
+          </div>
+          <div class="ed-meta">
+            <span>v4 of 4</span>
+            <span aria-hidden>·</span>
+            <span>Reviewed 12 Mar 2026 by Sister Anne</span>
+            <span aria-hidden>·</span>
+            <span>Self-sufficiency 68/100 ↑ +4</span>
+          </div>
+
+          <div class="ed-prose">
+            <p class="ed-dropcap no-indent"><strong>Stable mental state with calm afternoons,</strong> supported through familiar music and family connection. That is the need on the page; the rest of this section explains how the team holds it steady.</p>
+
+            <p>Eddie is generally calm and oriented. There is occasional confusion in the late afternoon — what families call sundowning — but he responds well to familiar music and family photos. His mood is bright on most days. Brief low moments arrive around the anniversary of Margaret's death; the team is briefed in the week before.</p>
+          </div>
+
+          <div class="ed-label">Desired outcome</div>
+          <div class="ed-prose"><p class="no-indent">A stable mental state, calm afternoons, no escalation requiring PRN medication. Maintained over a rolling 90-day window.</p></div>
+
+          <div class="ed-label">Interventions</div>
+          <ul class="ed-list">
+            <li>Sinatra playlist on his bedside Bluetooth speaker — he asks for it by name.</li>
+            <li>Family photo album within reach on the lounge chair.</li>
+            <li>Cup of tea offered at 16:00 if pacing is observed.</li>
+            <li>Daily video call with daughter Sarah, opt-in.</li>
+          </ul>
+
+          <blockquote class="ed-pull">
+            "I want my music when I'm sad. And to talk to my Sarah."
+            <cite>— Eddie · captured 12 Mar by Sister Anne, Eddie present</cite>
+          </blockquote>
+
+          <div class="ed-stats">
+            <div class="ed-stat">
+              <div class="stat-label">Frequency</div>
+              <div class="stat-value">Daily</div>
+              <div class="stat-foot">observation, weekly summary</div>
+            </div>
+            <div class="ed-stat">
+              <div class="stat-label">Self-sufficiency</div>
+              <div class="stat-value">68 / 100</div>
+              <div class="stat-foot">↑ four points vs prior cycle</div>
+            </div>
+            <div class="ed-stat">
+              <div class="stat-label">Responsible</div>
+              <div class="stat-value">Nurse on shift</div>
+              <div class="stat-foot">weekly review by Clinical Lead</div>
+            </div>
+            <div class="ed-stat">
+              <div class="stat-label">Linked apps</div>
+              <div class="stat-value">risk · safety</div>
+              <div class="stat-foot">3 active risks · safety plan current</div>
+            </div>
+          </div>
+
+          <div class="saf-row">
+            <span>CQC SAF</span>
+            <span class="cqc-pill cqc-safe">Safe</span>
+            <span class="cqc-pill cqc-effective">Effective</span>
+            <span class="cqc-pill cqc-caring">Caring</span>
+            <span class="cqc-pill cqc-responsive">Responsive</span>
+            <span class="cqc-pill cqc-wellled">Well-led</span>
+          </div>
+        </section>
+
+        <div class="ed-divider"><span class="glyph">· · ·</span></div>
+
+        <!-- ============================================== -->
+        <!-- DOMAIN — Emotional                               -->
+        <!-- ============================================== -->
+        <section class="ed-section domain-card" data-domain="Emotional" style="background:transparent; border:none; padding:0; cursor:default;">
+          <div class="flex items-baseline justify-between gap-3 flex-wrap">
+            <div>
+              <div class="ed-kicker">Up to date · 82 / 100</div>
+              <h2 class="ed-h2">Emotional</h2>
+            </div>
+            <div class="ed-actions">
+              <button class="ed-icon-btn" title="History" aria-label="History"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg></button>
+              <button class="ed-icon-btn" title="Edit" aria-label="Edit"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+            </div>
+          </div>
+          <div class="ed-meta">
+            <span>Reviewed 28 Apr by Sister Anne</span>
+            <span aria-hidden>·</span>
+            <span>v3 of 3</span>
+          </div>
+          <div class="ed-prose">
+            <p class="no-indent">Settled and content. Engages warmly with the carers he knows. No signs of low mood outside the Margaret anniversary on 14 September — extra emotional support is planned for that week each year.</p>
+          </div>
+        </section>
+
+        <div class="ed-divider"><span class="glyph">· · ·</span></div>
+
+        <!-- ============================================== -->
+        <!-- DOMAIN — Depression and anxiety                  -->
+        <!-- ============================================== -->
+        <section class="ed-section domain-card" data-domain="Depression and anxiety" style="background:transparent; border:none; padding:0; cursor:default;">
+          <div class="flex items-baseline justify-between gap-3 flex-wrap">
+            <div>
+              <div class="ed-kicker" style="color:#B45309">Review overdue · 88 days</div>
+              <h2 class="ed-h2">Depression and anxiety</h2>
+            </div>
+            <div class="ed-actions">
+              <button class="ed-icon-btn" title="History" aria-label="History"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg></button>
+              <button class="ed-icon-btn" title="Edit" aria-label="Edit"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+            </div>
+          </div>
+          <div class="ed-meta">
+            <span>Last reviewed 8 Feb 2026</span>
+            <span aria-hidden>·</span>
+            <span>71 / 100</span>
+            <span aria-hidden>·</span>
+            <span>Linked to kooper · risk (risk to self · low)</span>
+          </div>
+          <div class="ed-prose">
+            <p class="no-indent">Mild low mood reported during the care plan review. PHQ-9 score of 6, in the mild range. Monitored weekly by Sister Anne, with the GP team copied on any change. The risk to self is low and stable; the link from this domain to the risk register is open and current.</p>
+          </div>
+        </section>
+
+        <div class="ed-divider"><span class="glyph">· · ·</span></div>
+
+        <!-- ============================================== -->
+        <!-- DOMAIN — Personality                             -->
+        <!-- ============================================== -->
+        <section class="ed-section domain-card" data-domain="Personality" style="background:transparent; border:none; padding:0; cursor:default;">
+          <div class="flex items-baseline justify-between gap-3 flex-wrap">
+            <div>
+              <div class="ed-kicker">Up to date · 90 / 100</div>
+              <h2 class="ed-h2">Personality</h2>
+            </div>
+            <div class="ed-actions">
+              <button class="ed-icon-btn" title="History" aria-label="History"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg></button>
+              <button class="ed-icon-btn" title="Edit" aria-label="Edit"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+            </div>
+          </div>
+          <div class="ed-meta">
+            <span>Reviewed 15 Apr by Sister Anne</span>
+          </div>
+          <div class="ed-prose">
+            <p class="no-indent">Warm, talkative, fond of jazz and storytelling. There is a particular bond with Daniel, the carer who shares his Polish heritage; the rota tries to honour that pairing on Sunday mornings. Eddie does best with one instruction at a time and a moment to settle between asks.</p>
+          </div>
+        </section>
+
+        <div class="ed-divider"><span class="glyph">· · ·</span></div>
+
+        <!-- ============================================== -->
+        <!-- DOMAIN — Life events                             -->
+        <!-- ============================================== -->
+        <section class="ed-section domain-card" data-domain="Life events" style="background:transparent; border:none; padding:0; cursor:default;">
+          <div class="flex items-baseline justify-between gap-3 flex-wrap">
+            <div>
+              <div class="ed-kicker">Up to date</div>
+              <h2 class="ed-h2">Life events</h2>
+            </div>
+            <div class="ed-actions">
+              <button class="ed-icon-btn" title="History" aria-label="History"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg></button>
+              <button class="ed-icon-btn" title="Edit" aria-label="Edit"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+            </div>
+          </div>
+          <div class="ed-meta">
+            <span>Reviewed 28 Apr</span>
+            <span aria-hidden>·</span>
+            <span>14 Sep flagged annually</span>
+          </div>
+          <div class="ed-prose">
+            <p class="no-indent">Lost his wife Margaret in 2019. The 14 September anniversary is flagged automatically each year — Sister Anne briefs the team in the week before, and the rota leans toward carers Eddie knows best. Music and photographs do most of the work.</p>
+          </div>
+        </section>
+
+        <div class="ed-divider"><span class="glyph">· · ·</span></div>
+
+        <!-- ============================================== -->
+        <!-- COLLAPSED — five more                            -->
+        <!-- ============================================== -->
+        <details class="bg-white border border-kapture-fog rounded-2xl">
+          <summary class="flex items-center justify-between gap-3 p-5 cursor-pointer list-none">
+            <div>
+              <div class="ed-kicker" style="margin-bottom:0.25rem">Seventeen more in Mental Health</div>
+              <div class="font-display font-semibold text-kapture-black">Memory · Attention · Judgement · Orientation · Insight · Concentration · Hallucinations · Motivation · Risk to self · Risk to others · Risk from others · Safeguarding · Drugs &amp; alcohol · Response to losses · Cognitive deterioration · What makes me feel better · Response to diagnosis</div>
+            </div>
+            <span class="chip text-[0.6875rem]">Expand</span>
+          </summary>
+          <div class="px-5 pb-5 ed-prose"><p class="no-indent text-sm text-kapture-smoke">Mental Health bundles cognition (memory, attention, judgement) with the psychological domains (mood, mind, story). Open to read each in full editorial form — same anatomy throughout: need, current situation, desired outcome, frequency, interventions, self-sufficiency, responsible staff, and Eddie's own voice on the page.</p></div>
+        </details>
+
+      </article>
+    </main>
+
+    <!-- ============================================== -->
+    <!-- RIGHT PANE — Versioned diff history             -->
+    <!-- ============================================== -->
+    <aside class="lg:col-span-3">
+      <div class="surface p-4 lg:sticky lg:top-44 scroll-stack">
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="font-display text-sm font-semibold text-kapture-black uppercase tracking-wider">Mental state · history</h2>
+          <button onclick="kooperToast('Opens full audit log filtered to this element')" class="text-xs text-kapture-smoke hover:text-kapture-black">Full audit →</button>
+        </div>
+
+        <div class="space-y-2.5">
+          <!-- Current version -->
+          <div class="bg-kapture-paper rounded-lg p-3 border border-kapture-fog">
+            <div class="flex items-center justify-between mb-2">
+              <span class="chip chip-dark text-[0.6875rem]">Current · v4</span>
+              <span class="font-mono text-[0.6875rem] text-kapture-mist">12 Mar 2026</span>
+            </div>
+            <div class="text-[0.6875rem] text-kapture-mist leading-relaxed">
+              <span class="text-kapture-coal font-medium">Sister Anne</span> updated current situation · added music intervention. Patient present.
+            </div>
+            <div class="mt-2 flex items-center gap-2 text-[0.6875rem]">
+              <span class="text-kapture-mist">Self-sufficiency</span>
+              <span class="font-mono font-semibold text-kapture-black">68</span>
+            </div>
+          </div>
+
+          <!-- Diff vs prior -->
+          <div class="bg-white rounded-lg p-3 border border-kapture-fog">
+            <div class="flex items-center justify-between mb-2">
+              <span class="chip text-[0.6875rem]">v3 → v4 diff</span>
+              <span class="font-mono text-[0.6875rem] text-kapture-mist">8 Feb 2026</span>
+            </div>
+            <div class="text-[0.6875rem] text-kapture-smoke leading-relaxed space-y-2">
+              <div>
+                <div class="text-kapture-mist mb-0.5">Self-sufficiency</div>
+                <div class="font-mono"><span class="diff-del">64</span> → <span class="diff-add font-semibold">68</span></div>
+              </div>
+              <div>
+                <div class="text-kapture-mist mb-0.5">Current situation</div>
+                <p>Added: <span class="diff-add">"Responds well to familiar music and family photos."</span></p>
+              </div>
+              <div>
+                <div class="text-kapture-mist mb-0.5">Interventions</div>
+                <p>Added: <span class="diff-add">Sinatra playlist on bedside speaker</span></p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Older entries -->
+          <div class="bg-white rounded-lg p-3 border border-kapture-fog hover:border-kapture-black transition cursor-pointer" onclick="kooperToast('Opens v2 full snapshot')">
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-[0.6875rem] text-kapture-coal font-medium">v2 · 15 Dec 2025</span>
+              <span class="font-mono text-[0.6875rem] text-kapture-mist">62</span>
+            </div>
+            <div class="text-[0.6875rem] text-kapture-mist">Initial situation captured. Adjustment to home routines.</div>
+          </div>
+          <div class="bg-white rounded-lg p-3 border border-kapture-fog hover:border-kapture-black transition cursor-pointer" onclick="kooperToast('Opens v1 full snapshot')">
+            <div class="flex items-center justify-between mb-1">
+              <span class="text-[0.6875rem] text-kapture-coal font-medium">v1 · 10 Sep 2025</span>
+              <span class="font-mono text-[0.6875rem] text-kapture-mist">58</span>
+            </div>
+            <div class="text-[0.6875rem] text-kapture-mist">Care plan opened on admission.</div>
+          </div>
+        </div>
+
+        <!-- Trend chart -->
+        <div class="mt-5 pt-4 border-t border-kapture-fog">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs font-medium text-kapture-mist uppercase tracking-wider">Self-sufficiency trend</span>
+            <span class="text-xs text-status-ok font-medium">▲ +10 over 6 months</span>
+          </div>
+          <div class="flex items-end gap-1 h-14">
+            <div class="bg-kapture-fog flex-1 rounded-t" style="height:55%" title="58 · Sep 2025"></div>
+            <div class="bg-kapture-fog flex-1 rounded-t" style="height:62%" title="62 · Dec 2025"></div>
+            <div class="bg-kapture-yellow flex-1 rounded-t" style="height:64%" title="64 · Feb 2026"></div>
+            <div class="bg-kapture-black flex-1 rounded-t" style="height:68%" title="68 · Mar 2026 · current"></div>
+          </div>
+          <div class="flex justify-between text-[0.625rem] text-kapture-mist mt-1 font-mono">
+            <span>Sep</span><span>Dec</span><span>Feb</span><span>Mar</span>
+          </div>
+        </div>
+
+        <!-- Alert triggers fired -->
+        <div class="mt-5 pt-4 border-t border-kapture-fog">
+          <div class="text-xs font-medium text-kapture-mist uppercase tracking-wider mb-2">Alerts fired by this element</div>
+          <div class="text-[0.6875rem] text-kapture-smoke">No alerts in last 90 days. Review-overdue alert will fire in <span class="font-mono text-kapture-coal">5 days</span> if not reviewed.</div>
+        </div>
+      </div>
+    </aside>
+
+  </div>
+
+  <!-- ============================================== -->
+  <!-- BOTTOM — CQC EVIDENCE PACK READINESS            -->
+  <!-- ============================================== -->
+  <section class="mt-8 bg-kapture-black text-white rounded-2xl p-6 lg:p-8 relative overflow-hidden">
+    <div class="absolute -right-20 -top-20 w-60 h-60 rounded-full bg-kapture-yellow/15 blur-3xl pointer-events-none"></div>
+    <div class="relative grid grid-cols-1 lg:grid-cols-2 gap-6 items-center">
+      <div>
+        <span class="chip chip-yellow font-mono text-[0.6875rem] tracking-widest mb-3">CQC EVIDENCE READY</span>
+        <h3 class="font-display text-xl lg:text-2xl font-semibold mt-3 mb-2">Edward's care plan is inspector-ready.</h3>
+        <p class="text-kapture-mist text-sm leading-relaxed">Every domain in this plan declares its alignment to the 5 CQC SAF quality statements. The evidence pack pulls from 38 reviewed elements + linked risk + safety plan + holistic profile, all watermarked with Sister Anne's identity and timestamped to the second.</p>
+      </div>
+      <div class="grid grid-cols-5 gap-2">
+        <div class="bg-kapture-coal border border-kapture-ash rounded-lg p-3 text-center">
+          <div class="cqc-pill cqc-safe mx-auto mb-1">Safe</div>
+          <div class="font-mono text-lg font-semibold">98%</div>
+        </div>
+        <div class="bg-kapture-coal border border-kapture-ash rounded-lg p-3 text-center">
+          <div class="cqc-pill cqc-effective mx-auto mb-1">Effective</div>
+          <div class="font-mono text-lg font-semibold">100%</div>
+        </div>
+        <div class="bg-kapture-coal border border-kapture-ash rounded-lg p-3 text-center">
+          <div class="cqc-pill cqc-caring mx-auto mb-1">Caring</div>
+          <div class="font-mono text-lg font-semibold">100%</div>
+        </div>
+        <div class="bg-kapture-coal border border-kapture-ash rounded-lg p-3 text-center">
+          <div class="cqc-pill cqc-responsive mx-auto mb-1">Resp.</div>
+          <div class="font-mono text-lg font-semibold">96%</div>
+        </div>
+        <div class="bg-kapture-coal border border-kapture-ash rounded-lg p-3 text-center">
+          <div class="cqc-pill cqc-wellled mx-auto mb-1">Well-led</div>
+          <div class="font-mono text-lg font-semibold">100%</div>
+        </div>
+      </div>
+      <div class="lg:col-span-2 flex flex-wrap items-center gap-3 pt-3 border-t border-kapture-ash mt-2">
+        <button onclick="kooperToast('Compiling CQC evidence pack — Edward + linked risk + safety plan + holistic profile')" class="btn-yellow text-sm">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Compile evidence pack
+        </button>
+        <button onclick="kooperToast('Generates printable PDF of full plan')" class="btn-secondary text-sm border-white text-white hover:bg-white hover:text-kapture-black">
+          Print full plan
+        </button>
+        <span class="text-xs text-kapture-mist ml-auto">Last pack generated <span class="font-mono">04 May 2026</span> · 2 days ago</span>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- ============================================== -->
+<!-- FAB — Add care plan element                      -->
+<!-- ============================================== -->
+<button class="fab" onclick="openAddElement()">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+  Add element
+</button>
+
+<!-- ============================================== -->
+<!-- MODAL — Add element                              -->
+<!-- ============================================== -->
+<div id="modalBackdrop" class="fixed inset-0 bg-black/60 z-50 hidden items-center justify-center p-4" onclick="if(event.target===this)closeModal()">
+  <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+
+    <!-- Add element form -->
+    <div id="modalAdd" class="hidden">
+      <div class="flex items-center justify-between px-6 py-4 border-b border-kapture-fog">
+        <div>
+          <h3 class="font-display text-lg font-semibold">Add care plan element</h3>
+          <p class="text-xs text-kapture-smoke mt-0.5">For Mr Edward Banda · category: <span id="addCatLabel" class="font-medium text-kapture-black">Psychological</span></p>
+        </div>
+        <button onclick="closeModal()" class="text-kapture-mist hover:text-kapture-black p-1.5 rounded hover:bg-kapture-paper" aria-label="Close">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <form id="addForm" class="p-6 space-y-4" onsubmit="return submitAddElement(event)">
+        <div>
+          <label class="text-[0.6875rem] uppercase tracking-wider text-kapture-mist font-medium block mb-1">Domain name</label>
+          <input id="fldName" required class="field-input" placeholder="e.g. Sleep, Nutrition, Continence" />
+        </div>
+        <div>
+          <label class="text-[0.6875rem] uppercase tracking-wider text-kapture-mist font-medium block mb-1">Need identified</label>
+          <textarea id="fldNeed" required class="field-textarea" placeholder="What does Edward need in this domain?"></textarea>
+        </div>
+        <div>
+          <label class="text-[0.6875rem] uppercase tracking-wider text-kapture-mist font-medium block mb-1">Current situation</label>
+          <textarea id="fldSituation" class="field-textarea" placeholder="What is happening now?"></textarea>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="text-[0.6875rem] uppercase tracking-wider text-kapture-mist font-medium block mb-1">Desired outcome</label>
+            <input id="fldOutcome" class="field-input" placeholder="What success looks like" />
+          </div>
+          <div>
+            <label class="text-[0.6875rem] uppercase tracking-wider text-kapture-mist font-medium block mb-1">Frequency</label>
+            <input id="fldFreq" class="field-input" placeholder="Daily / weekly / on demand" />
+          </div>
+        </div>
+        <div>
+          <label class="text-[0.6875rem] uppercase tracking-wider text-kapture-mist font-medium block mb-1">Patient involvement quote</label>
+          <input id="fldVoice" class="field-input" placeholder='What did Edward say? e.g. "I want my music."' />
+          <p class="text-[0.6875rem] text-kapture-smoke mt-1">CQC Caring requires evidence the resident participated.</p>
+        </div>
+        <div class="flex items-center justify-end gap-2 pt-4 border-t border-kapture-fog">
+          <button type="button" onclick="closeModal()" class="btn-secondary text-xs">Cancel</button>
+          <button type="submit" class="btn-yellow text-xs">Save element</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- History panel -->
+    <div id="modalHistory" class="hidden">
+      <div class="flex items-center justify-between px-6 py-4 border-b border-kapture-fog">
+        <div>
+          <h3 class="font-display text-lg font-semibold" id="histTitle">History</h3>
+          <p class="text-xs text-kapture-smoke mt-0.5">Every change versioned · immutable</p>
+        </div>
+        <button onclick="closeModal()" class="text-kapture-mist hover:text-kapture-black p-1.5 rounded hover:bg-kapture-paper" aria-label="Close">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="p-6 space-y-3">
+        <div class="flex items-start gap-3 p-3 rounded-lg bg-kapture-paper border border-kapture-fog">
+          <span class="chip chip-dark text-[0.6875rem]">v4 · current</span>
+          <div class="flex-1 text-xs text-kapture-coal">Sister Anne updated current situation, added music intervention. Patient present.</div>
+          <span class="font-mono text-[0.6875rem] text-kapture-mist">12 Mar 2026</span>
+        </div>
+        <div class="flex items-start gap-3 p-3 rounded-lg border border-kapture-fog">
+          <span class="chip text-[0.6875rem]">v3</span>
+          <div class="flex-1 text-xs text-kapture-smoke">Sister Anne raised self-sufficiency 64 → 68 after PHQ-9 stabilisation.</div>
+          <span class="font-mono text-[0.6875rem] text-kapture-mist">8 Feb 2026</span>
+        </div>
+        <div class="flex items-start gap-3 p-3 rounded-lg border border-kapture-fog">
+          <span class="chip text-[0.6875rem]">v2</span>
+          <div class="flex-1 text-xs text-kapture-smoke">Initial situation refined. Adjustment to home routines.</div>
+          <span class="font-mono text-[0.6875rem] text-kapture-mist">15 Dec 2025</span>
+        </div>
+        <div class="flex items-start gap-3 p-3 rounded-lg border border-kapture-fog">
+          <span class="chip text-[0.6875rem]">v1</span>
+          <div class="flex-1 text-xs text-kapture-smoke">Care plan opened on admission to Draycott.</div>
+          <span class="font-mono text-[0.6875rem] text-kapture-mist">10 Sep 2025</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Compile pack progress -->
+    <div id="modalPack" class="hidden">
+      <div class="flex items-center justify-between px-6 py-4 border-b border-kapture-fog">
+        <h3 class="font-display text-lg font-semibold">Compiling evidence pack</h3>
+        <button onclick="closeModal()" class="text-kapture-mist hover:text-kapture-black p-1.5 rounded hover:bg-kapture-paper" aria-label="Close">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="p-6 space-y-3">
+        <div id="packSteps" class="space-y-2 text-sm"></div>
+        <div class="pt-4 border-t border-kapture-fog hidden" id="packDownload">
+          <a id="packDownloadLink" download="Edward-Banda-Care-Plan-Evidence-Pack.txt" href="#" class="btn-yellow text-xs w-full justify-center">Download pack (.txt mock)</a>
+          <p class="text-[0.6875rem] text-kapture-smoke mt-2 text-center">Production builds emit a watermarked, signed PDF · CQC SAF mapped</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- INLINE EDIT OVERLAY                              -->
+<!-- ============================================== -->
+<div id="editPanel" class="fixed bottom-0 left-0 right-0 bg-white border-t border-kapture-fog shadow-2xl z-40 hidden">
+  <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-4">
+    <div class="flex items-center justify-between mb-3">
+      <div>
+        <span class="chip chip-yellow text-[0.6875rem]">Editing</span>
+        <span class="font-display font-semibold ml-2" id="editPanelTitle">Mental state</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="saveEdit()" class="btn-yellow text-xs">Save as v5</button>
+        <button onclick="closeEdit()" class="btn-secondary text-xs">Cancel</button>
+      </div>
+    </div>
+    <textarea id="editPanelBody" class="field-textarea" rows="3"></textarea>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- FOOTER                                           -->
+<!-- ============================================== -->
+<footer class="bg-kapture-paper border-t border-kapture-fog py-6 mt-12">
+  <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row md:items-center md:justify-between gap-3 text-xs text-kapture-smoke">
+    <div class="flex items-center gap-3">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="22" height="22" fill="none" aria-label="kooper" role="img" class="shrink-0 text-kapture-black"><path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" d="M255.75 133.125c67.679 0 122.625 54.946 122.625 122.625S323.429 378.375 255.75 378.375 133.125 323.429 133.125 255.75s54.946-122.625 122.625-122.625m0-132.75c18.832 0 34.121 15.289 34.121 34.121s-15.289 34.121-34.121 34.121-34.121-15.289-34.121-34.121S236.918.375 255.75.375M75.173 75.173c13.316-13.316 34.938-13.316 48.254 0s13.316 34.938 0 48.254-34.938 13.316-48.254 0-13.316-34.938 0-48.254M511.125 255.75c0 18.832-15.289 34.121-34.121 34.121s-34.121-15.289-34.121-34.121 15.289-34.121 34.121-34.121 34.121 15.289 34.121 34.121M255.75 442.883c18.832 0 34.121 15.289 34.121 34.121s-15.289 34.121-34.121 34.121-34.121-15.289-34.121-34.121 15.289-34.121 34.121-34.121m132.323-54.81c13.316-13.316 34.938-13.316 48.254 0s13.316 34.938 0 48.254-34.938 13.316-48.254 0-13.316-34.938 0-48.254M68.617 255.75c0 18.832-15.289 34.121-34.121 34.121S.375 274.582.375 255.75s15.289-34.121 34.121-34.121 34.121 15.289 34.121 34.121m54.81 132.323c13.316 13.316 13.316 34.938 0 48.254s-34.938 13.316-48.254 0-13.316-34.938 0-48.254 34.938-13.316 48.254 0"/><path fill="#FFD400" fill-rule="evenodd" clip-rule="evenodd" d="M436.327 75.173c13.316 13.316 13.316 34.938 0 48.254s-34.938 13.316-48.254 0-13.316-34.938 0-48.254 34.938-13.316 48.254 0"/></svg>
+      <div class="flex items-center gap-1.5 font-display lowercase tracking-wide text-kapture-black">
+        <span class="font-semibold">kooper</span>
+        <span class="text-kapture-mist">·</span>
+        <span class="font-medium">care plans</span>
+      </div>
+    </div>
+    <div class="flex items-center gap-3 flex-wrap">
+      <span class="font-mono">v0.1 mockup</span>
+      <span aria-hidden>·</span>
+      <span>Mock data · no PII</span>
+      <span aria-hidden>·</span>
+      <a href="kooper-care-microapp-specs.md" class="hover:text-kapture-black underline-offset-4 hover:underline">Schema spec</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // ============================================================
+  // STATE
+  // ============================================================
+  var STATE = {
+    activeCategory: 'psychological',
+    filter: 'all',
+    addedElements: []
+  };
+
+  var CATEGORIES = {
+    'mental-health': { label: 'Mental Health', reviewed: 20, total: 22, due: 2, status: 'warning' },
+    'physical':      { label: 'Physical',      reviewed: 14, total: 22, due: 4, status: 'warning' },
+    'social':        { label: 'Social',        reviewed: 13, total: 13, due: 0, status: 'ok' },
+    'end-of-life':   { label: 'End of Life',   reviewed: 0,  total: 5,  due: 0, status: 'neutral' }
+  };
+
+  // ============================================================
+  // TOAST
+  // ============================================================
+  function kooperToast(msg) {
+    var t = document.createElement('div');
+    t.textContent = msg;
+    t.style.cssText = 'position:fixed;bottom:5.5rem;left:50%;transform:translateX(-50%);background:#0A0A0A;color:#FFD400;padding:0.75rem 1.25rem;border-radius:10px;font-size:0.875rem;font-weight:500;z-index:100;box-shadow:0 12px 30px -8px rgba(0,0,0,0.3);font-family:Inter,sans-serif;max-width:90vw;text-align:center;';
+    document.body.appendChild(t);
+    setTimeout(function () { t.style.transition = 'opacity 0.3s ease'; t.style.opacity = '0'; }, 1800);
+    setTimeout(function () { t.remove(); }, 2200);
+  }
+
+  // ============================================================
+  // CATEGORY SWAP
+  // ============================================================
+  var CAT_DECKS = {
+    'mental-health': 'Twenty-two domains that hold the inner life — memory, attention, judgement, mood, mind, story. Twenty in current review. Two due before next Wednesday.',
+    'physical':      'Twenty-two domains across the body — mobility, skin, continence, nutrition. Fourteen current. Eight to revisit.',
+    'social':        'Thirteen domains that hold relationships and community — family, friendship, faith, leisure. All current.',
+    'end-of-life':   'Five domains for the late chapter — wishes, comfort, family, faith, place of care. Opened only when the resident, family, and clinical lead agree the time is right.'
+  };
+
+  function selectCategory(el, slug) {
+    document.querySelectorAll('.category-item').forEach(function (n) { n.classList.remove('active'); });
+    el.classList.add('active');
+    STATE.activeCategory = slug;
+
+    var c = CATEGORIES[slug];
+    if (!c) return;
+    document.getElementById('centerCategoryTitle').textContent = c.label;
+    var kicker = document.getElementById('centerKicker');
+    if (kicker) kicker.textContent = c.label.toUpperCase() + ' DOMAINS';
+    var sub = document.getElementById('centerCategorySub');
+    if (sub) sub.textContent = CAT_DECKS[slug] || (c.total + ' domains · ' + c.reviewed + ' reviewed');
+    kooperToast('Loaded ' + c.label + ' · ' + c.reviewed + '/' + c.total);
+  }
+
+  // ============================================================
+  // FILTER
+  // ============================================================
+  var FILTERS = ['all','due','reviewed','overdue'];
+  function cycleFilter(btn) {
+    var idx = FILTERS.indexOf(STATE.filter);
+    STATE.filter = FILTERS[(idx + 1) % FILTERS.length];
+    btn.textContent = 'Filter: ' + STATE.filter;
+    kooperToast('Filter set to ' + STATE.filter);
+  }
+
+  function markAllReviewed() {
+    var cards = document.querySelectorAll('.domain-card');
+    cards.forEach(function (c) {
+      var chip = c.querySelector('.chip-warning');
+      if (chip) chip.outerHTML = '<span class="chip chip-ok text-[0.6875rem]">Up to date</span>';
+    });
+    kooperToast('All domains marked reviewed · audit log entry fired');
+  }
+
+  // ============================================================
+  // DOMAIN CARD SELECT
+  // ============================================================
+  function selectDomain(card, name) {
+    document.querySelectorAll('.domain-card').forEach(function (c) { c.classList.remove('active'); });
+    card.classList.add('active');
+    var hist = document.querySelector('.font-display.text-sm.font-semibold.text-kapture-black.uppercase.tracking-wider');
+    if (hist && name) hist.textContent = name + ' · history';
+  }
+
+  // ============================================================
+  // MODAL — Add element
+  // ============================================================
+  function openAddElement() {
+    var c = CATEGORIES[STATE.activeCategory];
+    document.getElementById('addCatLabel').textContent = c ? c.label : 'Psychological';
+    document.getElementById('modalAdd').classList.remove('hidden');
+    document.getElementById('modalHistory').classList.add('hidden');
+    document.getElementById('modalPack').classList.add('hidden');
+    document.getElementById('modalBackdrop').classList.remove('hidden');
+    document.getElementById('modalBackdrop').classList.add('flex');
+    setTimeout(function(){ document.getElementById('fldName').focus(); }, 50);
+  }
+
+  function submitAddElement(e) {
+    e.preventDefault();
+    var name = document.getElementById('fldName').value.trim();
+    var need = document.getElementById('fldNeed').value.trim();
+    var sit  = document.getElementById('fldSituation').value.trim();
+    var out  = document.getElementById('fldOutcome').value.trim();
+    var freq = document.getElementById('fldFreq').value.trim();
+    var voice = document.getElementById('fldVoice').value.trim();
+    if (!name || !need) return false;
+
+    // Render new card into centre pane
+    var main = document.querySelector('main.lg\\:col-span-6');
+    var card = document.createElement('div');
+    card.className = 'domain-card';
+    card.onclick = function () { selectDomain(card, name); };
+    card.innerHTML = ''
+      + '<div class="flex">'
+      + '  <div class="status-strip status-strip-ok"></div>'
+      + '  <div class="flex-1 p-5">'
+      + '    <div class="flex items-start justify-between mb-2">'
+      + '      <div>'
+      + '        <div class="flex items-center gap-2 flex-wrap">'
+      + '          <h3 class="font-display text-base font-semibold text-kapture-black">' + name + '</h3>'
+      + '          <span class="chip chip-ok text-[0.6875rem]">v1 · just added</span>'
+      + '        </div>'
+      + '        <div class="font-mono text-xs text-kapture-mist mt-1">Created ' + new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}) + ' · by Sister Anne</div>'
+      + '      </div>'
+      + '    </div>'
+      + '    <div class="space-y-2">'
+      + '      <div><div class="text-[0.6875rem] uppercase tracking-wider text-kapture-mist font-medium mb-1">Need identified</div><p class="text-sm text-kapture-black">' + need + '</p></div>'
+      + (sit ? '<div><div class="text-[0.6875rem] uppercase tracking-wider text-kapture-mist font-medium mb-1">Current situation</div><p class="text-xs text-kapture-smoke">' + sit + '</p></div>' : '')
+      + (out || freq ? '<div class="grid grid-cols-2 gap-3 pt-1">'
+          + (out ? '<div><div class="text-[0.6875rem] uppercase tracking-wider text-kapture-mist font-medium mb-1">Desired outcome</div><p class="text-xs text-kapture-smoke">' + out + '</p></div>' : '<div></div>')
+          + (freq ? '<div><div class="text-[0.6875rem] uppercase tracking-wider text-kapture-mist font-medium mb-1">Frequency</div><p class="text-xs text-kapture-smoke">' + freq + '</p></div>' : '<div></div>')
+          + '</div>' : '')
+      + (voice ? '<div class="bg-kapture-yellow/10 border border-kapture-yellow/30 rounded-lg p-3 mt-2"><p class="text-xs text-kapture-coal italic">"' + voice + '" — captured at creation, Edward present.</p></div>' : '')
+      + '    </div>'
+      + '  </div>'
+      + '</div>';
+    main.appendChild(card);
+
+    // Bump category counters
+    var c = CATEGORIES[STATE.activeCategory];
+    if (c) { c.total += 1; c.reviewed += 1; }
+    var item = document.querySelector('.category-item.active');
+    if (item) {
+      var pt = item.querySelector('.progress-text');
+      if (pt && c) pt.textContent = c.reviewed + '/' + c.total;
+    }
+    STATE.addedElements.push(name);
+    closeModal();
+    kooperToast('Added "' + name + '" · v1 saved · audit log fired');
+    setTimeout(function () { card.scrollIntoView({behavior:'smooth', block:'center'}); }, 150);
+    return false;
+  }
+
+  // ============================================================
+  // MODAL — History
+  // ============================================================
+  function openHistory(name) {
+    document.getElementById('histTitle').textContent = (name || 'Mental state') + ' · history';
+    document.getElementById('modalAdd').classList.add('hidden');
+    document.getElementById('modalPack').classList.add('hidden');
+    document.getElementById('modalHistory').classList.remove('hidden');
+    document.getElementById('modalBackdrop').classList.remove('hidden');
+    document.getElementById('modalBackdrop').classList.add('flex');
+  }
+
+  // ============================================================
+  // MODAL — Compile evidence pack
+  // ============================================================
+  function compilePack() {
+    document.getElementById('modalAdd').classList.add('hidden');
+    document.getElementById('modalHistory').classList.add('hidden');
+    document.getElementById('modalPack').classList.remove('hidden');
+    document.getElementById('modalBackdrop').classList.remove('hidden');
+    document.getElementById('modalBackdrop').classList.add('flex');
+
+    var steps = ['Loading 38 reviewed elements...', 'Pulling kooper · risk (3 active)...', 'Pulling kooper · safety plan (current)...', 'Pulling holistic profile...', 'Mapping each element to CQC SAF...', 'Watermarking with Sister Anne identity...', 'Pack ready'];
+    var box = document.getElementById('packSteps');
+    box.innerHTML = '';
+    steps.forEach(function (s, i) {
+      setTimeout(function () {
+        var row = document.createElement('div');
+        row.className = 'flex items-center gap-2 text-kapture-coal';
+        row.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg><span>' + s + '</span>';
+        box.appendChild(row);
+        if (i === steps.length - 1) {
+          var dl = document.getElementById('packDownload');
+          dl.classList.remove('hidden');
+          var blob = new Blob([packBody()], {type:'text/plain'});
+          document.getElementById('packDownloadLink').href = URL.createObjectURL(blob);
+        }
+      }, 350 * i);
+    });
+  }
+
+  function packBody() {
+    return 'KOOPER · CARE — CQC EVIDENCE PACK\n'
+      + 'Resident: Mr Edward Banda (NHS 485 777 3456)\n'
+      + 'Plan version: v4 · 12 Mar 2026\n'
+      + 'Generated: ' + new Date().toISOString() + '\n'
+      + 'Watermark: Sister Anne · Nurse · Draycott\n\n'
+      + '— Plan progress: 38/62 reviewed (61%)\n'
+      + '— CQC SAF: Safe 98% · Effective 100% · Caring 100% · Responsive 96% · Well-led 100%\n'
+      + '— Linked: kooper · risk (3 active) · kooper · safety plan (current) · holistic profile\n\n'
+      + 'This is a mock pack from the kooper · care plans demo. Production builds emit a signed PDF.\n';
+  }
+
+  function closeModal() {
+    document.getElementById('modalBackdrop').classList.add('hidden');
+    document.getElementById('modalBackdrop').classList.remove('flex');
+  }
+
+  // ============================================================
+  // INLINE EDIT
+  // ============================================================
+  function openEdit(name, body) {
+    document.getElementById('editPanelTitle').textContent = name || 'Mental state';
+    document.getElementById('editPanelBody').value = body || 'Eddie is generally calm and oriented. Occasional confusion in the late afternoon (sundowning). Responds well to familiar music and family photos.';
+    document.getElementById('editPanel').classList.remove('hidden');
+    setTimeout(function(){ document.getElementById('editPanelBody').focus(); }, 50);
+  }
+  function saveEdit() {
+    closeEdit();
+    kooperToast('Saved as v5 · diff captured · alerts evaluated');
+  }
+  function closeEdit() {
+    document.getElementById('editPanel').classList.add('hidden');
+  }
+
+  // ============================================================
+  // BIND ON LOAD
+  // ============================================================
+  document.addEventListener('DOMContentLoaded', function () {
+    // History buttons → use the section's data-domain so the modal shows the right name
+    document.querySelectorAll('[title="History"]').forEach(function (b) {
+      var sec = b.closest('[data-domain]');
+      var name = sec ? sec.getAttribute('data-domain') : 'Mental state';
+      b.addEventListener('click', function (e) { e.stopPropagation(); openHistory(name); });
+    });
+    // Edit buttons → open the inline edit panel with the section's first paragraph
+    document.querySelectorAll('[title="Edit"]').forEach(function (b) {
+      var sec = b.closest('[data-domain]');
+      var name = sec ? sec.getAttribute('data-domain') : 'Mental state';
+      var firstPara = sec ? (sec.querySelector('.ed-prose p') || {}).textContent : '';
+      b.addEventListener('click', function (e) { e.stopPropagation(); openEdit(name, (firstPara || '').trim()); });
+    });
+    // Compile evidence pack button
+    document.querySelectorAll('button').forEach(function (b) {
+      var t = (b.textContent || '').trim();
+      if (t === 'Compile evidence pack') b.setAttribute('onclick', 'compilePack()');
+      if (t === 'Print full plan') b.setAttribute('onclick', "window.print()");
+    });
+    // Domain sections selectable — read the editorial heading or data-domain
+    document.querySelectorAll('.domain-card').forEach(function (card) {
+      card.addEventListener('click', function (e) {
+        if (e.target.closest('button')) return;
+        var name = card.getAttribute('data-domain') || (card.querySelector('h2,h3') || {}).textContent || '';
+        selectDomain(card, name);
+      });
+    });
+    // ESC closes modal/edit
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') { closeModal(); closeEdit(); }
+      if (e.key === '/' && e.target === document.body) {
+        e.preventDefault();
+        kooperToast('Cmd+K search will live here in production');
+      }
+    });
+    // Wire any remaining unbound buttons to a friendly toast
+    document.querySelectorAll('button:not([onclick]):not([type="submit"])').forEach(function (b) {
+      var label = (b.textContent || '').trim().slice(0, 60);
+      if (!label) return;
+      b.addEventListener('click', function () { kooperToast('✓ ' + label); });
+    });
+  });
+</script>
+
+</body>
+</html>

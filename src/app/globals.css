@@ -1,0 +1,125 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 255 255 255;
+  --foreground: 10 10 10;
+  --muted: 245 245 245;
+  --muted-foreground: 90 90 90;
+  --border: 230 230 230;
+  --accent: 255 212 0;
+}
+
+.dark {
+  --background: 10 10 10;
+  --foreground: 245 245 245;
+  --muted: 26 26 26;
+  --muted-foreground: 154 154 154;
+  --border: 38 38 38;
+  --accent: 255 212 0;
+}
+
+* {
+  border-color: rgb(var(--border));
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: rgb(var(--background));
+  color: rgb(var(--foreground));
+  font-feature-settings: "rlig" 1, "calt" 1, "ss01" 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@layer components {
+  .container-kapture {
+    @apply mx-auto w-full max-w-7xl px-6 lg:px-10;
+  }
+
+  .btn-kapture {
+    @apply inline-flex w-full min-h-[50px] items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-semibold tracking-tight transition-all duration-200 sm:w-auto;
+  }
+
+  .btn-primary {
+    @apply btn-kapture bg-kapture-black text-kapture-white hover:bg-transparent hover:text-kapture-black hover:ring-2 hover:ring-inset hover:ring-kapture-black dark:bg-kapture-white dark:text-kapture-black dark:hover:bg-transparent dark:hover:text-kapture-white dark:hover:ring-kapture-white;
+  }
+
+  .btn-secondary {
+    @apply btn-kapture bg-transparent text-kapture-black ring-2 ring-inset ring-kapture-black hover:bg-kapture-black hover:text-kapture-white dark:text-kapture-white dark:ring-kapture-white dark:hover:bg-kapture-white dark:hover:text-kapture-black;
+  }
+
+  .btn-yellow {
+    @apply btn-kapture bg-kapture-yellow text-kapture-black hover:bg-kapture-amber;
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium uppercase tracking-wider text-kapture-mist dark:text-kapture-fog;
+  }
+
+  .field {
+    @apply w-full rounded-kapture border bg-transparent px-4 py-3 text-sm text-kapture-black placeholder:text-kapture-mist focus:border-kapture-black focus:outline-none focus:ring-2 focus:ring-kapture-yellow/50 dark:text-kapture-white dark:placeholder:text-kapture-smoke dark:focus:border-kapture-white;
+  }
+
+  /* Selects: hide the native chevron, draw a custom one with the same
+     16px breathing room from the right edge as the label has from the left.
+     Mist-grey strokes — reads against both light and dark backgrounds. */
+  select.field {
+    @apply appearance-none bg-no-repeat pr-11;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20' stroke='%239A9A9A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 8 10 12 14 8'/%3E%3C/svg%3E");
+    background-position: right 1rem center;
+    background-size: 0.875rem 0.875rem;
+  }
+
+  .label {
+    @apply mb-2 block text-xs font-semibold uppercase tracking-wider text-kapture-mist dark:text-kapture-fog;
+  }
+
+  .h-section {
+    @apply font-display text-section text-kapture-black dark:text-kapture-white;
+  }
+
+  .lede {
+    @apply text-base leading-relaxed text-kapture-smoke dark:text-kapture-fog md:text-lg;
+  }
+
+  .divider-dot {
+    @apply inline-block h-1.5 w-1.5 rounded-full bg-kapture-yellow;
+  }
+
+  .bento-card {
+    @apply relative overflow-hidden rounded-2xl border bg-white p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-kapture-lift dark:bg-kapture-ink md:p-8;
+  }
+
+  .bento-card-dark {
+    @apply relative overflow-hidden rounded-2xl border border-kapture-ash bg-kapture-black p-6 text-kapture-white transition-all duration-300 hover:-translate-y-1 md:p-8;
+  }
+
+  .bento-card-yellow {
+    @apply relative overflow-hidden rounded-2xl bg-kapture-yellow p-6 text-kapture-black transition-all duration-300 hover:-translate-y-1 hover:shadow-kapture-lift md:p-8;
+  }
+
+  .grid-bg {
+    @apply absolute inset-0 -z-10 bg-kapture-grid bg-grid opacity-60 dark:bg-kapture-grid-dark;
+    mask-image: radial-gradient(ellipse at center, black 30%, transparent 75%);
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}

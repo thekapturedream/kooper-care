@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>kooper · clinical — Edward Banda</title>
+<meta name="description" content="The clinical workspace. Major Active Problems with SNOMED CT, MHA Sections, DoLS Applications, ECT records, pathology results, vitals trends. For nurses, clinical leads, GP-on-call." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = { theme: { extend: { colors: { kapture: { black:'#0A0A0A',ink:'#111111',coal:'#1A1A1A',ash:'#2A2A2A',smoke:'#3A3A3A',mist:'#9A9A9A',fog:'#D4D4D4',paper:'#F5F5F5',white:'#FFFFFF',yellow:'#FFD400',amber:'#F5B400'}, status:{critical:'#E5484D',warning:'#FFD400',ok:'#10B981',neutral:'#D4D4D4'}}, fontFamily:{display:['Space Grotesk','sans-serif'],sans:['Inter','sans-serif'],mono:['JetBrains Mono','monospace']}}}};
+</script>
+<style>
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Inter', sans-serif; background: #F5F5F5; color: #0A0A0A; -webkit-font-smoothing: antialiased; }
+  .font-display { font-family: 'Space Grotesk', sans-serif; }
+  .font-mono { font-family: 'JetBrains Mono', monospace; }
+  .container-c { max-width: 1400px; margin-left: auto; margin-right: auto; padding-left: 1rem; padding-right: 1rem; }
+  @media (min-width: 640px) { .container-c { padding-left: 1.5rem; padding-right: 1.5rem; } }
+  @media (min-width: 1024px) { .container-c { padding-left: 2rem; padding-right: 2rem; } }
+
+  .surface { background: #FFFFFF; border: 1px solid #D4D4D4; border-radius: 14px; }
+
+  .btn-primary { background: #0A0A0A; color: #FFFFFF; border: 1px solid #0A0A0A; padding: 0.5rem 0.875rem; border-radius: 10px; font-weight: 500; transition: all 0.15s ease; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.8125rem; }
+  .btn-primary:hover { background: transparent; color: #0A0A0A; }
+  .btn-secondary { background: transparent; color: #0A0A0A; border: 1px solid #0A0A0A; padding: 0.5rem 0.875rem; border-radius: 10px; font-weight: 500; transition: all 0.15s ease; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.8125rem; }
+  .btn-secondary:hover { background: #0A0A0A; color: #FFFFFF; }
+  .btn-yellow { background: #FFD400; color: #0A0A0A; border: 1px solid #FFD400; padding: 0.5rem 0.875rem; border-radius: 10px; font-weight: 600; transition: all 0.15s ease; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.8125rem; }
+  .btn-yellow:hover { background: #F5B400; }
+
+  .chip { display: inline-flex; align-items: center; gap: 0.375rem; padding: 0.25rem 0.625rem; border-radius: 999px; font-size: 0.75rem; font-weight: 500; line-height: 1; background: #F5F5F5; color: #2A2A2A; border: 1px solid #D4D4D4; }
+  .chip-yellow { background: #FFD400; color: #0A0A0A; border-color: #FFD400; }
+  .chip-dark { background: #0A0A0A; color: #FFFFFF; border-color: #0A0A0A; }
+  .chip-ok { background: rgba(16,185,129,0.1); color: #047857; border-color: rgba(16,185,129,0.25); }
+  .chip-warn { background: rgba(255,212,0,0.2); color: #876300; border-color: rgba(255,212,0,0.5); }
+  .chip-crit { background: rgba(229,72,77,0.1); color: #B42318; border-color: rgba(229,72,77,0.25); }
+  .chip-outline-light { background: transparent; color: #FFFFFF; border-color: rgba(255,255,255,0.25); }
+
+  .nav-link { padding: 0.5rem 0.75rem; font-size: 0.875rem; font-weight: 500; color: #FFFFFF; opacity: 0.75; border-radius: 8px; transition: all 0.15s ease; text-decoration: none; }
+  .nav-link:hover { opacity: 1; background: #1A1A1A; }
+  .nav-link-active { opacity: 1; background: #1A1A1A; color: #FFD400; }
+
+  .tree-item { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0.75rem; border-radius: 8px; cursor: pointer; transition: all 0.15s ease; font-size: 0.8125rem; color: #1A1A1A; user-select: none; }
+  .tree-item:hover { background: #F5F5F5; }
+  .tree-item.active { background: #0A0A0A; color: #FFFFFF; font-weight: 500; }
+  .tree-folder { font-weight: 600; padding: 0.5rem 0.5rem 0.25rem; font-size: 0.6875rem; letter-spacing: 0.06em; text-transform: uppercase; color: #6B7280; }
+  .tree-count { margin-left: auto; font-family: 'JetBrains Mono', monospace; font-size: 0.6875rem; color: #9A9A9A; background: #F5F5F5; padding: 0 0.375rem; border-radius: 4px; }
+  .tree-item.active .tree-count { background: rgba(255,212,0,0.2); color: #FFD400; }
+
+  .problem-row { display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.875rem 1rem; border-radius: 10px; border: 1px solid transparent; cursor: pointer; transition: all 0.15s ease; }
+  .problem-row:hover { background: #F9FAFB; border-color: #D4D4D4; }
+  .problem-row.active { background: #FFFBEB; border-color: #FCD34D; }
+
+  .severity-flag { width: 6px; height: 24px; border-radius: 3px; flex-shrink: 0; margin-top: 2px; }
+
+  .news2-cell { background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 10px; padding: 0.625rem 0.75rem; text-align: center; }
+  .news2-cell.warn { background: #FFFBEB; border-color: #FCD34D; }
+  .news2-cell.crit { background: #FEE2E2; border-color: #FCA5A5; }
+
+  .id-banner { background: linear-gradient(180deg,#0A0A0A 0%,#1A1A1A 100%); color: #FFFFFF; }
+  .id-pill { padding: 0.25rem 0.625rem; border-radius: 999px; font-size: 0.6875rem; font-weight: 600; }
+
+  .saf-pill { display: inline-flex; align-items: center; padding: 0.125rem 0.5rem; border-radius: 999px; font-size: 0.6875rem; font-weight: 600; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.04em; text-transform: uppercase; }
+  .saf-safe { background: rgba(229,72,77,0.1); color: #B42318; }
+  .saf-effective { background: rgba(16,185,129,0.1); color: #047857; }
+
+  .toast { position: fixed; bottom: 5.5rem; left: 50%; transform: translateX(-50%); background: #0A0A0A; color: #FFD400; padding: 0.75rem 1.25rem; border-radius: 10px; font-size: 0.875rem; font-weight: 500; box-shadow: 0 12px 30px -8px rgba(0,0,0,0.3); z-index: 100; opacity: 0; transition: opacity 0.2s ease; }
+  .toast.on { opacity: 1; }
+
+  .scroll-stack { max-height: calc(100vh - 14rem); overflow-y: auto; }
+  @media (max-width: 1023px) { .scroll-stack { max-height: none; } }
+  .scroll-stack::-webkit-scrollbar { width: 6px; }
+  .scroll-stack::-webkit-scrollbar-thumb { background: #D4D4D4; border-radius: 3px; }
+
+  /* ============================================================
+     EDITORIAL TYPOGRAPHY (shared with care plans) — InDesign feel
+     ============================================================ */
+  .editorial { background: #FAFAF7; padding: 2.5rem 2.75rem 3rem; border-radius: 18px; border: 1px solid #ECEAE3; }
+  @media (max-width: 1023px) { .editorial { padding: 1.75rem 1.5rem 2rem; } }
+  .ed-masthead { display: flex; align-items: center; justify-content: space-between; padding-bottom: 1rem; border-bottom: 2px solid #0A0A0A; margin-bottom: 1.75rem; }
+  .ed-masthead .vol { font-family: 'JetBrains Mono', monospace; font-size: 0.6875rem; letter-spacing: 0.14em; text-transform: uppercase; color: #6B7280; }
+  .ed-kicker { font-family: 'JetBrains Mono', monospace; font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #876300; margin-bottom: 0.625rem; display: inline-flex; align-items: center; gap: 0.5rem; }
+  .ed-kicker::before { content: ''; width: 24px; height: 2px; background: #FFD400; display: inline-block; }
+  .ed-h1 { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: clamp(2.25rem, 3.6vw, 3rem); line-height: 1.05; letter-spacing: -0.02em; color: #0A0A0A; margin-bottom: 0.5rem; }
+  .ed-deck { font-family: 'Source Serif 4', serif; font-weight: 400; font-style: italic; font-size: clamp(1.0625rem, 1.3vw, 1.1875rem); line-height: 1.5; color: #3A3A3A; max-width: 42ch; }
+  .ed-byline { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: #6B7280; padding: 0.75rem 0; border-top: 1px solid #ECEAE3; border-bottom: 1px solid #ECEAE3; margin: 1.25rem 0 1.5rem; display: flex; flex-wrap: wrap; gap: 0.5rem 1.25rem; }
+  .ed-byline strong { color: #0A0A0A; font-weight: 600; }
+  .ed-prose { font-family: 'Source Serif 4', serif; font-size: 1.0625rem; line-height: 1.7; color: #1A1A1A; }
+  .ed-prose p { margin-bottom: 1em; }
+  .ed-prose p + p { text-indent: 1.2em; }
+  .ed-prose p.no-indent + p, .ed-prose p:first-of-type + p { text-indent: 0; }
+  /* drop cap removed by direction — keep class inert */
+  .ed-h2 { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: clamp(1.5rem, 2.2vw, 1.75rem); line-height: 1.15; letter-spacing: -0.012em; color: #0A0A0A; margin: 2rem 0 0.5rem; }
+  .ed-meta { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; color: #6B7280; margin-bottom: 1rem; display: flex; flex-wrap: wrap; gap: 0.5rem 1rem; }
+  .ed-label { font-family: 'JetBrains Mono', monospace; font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #6B7280; margin: 1.25rem 0 0.375rem; padding-left: 0.75rem; border-left: 2px solid #FFD400; }
+  .ed-stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem 1.5rem; margin: 1.25rem 0 1.5rem; padding: 1rem 0; border-top: 1px solid #ECEAE3; border-bottom: 1px solid #ECEAE3; }
+  .ed-stat .stat-label { font-family: 'JetBrains Mono', monospace; font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #6B7280; margin-bottom: 0.25rem; }
+  .ed-stat .stat-value { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 1.25rem; color: #0A0A0A; line-height: 1.1; }
+  .ed-stat .stat-foot { font-family: 'Source Serif 4', serif; font-size: 0.8125rem; color: #6B7280; margin-top: 0.125rem; font-style: italic; }
+  .ed-divider { display: flex; align-items: center; justify-content: center; gap: 0.875rem; margin: 2.25rem 0; color: #D4D4D4; }
+  .ed-divider::before, .ed-divider::after { content: ''; flex: 1; height: 1px; background: #ECEAE3; }
+  .ed-divider .glyph { font-family: 'JetBrains Mono', monospace; font-size: 0.875rem; letter-spacing: 0.4em; color: #6B7280; }
+  .saf-row { display: flex; flex-wrap: wrap; gap: 0.375rem; align-items: center; padding-top: 1rem; margin-top: 1rem; border-top: 1px solid #ECEAE3; font-family: 'JetBrains Mono', monospace; font-size: 0.6875rem; color: #6B7280; }
+</style>
+</head>
+<body>
+
+<!-- ============================================== -->
+<!-- TOP NAV                                          -->
+<!-- ============================================== -->
+<nav class="bg-kapture-black text-white sticky top-0 z-50">
+  <div class="container-c">
+    <div class="flex items-center justify-between h-16 gap-4">
+      <a href="kooper-care-landing.html" class="flex items-center gap-3 shrink-0" title="Back to landing">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="28" height="28" fill="none" aria-label="kooper" role="img" class="text-white"><path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" d="M255.75 133.125c67.679 0 122.625 54.946 122.625 122.625S323.429 378.375 255.75 378.375 133.125 323.429 133.125 255.75s54.946-122.625 122.625-122.625m0-132.75c18.832 0 34.121 15.289 34.121 34.121s-15.289 34.121-34.121 34.121-34.121-15.289-34.121-34.121S236.918.375 255.75.375M75.173 75.173c13.316-13.316 34.938-13.316 48.254 0s13.316 34.938 0 48.254-34.938 13.316-48.254 0-13.316-34.938 0-48.254M511.125 255.75c0 18.832-15.289 34.121-34.121 34.121s-34.121-15.289-34.121-34.121 15.289-34.121 34.121-34.121 34.121 15.289 34.121 34.121M255.75 442.883c18.832 0 34.121 15.289 34.121 34.121s-15.289 34.121-34.121 34.121-34.121-15.289-34.121-34.121 15.289-34.121 34.121-34.121m132.323-54.81c13.316-13.316 34.938-13.316 48.254 0s13.316 34.938 0 48.254-34.938 13.316-48.254 0-13.316-34.938 0-48.254M68.617 255.75c0 18.832-15.289 34.121-34.121 34.121S.375 274.582.375 255.75s15.289-34.121 34.121-34.121 34.121 15.289 34.121 34.121m54.81 132.323c13.316 13.316 13.316 34.938 0 48.254s-34.938 13.316-48.254 0-13.316-34.938 0-48.254 34.938-13.316 48.254 0"/><path fill="#FFD400" fill-rule="evenodd" clip-rule="evenodd" d="M436.327 75.173c13.316 13.316 13.316 34.938 0 48.254s-34.938 13.316-48.254 0-13.316-34.938 0-48.254 34.938-13.316 48.254 0"/></svg>
+        <span class="hidden sm:flex items-center gap-2 font-display lowercase tracking-wide text-base">
+          <span class="font-semibold">kooper</span>
+          <span class="text-white/40">·</span>
+          <span class="font-medium">clinical</span>
+        </span>
+      </a>
+      <div class="hidden lg:flex items-center gap-1">
+        <a href="kooper-care-landing.html" class="nav-link">Home</a>
+        <a href="kooper-care-dashboards.html" class="nav-link">Dashboard</a>
+        <a href="kooper-care-plans.html" class="nav-link">Care plans</a>
+        <a href="kooper-clinical.html" class="nav-link nav-link-active">Clinical</a>
+        <a href="kooper-recording-demo.html" class="nav-link">Recording</a>
+        <a href="kooper-reports.html" class="nav-link">Reports</a>
+      </div>
+      <div class="flex items-center gap-2 shrink-0">
+        <button onclick="kooperToast('Cmd+K opens find')" class="hidden md:inline-flex items-center gap-2 px-3 py-1.5 bg-kapture-coal text-kapture-mist rounded-lg text-xs hover:bg-kapture-ash">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <span>Find</span>
+          <span class="font-mono text-[0.6875rem] bg-kapture-ash px-1.5 py-0.5 rounded">⌘K</span>
+        </button>
+        <div class="hidden md:flex items-center gap-2 pl-3 border-l border-kapture-ash">
+          <div class="w-8 h-8 rounded-full bg-kapture-ash flex items-center justify-center font-mono text-xs">SA</div>
+          <div class="text-xs">
+            <div class="font-medium">Sister Anne</div>
+            <div class="text-kapture-mist">Nurse · Draycott</div>
+          </div>
+        </div>
+        <a href="kooper-sign-in.html" class="hidden md:inline-flex p-1.5 rounded text-kapture-mist hover:text-white hover:bg-kapture-coal transition" title="Sign out" aria-label="Sign out">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ============================================== -->
+<!-- IDENTITY & COMMUNICATION NEEDS BANNER            -->
+<!-- ============================================== -->
+<div class="id-banner sticky top-16 z-40">
+  <div class="container-c py-3">
+    <div class="flex items-center justify-between gap-3 flex-wrap">
+      <div class="flex items-center gap-3 flex-wrap">
+        <div class="w-10 h-10 rounded-xl bg-kapture-yellow text-kapture-black flex items-center justify-center font-display text-sm font-bold">EB</div>
+        <div>
+          <div class="flex items-center gap-2 flex-wrap">
+            <h1 class="font-display font-semibold">Mr Edward Banda</h1>
+            <span class="id-pill bg-white text-kapture-black">Eddie · he/him</span>
+            <span class="chip chip-outline-light text-[0.6875rem]">Age 78 · Room 12</span>
+            <span class="chip chip-outline-light text-[0.6875rem]">NHS 485 777 3456</span>
+          </div>
+          <div class="text-xs text-white/70 mt-0.5">English first language · large-print preferred · hearing aid (R) · MCA assessed 12 Mar 2026 · capacity fluctuating</div>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 flex-wrap">
+        <span class="chip chip-warn text-[0.6875rem]"><span class="w-1.5 h-1.5 rounded-full" style="background:#FFD400"></span> NEWS2 = 2 (low risk)</span>
+        <span class="chip chip-outline-light text-[0.6875rem]">Plan v4 · current</span>
+        <button onclick="kooperToast('Switch resident — opens picker')" class="btn-yellow text-xs py-1.5">Switch resident</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- WORKSPACE                                        -->
+<!-- ============================================== -->
+<div class="container-c py-5 pb-24">
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+
+    <!-- ============================================== -->
+    <!-- LEFT — Clinical tree                            -->
+    <!-- ============================================== -->
+    <aside class="lg:col-span-3">
+      <div class="surface p-3 lg:sticky lg:top-44 scroll-stack">
+        <div class="flex items-center justify-between mb-2">
+          <h2 class="font-display text-sm font-semibold uppercase tracking-wider">Clinical</h2>
+          <span class="font-mono text-xs text-kapture-mist">SNOMED CT</span>
+        </div>
+
+        <div class="tree-folder">Major active problems</div>
+        <nav class="space-y-0.5">
+          <div class="tree-item active" onclick="selectProblem(this,'mixed-anxiety-depression')">
+            <span class="severity-flag" style="background:#FCD34D"></span>
+            <span class="flex-1">Mixed anxiety & depression</span>
+            <span class="tree-count">F41.2</span>
+          </div>
+          <div class="tree-item" onclick="selectProblem(this,'adhd')">
+            <span class="severity-flag" style="background:#10B981"></span>
+            <span class="flex-1">ADHD</span>
+            <span class="tree-count">F90.0</span>
+          </div>
+          <div class="tree-item" onclick="selectProblem(this,'cptsd')">
+            <span class="severity-flag" style="background:#F59E0B"></span>
+            <span class="flex-1">Complex PTSD</span>
+            <span class="tree-count">6B41</span>
+          </div>
+          <div class="tree-item" onclick="selectProblem(this,'mild-cog')">
+            <span class="severity-flag" style="background:#10B981"></span>
+            <span class="flex-1">Mild cognitive impairment</span>
+            <span class="tree-count">G31.84</span>
+          </div>
+          <div class="tree-item" onclick="selectProblem(this,'osteoarthritis')">
+            <span class="severity-flag" style="background:#10B981"></span>
+            <span class="flex-1">Osteoarthritis · L hip</span>
+            <span class="tree-count">M16.5</span>
+          </div>
+        </nav>
+
+        <div class="tree-folder mt-4">Mental Health Act</div>
+        <nav class="space-y-0.5">
+          <div class="tree-item" onclick="selectMHA('s117')">
+            <span class="w-1.5 h-1.5 rounded-full bg-status-ok"></span>
+            <span class="flex-1">S117 aftercare</span>
+            <span class="tree-count">Active</span>
+          </div>
+          <div class="tree-item" onclick="selectMHA('cto')">
+            <span class="w-1.5 h-1.5 rounded-full bg-kapture-mist"></span>
+            <span class="flex-1">CTO history</span>
+            <span class="tree-count">2 prior</span>
+          </div>
+        </nav>
+
+        <div class="tree-folder mt-4">DoLS</div>
+        <nav class="space-y-0.5">
+          <div class="tree-item" onclick="selectDoLS()">
+            <span class="w-1.5 h-1.5 rounded-full bg-status-warning"></span>
+            <span class="flex-1">DoLS authorisation</span>
+            <span class="tree-count">Renew 5d</span>
+          </div>
+        </nav>
+
+        <div class="tree-folder mt-4">Risks</div>
+        <nav class="space-y-0.5">
+          <div class="tree-item" onclick="kooperToast('Falls risk · Bradford 18')">
+            <span class="severity-flag" style="background:#FCD34D"></span>
+            <span class="flex-1">Falls (Bradford 18)</span>
+            <span class="tree-count">High</span>
+          </div>
+          <div class="tree-item" onclick="kooperToast('Skin integrity · sacrum monitoring')">
+            <span class="severity-flag" style="background:#FCD34D"></span>
+            <span class="flex-1">Skin · sacrum</span>
+            <span class="tree-count">Med</span>
+          </div>
+          <div class="tree-item" onclick="kooperToast('Self-harm risk · low, monitored')">
+            <span class="severity-flag" style="background:#10B981"></span>
+            <span class="flex-1">Risk to self</span>
+            <span class="tree-count">Low</span>
+          </div>
+        </nav>
+
+        <div class="tree-folder mt-4">Pathology &amp; Radiology</div>
+        <nav class="space-y-0.5">
+          <div class="tree-item" onclick="kooperToast('Latest bloods · 28 Apr · all in range')">
+            <span class="w-1.5 h-1.5 rounded-full bg-status-ok"></span>
+            <span class="flex-1">Bloods · 28 Apr</span>
+            <span class="tree-count">OK</span>
+          </div>
+          <div class="tree-item" onclick="kooperToast('Hip X-ray report — degenerative changes')">
+            <span class="w-1.5 h-1.5 rounded-full bg-status-neutral"></span>
+            <span class="flex-1">L hip X-ray · 12 Mar</span>
+            <span class="tree-count">PDF</span>
+          </div>
+        </nav>
+
+        <button onclick="kooperToast('Add new clinical problem — SNOMED search opens')" class="btn-secondary w-full text-xs py-2 mt-4 justify-center">+ Add problem</button>
+      </div>
+    </aside>
+
+    <!-- ============================================== -->
+    <!-- CENTRE — problem detail                         -->
+    <!-- ============================================== -->
+    <main class="lg:col-span-6 space-y-4">
+      <article id="problemDetail" class="editorial">
+
+        <header class="ed-masthead">
+          <span class="vol">kooper · clinical</span>
+          <span class="vol">Major active problems · Vol. 4</span>
+        </header>
+
+        <div>
+          <div class="ed-kicker">Active · monitor</div>
+          <h1 class="ed-h1">Mixed anxiety &amp; depressive disorder</h1>
+          <p class="ed-deck">A long bereavement disorder, well held by medication, music, and the steady hand of Sister Anne. The team's job is to keep it steady.</p>
+        </div>
+
+        <div class="ed-byline">
+          <span><strong>SNOMED CT</strong> 231485007</span>
+          <span><strong>ICD-10</strong> F41.2</span>
+          <span><strong>Since</strong> Sep 2025</span>
+          <span><strong>Lead clinician</strong> Dr K. Adesina</span>
+        </div>
+
+        <div class="flex items-center gap-2 mb-5 flex-wrap">
+          <button onclick="kooperToast('Opens linked care plan element')" class="btn-secondary text-xs">Open in care plan</button>
+          <button onclick="kooperToast('Letter draft to GP opens')" class="btn-yellow text-xs">Draft GP letter</button>
+          <button onclick="kooperToast('CMHT review packet exporting')" class="btn-secondary text-xs">CMHT review pack</button>
+        </div>
+
+        <div class="ed-prose">
+          <p class="ed-dropcap no-indent">Eddie was diagnosed with mixed anxiety and depressive disorder in the months after Margaret died in 2019. The grief did the heavy lifting; the adjustment to Draycott on admission did the rest. Six years on, the picture is steady.</p>
+          <p>Mood is mostly bright. There are brief low days around the September anniversary, which the team flags weeks in advance. The PHQ-9 has trended down over six months — eight to six — and the GAD-7 sits at five. Sertraline 50mg in the morning and mirtazapine 15mg at night are well tolerated. There is no suicidal ideation. Family contact, especially the daily call with his daughter Sarah, is protective.</p>
+          <p>Risk to self is assessed low and stable. The link to the risk register is open and current.</p>
+        </div>
+
+        <div class="ed-stats">
+          <div class="ed-stat">
+            <div class="stat-label">Severity</div>
+            <div class="stat-value">Mild</div>
+            <div class="stat-foot">PHQ-9 score 6 · GAD-7 score 5 · 28 Apr</div>
+          </div>
+          <div class="ed-stat">
+            <div class="stat-label">Active medication</div>
+            <div class="stat-value">Sertraline 50</div>
+            <div class="stat-foot">+ mirtazapine 15mg ON</div>
+          </div>
+          <div class="ed-stat">
+            <div class="stat-label">Talking therapy</div>
+            <div class="stat-value">Completed</div>
+            <div class="stat-foot">bereavement counselling · 10 sessions, Sep 2025</div>
+          </div>
+          <div class="ed-stat">
+            <div class="stat-label">CMHT review</div>
+            <div class="stat-value">6-monthly</div>
+            <div class="stat-foot">next 12 Sep · Dr K. Adesina</div>
+          </div>
+        </div>
+
+        <div class="saf-row">
+          <span>CQC SAF</span>
+          <span class="saf-pill saf-safe">Safe</span>
+          <span class="saf-pill saf-effective">Effective</span>
+          <span class="saf-pill" style="background:rgba(255,212,0,0.2);color:#876300">Caring</span>
+          <span class="saf-pill" style="background:rgba(10,10,10,0.06)">Responsive</span>
+          <span class="saf-pill" style="background:rgba(123,58,237,0.1);color:#5B21B6">Well-led</span>
+        </div>
+      </article>
+
+      <!-- NEWS2 -->
+      <div class="surface p-5">
+        <div class="flex items-center justify-between mb-3 flex-wrap gap-2">
+          <div>
+            <div class="font-display font-semibold">NEWS2 · early warning</div>
+            <div class="text-xs text-kapture-smoke">Auto-calculated from kooper · vitals · last reading 07:40</div>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="chip chip-warn text-[0.6875rem] font-mono">SCORE 2</span>
+            <button onclick="kooperToast('NEWS2 auto-recompute on next vitals tap')" class="btn-secondary text-xs">Re-score</button>
+          </div>
+        </div>
+        <div class="grid grid-cols-3 sm:grid-cols-6 gap-2">
+          <div class="news2-cell"><div class="text-[0.625rem] uppercase tracking-wider text-kapture-mist mb-0.5">Resp rate</div><div class="font-mono font-semibold">17</div><div class="text-[0.6875rem] text-kapture-smoke">/min</div></div>
+          <div class="news2-cell"><div class="text-[0.625rem] uppercase tracking-wider text-kapture-mist mb-0.5">SpO₂</div><div class="font-mono font-semibold">96%</div><div class="text-[0.6875rem] text-kapture-smoke">on air</div></div>
+          <div class="news2-cell warn"><div class="text-[0.625rem] uppercase tracking-wider text-kapture-mist mb-0.5">Temp</div><div class="font-mono font-semibold">37.6</div><div class="text-[0.6875rem] text-kapture-smoke">°C</div></div>
+          <div class="news2-cell"><div class="text-[0.625rem] uppercase tracking-wider text-kapture-mist mb-0.5">Sys BP</div><div class="font-mono font-semibold">128</div><div class="text-[0.6875rem] text-kapture-smoke">mmHg</div></div>
+          <div class="news2-cell"><div class="text-[0.625rem] uppercase tracking-wider text-kapture-mist mb-0.5">Pulse</div><div class="font-mono font-semibold">78</div><div class="text-[0.6875rem] text-kapture-smoke">bpm</div></div>
+          <div class="news2-cell"><div class="text-[0.625rem] uppercase tracking-wider text-kapture-mist mb-0.5">AVPU</div><div class="font-mono font-semibold">A</div><div class="text-[0.6875rem] text-kapture-smoke">alert</div></div>
+        </div>
+        <p class="text-[0.6875rem] text-kapture-smoke mt-3">Auto-escalation triggers at score ≥ 5. Currently below threshold. Recheck in 4h or sooner if symptoms change.</p>
+      </div>
+
+      <!-- MHA / DoLS panel -->
+      <div class="surface p-5">
+        <div class="flex items-center justify-between mb-3">
+          <div class="font-display font-semibold">MHA · DoLS · ECT</div>
+          <button onclick="kooperToast('History of every section + DoLS variation opens')" class="btn-secondary text-xs">Full history</button>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <div class="border border-kapture-fog rounded-lg p-3">
+            <div class="flex items-center justify-between mb-1">
+              <span class="font-medium text-sm">S117 aftercare</span>
+              <span class="chip chip-ok text-[0.6875rem]">Active</span>
+            </div>
+            <div class="text-[0.6875rem] text-kapture-smoke">Plan agreed CMHT 12 Mar. Funding stream confirmed. Reviewed quarterly.</div>
+          </div>
+          <div class="border border-kapture-fog rounded-lg p-3">
+            <div class="flex items-center justify-between mb-1">
+              <span class="font-medium text-sm">DoLS authorisation</span>
+              <span class="chip chip-warn text-[0.6875rem]">Renew 5d</span>
+            </div>
+            <div class="text-[0.6875rem] text-kapture-smoke">Standard authorisation, 12-month. Best-interest decision logged. IMCA on file.</div>
+          </div>
+          <div class="border border-kapture-fog rounded-lg p-3">
+            <div class="flex items-center justify-between mb-1">
+              <span class="font-medium text-sm">ECT history</span>
+              <span class="chip text-[0.6875rem]">Nil</span>
+            </div>
+            <div class="text-[0.6875rem] text-kapture-smoke">No ECT recorded. Section 58A consent flow available if ever needed.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pathology -->
+      <div class="surface p-5">
+        <div class="flex items-center justify-between mb-3">
+          <div class="font-display font-semibold">Recent pathology</div>
+          <button onclick="kooperToast('Order new bloods — sends to community phlebotomy')" class="btn-yellow text-xs">Order bloods</button>
+        </div>
+        <div class="space-y-2 text-sm">
+          <div class="flex items-center justify-between p-2 rounded hover:bg-kapture-paper cursor-pointer" onclick="kooperToast('Full panel report opens')">
+            <span>FBC + U&amp;E + LFTs · 28 Apr</span>
+            <span class="chip chip-ok text-[0.6875rem]">All in range</span>
+          </div>
+          <div class="flex items-center justify-between p-2 rounded hover:bg-kapture-paper cursor-pointer" onclick="kooperToast('TSH report opens')">
+            <span>TSH · 28 Apr</span>
+            <span class="chip chip-ok text-[0.6875rem]">2.1 mIU/L</span>
+          </div>
+          <div class="flex items-center justify-between p-2 rounded hover:bg-kapture-paper cursor-pointer" onclick="kooperToast('Vit D report opens')">
+            <span>Vitamin D · 28 Apr</span>
+            <span class="chip chip-warn text-[0.6875rem]">52 nmol/L · low normal</span>
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- ============================================== -->
+    <!-- RIGHT — interventions, meds, escalation         -->
+    <!-- ============================================== -->
+    <aside class="lg:col-span-3">
+      <div class="surface p-4 lg:sticky lg:top-44 scroll-stack space-y-5">
+
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="font-display text-sm font-semibold uppercase tracking-wider">Active medications</h3>
+            <button onclick="kooperToast('Opens kooper · mar')" class="text-[0.6875rem] text-kapture-smoke hover:text-kapture-black">Open MAR →</button>
+          </div>
+          <div class="space-y-1.5 text-sm">
+            <div class="flex items-center justify-between"><span>Sertraline 50mg</span><span class="font-mono text-xs text-kapture-mist">OD</span></div>
+            <div class="flex items-center justify-between"><span>Mirtazapine 15mg</span><span class="font-mono text-xs text-kapture-mist">ON</span></div>
+            <div class="flex items-center justify-between"><span>Apixaban 5mg</span><span class="font-mono text-xs text-kapture-mist">BD</span></div>
+            <div class="flex items-center justify-between"><span>Paracetamol 1g</span><span class="font-mono text-xs text-kapture-mist">PRN · max 4/d</span></div>
+            <div class="flex items-center justify-between"><span>Vit D 1000 IU</span><span class="font-mono text-xs text-kapture-mist">OD</span></div>
+          </div>
+        </div>
+
+        <div class="pt-4 border-t border-kapture-fog">
+          <h3 class="font-display text-sm font-semibold uppercase tracking-wider mb-2">Allergies</h3>
+          <div class="flex flex-wrap gap-1.5">
+            <span class="chip chip-crit text-[0.6875rem]">Penicillin · rash</span>
+            <span class="chip text-[0.6875rem]">No food allergies</span>
+          </div>
+        </div>
+
+        <div class="pt-4 border-t border-kapture-fog">
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="font-display text-sm font-semibold uppercase tracking-wider">Today's interventions</h3>
+            <span class="font-mono text-xs text-kapture-mist">3 done</span>
+          </div>
+          <div class="space-y-2 text-xs">
+            <div class="flex items-center gap-2"><span class="text-status-ok">●</span><span>Morning meds · 08:10</span></div>
+            <div class="flex items-center gap-2"><span class="text-status-ok">●</span><span>Personal care · 07:42</span></div>
+            <div class="flex items-center gap-2"><span class="text-status-ok">●</span><span>Vitals · 07:40</span></div>
+            <div class="flex items-center gap-2"><span class="text-kapture-mist">○</span><span>Lunchtime meds · 12:00</span></div>
+            <div class="flex items-center gap-2"><span class="text-kapture-mist">○</span><span>Evening meds · 18:00</span></div>
+          </div>
+        </div>
+
+        <div class="pt-4 border-t border-kapture-fog">
+          <h3 class="font-display text-sm font-semibold uppercase tracking-wider mb-2">Escalate</h3>
+          <div class="space-y-2">
+            <button onclick="kooperToast('Page Sister Anne — 1 min ETA')" class="w-full text-left bg-kapture-paper hover:bg-kapture-fog rounded-lg p-2.5 text-xs flex items-center justify-between">
+              <span><strong>Page nurse</strong> · Sister Anne</span>
+              <span class="font-mono text-[0.6875rem] text-kapture-smoke">⏱ 1m</span>
+            </button>
+            <button onclick="kooperToast('Page clinical lead — 5 min ETA')" class="w-full text-left bg-kapture-paper hover:bg-kapture-fog rounded-lg p-2.5 text-xs flex items-center justify-between">
+              <span><strong>Page clinical lead</strong></span>
+              <span class="font-mono text-[0.6875rem] text-kapture-smoke">⏱ 5m</span>
+            </button>
+            <button onclick="kooperToast('GP-on-call notified · message sent')" class="w-full text-left bg-kapture-yellow hover:bg-kapture-amber rounded-lg p-2.5 text-xs flex items-center justify-between">
+              <span><strong>GP-on-call</strong></span>
+              <span class="font-mono text-[0.6875rem]">⚠ priority</span>
+            </button>
+            <button onclick="kooperToast('999 ambulance dispatch flow opens')" class="w-full text-left bg-status-critical text-white hover:opacity-90 rounded-lg p-2.5 text-xs flex items-center justify-between">
+              <span><strong>999 · ambulance</strong></span>
+              <span class="font-mono text-[0.6875rem]">deteriorating</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<div id="toast" class="toast">Saved</div>
+
+<script>
+function kooperToast(msg){const t=document.getElementById('toast');t.textContent=msg||'Saved';t.classList.add('on');clearTimeout(window.__t);window.__t=setTimeout(()=>t.classList.remove('on'),1700);}
+
+const PROBLEMS = {
+  'mixed-anxiety-depression': {title:'Mixed anxiety & depressive disorder', snomed:'231485007', icd:'F41.2', since:'Sep 2025', deck:'A long bereavement disorder, well held by medication, music, and the steady hand of Sister Anne. The team’s job is to keep it steady.', sev:'Active · monitor'},
+  'adhd':           {title:'Attention-deficit hyperactivity disorder', snomed:'406506008', icd:'F90.0', since:'2018', deck:'Adult ADHD, well-medicated, productive. The pattern shows up in pacing late afternoon and high engagement when given clear single tasks.', sev:'Stable · medicated'},
+  'cptsd':          {title:'Complex post-traumatic stress disorder', snomed:'—', icd:'ICD-11: 6B41', since:'2020', deck:'Trauma adaptation that surfaces around anniversaries and unfamiliar carers. EMDR is paused; the trusted-pairing approach holds the line.', sev:'Active · monthly'},
+  'mild-cog':       {title:'Mild cognitive impairment', snomed:'386805003', icd:'G31.84', since:'2024', deck:'Slow, monitored decline. Memory clinic baseline holds. The team uses single-step prompting and visual cues.', sev:'Stable'},
+  'osteoarthritis': {title:'Osteoarthritis · left hip', snomed:'396275006', icd:'M16.5', since:'—', deck:'Mechanical pain, well managed with paracetamol PRN, the right cushion, and a Zimmer for transfers.', sev:'Stable'}
+};
+
+function selectProblem(el, key){
+  document.querySelectorAll('.tree-item').forEach(n=>n.classList.remove('active'));
+  el.classList.add('active');
+  const p = PROBLEMS[key];
+  if (!p) return;
+  const detail = document.getElementById('problemDetail');
+  const h1 = detail.querySelector('.ed-h1');
+  const kicker = detail.querySelector('.ed-kicker');
+  const deck = detail.querySelector('.ed-deck');
+  const byline = detail.querySelector('.ed-byline');
+  if (h1) h1.textContent = p.title;
+  if (kicker) kicker.textContent = p.sev;
+  if (deck) deck.textContent = p.deck;
+  if (byline) byline.innerHTML = ''
+    + '<span><strong>SNOMED CT</strong> ' + p.snomed + '</span>'
+    + '<span><strong>ICD</strong> ' + p.icd + '</span>'
+    + '<span><strong>Since</strong> ' + p.since + '</span>'
+    + '<span><strong>Lead clinician</strong> Dr K. Adesina</span>';
+  kooperToast(p.title + ' · loaded');
+}
+
+function selectMHA(key){
+  kooperToast(key === 's117' ? 'S117 aftercare detail opens' : 'CTO history opens');
+}
+function selectDoLS(){
+  kooperToast('DoLS authorisation · renewal flow opens (5d)');
+}
+</script>
+</body>
+</html>

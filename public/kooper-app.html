@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>App detail · kooper · care</title>
+<meta name="description" content="Deep-dive on a kooper · care app — what it does, who uses it, what it replaces, what it integrates with, what it costs." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = { theme: { extend: { colors: { kapture: { black:'#0A0A0A',ink:'#111111',coal:'#1A1A1A',ash:'#2A2A2A',smoke:'#3A3A3A',mist:'#9A9A9A',fog:'#D4D4D4',paper:'#F5F5F5',white:'#FFFFFF',yellow:'#FFD400',amber:'#F5B400'}}, fontFamily:{display:['Space Grotesk','sans-serif'],sans:['Inter','sans-serif'],mono:['JetBrains Mono','monospace'],serif:['Source Serif 4','serif']}}}};
+</script>
+<style>
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Inter', sans-serif; background: #FAFAF7; color: #0A0A0A; -webkit-font-smoothing: antialiased; }
+  .font-display { font-family: 'Space Grotesk', sans-serif; }
+  .font-mono { font-family: 'JetBrains Mono', monospace; }
+  .font-serif { font-family: 'Source Serif 4', serif; }
+
+  .container-k { max-width: 1100px; margin-left: auto; margin-right: auto; padding-left: 1rem; padding-right: 1rem; }
+  @media (min-width: 640px) { .container-k { padding-left: 1.5rem; padding-right: 1.5rem; } }
+  @media (min-width: 1024px) { .container-k { padding-left: 2rem; padding-right: 2rem; } }
+
+  .nav-link { padding: 0.5rem 0.75rem; font-size: 0.875rem; font-weight: 500; color: #FFFFFF; opacity: 0.75; border-radius: 8px; transition: all 0.15s ease; text-decoration: none; }
+  .nav-link:hover { opacity: 1; background: #1A1A1A; }
+
+  .btn-primary { background: #0A0A0A; color: #FFFFFF; border: 1px solid #0A0A0A; padding: 0.625rem 1rem; border-radius: 10px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; transition: all 0.15s ease; text-decoration: none; }
+  .btn-primary:hover { background: transparent; color: #0A0A0A; }
+  .btn-yellow { background: #FFD400; color: #0A0A0A; border: 1px solid #FFD400; padding: 0.625rem 1rem; border-radius: 10px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; transition: all 0.15s ease; text-decoration: none; }
+  .btn-yellow:hover { background: #F5B400; }
+  .btn-secondary-on-dark { background: transparent; color: #FFFFFF; border: 1px solid rgba(255,255,255,0.4); padding: 0.5rem 0.875rem; border-radius: 10px; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.8125rem; transition: all 0.15s ease; text-decoration: none; }
+  .btn-secondary-on-dark:hover { background: rgba(255,255,255,0.1); }
+
+  .chip { display: inline-flex; align-items: center; gap: 0.375rem; padding: 0.25rem 0.625rem; border-radius: 999px; font-size: 0.75rem; font-weight: 500; line-height: 1; background: #FFFFFF; color: #2A2A2A; border: 1px solid #ECEAE3; }
+  .chip-yellow { background: #FFD400; color: #0A0A0A; border-color: #FFD400; }
+  .chip-dark { background: #0A0A0A; color: #FFFFFF; border-color: #0A0A0A; }
+  .chip-ok { background: rgba(16,185,129,0.1); color: #047857; border-color: rgba(16,185,129,0.25); }
+  .chip-outline-light { background: transparent; color: #FFFFFF; border-color: rgba(255,255,255,0.25); }
+
+  .h-display { font-family: 'Space Grotesk', sans-serif; font-weight: 600; letter-spacing: -0.02em; }
+
+  .ed-kicker { font-family: 'JetBrains Mono', monospace; font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #876300; display: inline-flex; align-items: center; gap: 0.5rem; }
+  .ed-kicker::before { content: ''; width: 18px; height: 2px; background: #FFD400; display: inline-block; }
+  .ed-kicker.on-dark { color: #FFD400; }
+
+  .stat-strip { display: grid; grid-template-columns: 1fr; gap: 0; border-top: 2px solid #0A0A0A; border-bottom: 1px solid #ECEAE3; padding: 1.5rem 0; }
+  @media (min-width: 768px) { .stat-strip { grid-template-columns: repeat(4, 1fr); gap: 0; } }
+  .stat-cell { padding: 0 1rem; border-left: 1px solid #ECEAE3; }
+  .stat-cell:first-child { border-left: 0; padding-left: 0; }
+  @media (max-width: 767px) { .stat-cell { border-left: 0; border-top: 1px solid #ECEAE3; padding: 0.75rem 0; } .stat-cell:first-child { border-top: 0; padding-top: 0; } }
+  .stat-label { font-family: 'JetBrains Mono', monospace; font-size: 0.625rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #6B7280; margin-bottom: 0.25rem; }
+  .stat-value { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 1.125rem; line-height: 1.2; color: #0A0A0A; }
+
+  .section-block { padding: 2.25rem 0; border-bottom: 1px solid #ECEAE3; }
+  .section-block:last-child { border-bottom: 0; }
+  .section-h { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 1.5rem; line-height: 1.2; letter-spacing: -0.012em; margin-bottom: 0.75rem; color: #0A0A0A; }
+  .section-prose { font-family: 'Source Serif 4', serif; font-size: 1.0625rem; line-height: 1.7; color: #1A1A1A; }
+  .section-prose p { margin-bottom: 0.85em; }
+
+  .integration-row { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; padding: 0.75rem 0; border-bottom: 1px dotted #ECEAE3; }
+  .integration-row:last-child { border-bottom: 0; }
+  .integration-name { font-family: 'JetBrains Mono', monospace; font-size: 0.875rem; color: #0A0A0A; font-weight: 500; }
+  .integration-role { font-family: 'Source Serif 4', serif; font-size: 0.9375rem; font-style: italic; color: #6B7280; text-align: right; max-width: 60%; }
+
+  .breadcrumb { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: #6B7280; }
+  .breadcrumb a { color: #6B7280; text-decoration: none; }
+  .breadcrumb a:hover { color: #0A0A0A; text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<!-- ============================================== -->
+<!-- TOP NAV                                          -->
+<!-- ============================================== -->
+<nav class="bg-kapture-black text-white sticky top-0 z-40">
+  <div class="container-k">
+    <div class="flex items-center justify-between h-16 gap-4">
+      <a href="kooper-care-landing.html" class="flex items-center gap-3" title="Back to landing">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="28" height="28" fill="none" aria-label="kooper" role="img" class="text-white"><path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" d="M255.75 133.125c67.679 0 122.625 54.946 122.625 122.625S323.429 378.375 255.75 378.375 133.125 323.429 133.125 255.75s54.946-122.625 122.625-122.625m0-132.75c18.832 0 34.121 15.289 34.121 34.121s-15.289 34.121-34.121 34.121-34.121-15.289-34.121-34.121S236.918.375 255.75.375M75.173 75.173c13.316-13.316 34.938-13.316 48.254 0s13.316 34.938 0 48.254-34.938 13.316-48.254 0-13.316-34.938 0-48.254M511.125 255.75c0 18.832-15.289 34.121-34.121 34.121s-34.121-15.289-34.121-34.121 15.289-34.121 34.121-34.121 34.121 15.289 34.121 34.121M255.75 442.883c18.832 0 34.121 15.289 34.121 34.121s-15.289 34.121-34.121 34.121-34.121-15.289-34.121-34.121 15.289-34.121 34.121-34.121m132.323-54.81c13.316-13.316 34.938-13.316 48.254 0s13.316 34.938 0 48.254-34.938 13.316-48.254 0-13.316-34.938 0-48.254M68.617 255.75c0 18.832-15.289 34.121-34.121 34.121S.375 274.582.375 255.75s15.289-34.121 34.121-34.121 34.121 15.289 34.121 34.121m54.81 132.323c13.316 13.316 13.316 34.938 0 48.254s-34.938 13.316-48.254 0-13.316-34.938 0-48.254 34.938-13.316 48.254 0"/><path fill="#FFD400" fill-rule="evenodd" clip-rule="evenodd" d="M436.327 75.173c13.316 13.316 13.316 34.938 0 48.254s-34.938 13.316-48.254 0-13.316-34.938 0-48.254 34.938-13.316 48.254 0"/></svg>
+        <span class="hidden sm:flex items-center gap-2 font-display lowercase tracking-wide text-base"><span class="font-semibold">kooper</span><span class="text-white/40">·</span><span class="font-medium">care</span></span>
+      </a>
+      <div class="hidden lg:flex items-center gap-1">
+        <a href="kooper-care-landing.html" class="nav-link">Home</a>
+        <a href="kooper-apps.html" class="nav-link">All apps</a>
+        <a href="kooper-care-landing.html#layers" class="nav-link">Architecture</a>
+        <a href="kooper-care-landing.html#users" class="nav-link">Users</a>
+        <a href="kooper-care-landing.html#pricing" class="nav-link">Pricing</a>
+        <a href="kooper-care-landing.html#cta" class="nav-link">Contact</a>
+      </div>
+      <div class="flex items-center gap-2">
+        <a href="kooper-sign-in.html" class="hidden md:inline-flex btn-secondary-on-dark text-sm">Sign in</a>
+        <a href="kooper-care-landing.html#cta" class="btn-yellow text-sm">Book demo</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ============================================== -->
+<!-- BREADCRUMB                                       -->
+<!-- ============================================== -->
+<div class="border-b border-[#ECEAE3]">
+  <div class="container-k py-3 breadcrumb">
+    <a href="kooper-care-landing.html">Home</a> · <a href="kooper-apps.html">All apps</a> · <span id="bcGroup">…</span> · <span id="bcName" class="text-black font-medium">…</span>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- HERO                                             -->
+<!-- ============================================== -->
+<section class="bg-black text-white">
+  <div class="container-k py-12 lg:py-16">
+    <div id="heroChips" class="flex items-center gap-2 flex-wrap mb-4"></div>
+    <h1 id="heroName" class="h-display text-[clamp(2.5rem,5.5vw,4rem)] leading-[1.05] mb-4">…</h1>
+    <p id="heroDeck" class="font-serif italic text-base lg:text-lg text-white/75 max-w-3xl leading-relaxed">…</p>
+    <div class="flex flex-wrap items-center gap-3 mt-6">
+      <a id="heroDemo" href="#" class="btn-yellow text-sm">Open the demo →</a>
+      <a href="kooper-care-landing.html#cta" class="btn-secondary-on-dark text-sm">Book a walkthrough</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================== -->
+<!-- STAT STRIP                                       -->
+<!-- ============================================== -->
+<section class="container-k">
+  <div class="stat-strip">
+    <div class="stat-cell">
+      <div class="stat-label">Group</div>
+      <div id="statGroup" class="stat-value">…</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-label">Primary users</div>
+      <div id="statUsers" class="stat-value">…</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-label">Replaces</div>
+      <div id="statReplaces" class="stat-value">…</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-label">Pricing</div>
+      <div id="statPricing" class="stat-value">…</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================== -->
+<!-- SECTIONS                                         -->
+<!-- ============================================== -->
+<main class="container-k">
+  <div id="sections" class="pb-8"></div>
+
+  <!-- Integrations -->
+  <section class="section-block">
+    <div class="ed-kicker mb-2">INTEGRATES WITH</div>
+    <h2 class="section-h">Where it sits in the ecosystem.</h2>
+    <p class="section-prose mb-4">Every app in kooper · care reads and writes to the shared Care Graph. The integrations below are the most active relationships — what this app sends, what it pulls, and where it routes events.</p>
+    <div id="integrations"></div>
+  </section>
+
+  <!-- Other apps in group -->
+  <section class="section-block">
+    <div class="ed-kicker mb-2">SAME GROUP</div>
+    <h2 class="section-h">Other apps you'd typically pair this with.</h2>
+    <div id="sameGroup" class="grid grid-cols-1 md:grid-cols-3 gap-3"></div>
+  </section>
+</main>
+
+<!-- ============================================== -->
+<!-- BOTTOM CTA                                       -->
+<!-- ============================================== -->
+<section class="bg-kapture-yellow py-14">
+  <div class="container-k">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+      <div class="lg:col-span-7">
+        <h2 class="h-display text-3xl text-black">Want this in your stack?</h2>
+        <p class="text-black/80 mt-2 max-w-xl">Book a 20-minute walkthrough. We'll scope which apps fit your service type, show this one in your context, and quote you on the call.</p>
+      </div>
+      <div class="lg:col-span-5 flex flex-wrap gap-3 lg:justify-end">
+        <a href="kooper-care-landing.html#cta" class="btn-primary text-sm">Book a demo</a>
+        <a href="kooper-apps.html" class="bg-black text-white border border-black rounded-[10px] px-3.5 py-2 text-sm font-semibold hover:bg-transparent hover:text-black inline-flex items-center gap-2">All 20 apps</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+// ============================================================
+// APP CATALOGUE — single source of truth for the deep-dive page
+// ============================================================
+const APPS = {
+  hr: {
+    name: 'kooper · hr', group: 'Spine', groupHref: 'kooper-apps.html#spine',
+    pricing: '£2.40 / user / month',
+    chips: [{ label: 'REQUIRED · CORE', cls: 'chip-yellow' }],
+    primary: 'All staff',
+    replaces: 'Workers, rota, training records',
+    deck: 'The single non-optional app. The auth + RBAC spine that resolves which apps load for which user, and the source of truth for every worker record, role, training certificate and shift.',
+    demo: 'kooper-hr.html',
+    sections: [
+      { heading: 'Why hr is the spine', body: ['Every kooper · care session begins with hr. When Sister Anne taps her face on a handset, hr resolves her worker record, looks up her role at this community, pulls the residents in scope for the shift, checks her mandatory training is current, and routes the right app stack to her phone in under 800ms.', 'Without hr there is no session. Every other app in the catalogue is a passenger on the auth + role context that hr maintains. That is why it is the only app you cannot remove.'] },
+      { heading: 'What it covers', body: ['Worker records, contracts, right-to-work and DBS evidence stored as audit-trailed documents. Role assignments per community (one worker can hold different roles in different homes). Mandatory training tracker — care certificate, manual handling, fire safety, food hygiene — with expiry warnings. Rota lite — shift patterns, swap requests, sickness logging. Payroll-ready exports — hours per worker per period, broken down by community.', 'On the auth side: OAuth + PKCE, magic-link and password sign-in, MFA enforced for managers and above, SSO ready for groups using Azure AD or Google Workspace.'] },
+      { heading: 'How field-level RBAC works', body: ['hr stores the role-to-permission mapping in a `field_permissions` table that every other app reads from. A field on a resident record (say "DoLS authorisation expiry") is tagged with which roles can read and which can write. Family role gets read=false on that field; nurse role gets read=true and write=false; clinical lead gets both.', 'When a user opens any app, that app loads the field-permission mask for the user\'s role and silently hides or read-only-locks the fields they shouldn\'t edit. There is no client-side bypass — RLS enforces the same rules at the database.'] }
+    ],
+    integrations: [
+      { with: 'every other app', role: 'Resolves session, role, residents in scope.' },
+      { with: 'kooper · audit', role: 'Every login, role-grant, training-update writes a row.' },
+      { with: 'kooper · compliance', role: 'Training currency feeds the DSPT pack and CQC SAF.' }
+    ]
+  },
+
+  'care-plans': {
+    name: 'kooper · care plans', group: 'Clinical core', groupHref: 'kooper-apps.html#clinical-core',
+    pricing: '£1.20 / user / month',
+    chips: [{ label: 'EDITORIAL · 62 DOMAINS', cls: 'chip-yellow' }],
+    primary: 'Nurse · Clinical Lead · Manager',
+    replaces: 'Care planning + assessments + outcomes (PCS / Nourish modules)',
+    deck: 'The clinical heart. Sixty-two domains across cognition, psychological, physical, social, and end-of-life — versioned, diff-aware, and laid out as a magazine spread so the team and the resident actually read them.',
+    demo: 'kooper-care-plans.html',
+    sections: [
+      { heading: 'Editorial reading layout', body: ['Every domain in the plan is set as an article — masthead, kicker, display title, italic-serif deck, body in Source Serif, labelled fields, pull quote with the resident\'s own voice, four-up stat panel, CQC SAF tag row. The team opens the plan and reads it. The inspector opens the plan and reads it. The resident opens the plan and reads it. That readability is the design point.'] },
+      { heading: 'Versioned and diff-aware', body: ['Every save creates a new version of the affected element. The history pane shows every prior version with the change author, timestamp, and a per-field diff. Compile evidence pack pulls the current version of every element with its full history attached.'] },
+      { heading: 'Patient involvement is a first-class field', body: ['CQC Caring requires evidence the resident participated. Every domain has a yellow-bar pull-quote slot for the resident\'s own words, captured with them in the room and time-stamped to the second. If the field is empty, the section is flagged amber on the readiness scorecard.'] }
+    ],
+    integrations: [
+      { with: 'kooper · recording', role: 'Each recording event links to the care-plan element it serves; adherence rate computed automatically.' },
+      { with: 'kooper · risk', role: 'Risk assessments link bidirectionally to the relevant care-plan domain.' },
+      { with: 'kooper · clinical', role: 'Major active problems map to the clinical domains and surface as cross-references.' },
+      { with: 'kooper · ai', role: 'AI suggests review prompts when a domain is approaching due-date or has stale evidence.' }
+    ]
+  },
+
+  clinical: {
+    name: 'kooper · clinical', group: 'Clinical core', groupHref: 'kooper-apps.html#clinical-core',
+    pricing: '£0.80 / user / month',
+    chips: [{ label: 'NHS-GRADE · SNOMED CT', cls: 'chip-yellow' }],
+    primary: 'Nurse · Clinical Lead · GP',
+    replaces: 'SystmOne / EMIS-style clinical record (for residential care)',
+    deck: 'The SystmOne-pattern clinical workspace, redesigned for residential care. Major Active Problems with SNOMED CT codes, MHA Sections, DoLS authorisations, ECT records, pathology results, and the NEWS2 panel.',
+    demo: 'kooper-clinical.html',
+    sections: [
+      { heading: 'Built around Major Active Problems', body: ['The clinical tree leads with the resident\'s active problems, each tagged with its SNOMED CT code, ICD-10 reference, severity band, and lead clinician. Click any problem and the editorial detail pane shows the clinical narrative, active medications, talking-therapy history, and CQC review schedule.', 'For residents with mental-health diagnoses, the same surface carries S117 aftercare plans, DoLS standard authorisations, and ECT consent records — the legal instruments that residential care has to evidence to inspectors.'] },
+      { heading: 'NEWS2 auto-calculated, auto-escalated', body: ['Every vitals reading from kooper · charts updates the NEWS2 panel. If the composite score reaches 5 or above, the alert engine auto-pages the on-shift nurse with a 5-minute acknowledgement requirement and adds the event to the responsive-quality-statement evidence trail.'] },
+      { heading: 'The escalation ladder', body: ['Right rail carries the four escalation tiers — page nurse (1 min), page clinical lead (5 min), GP-on-call (priority), 999 ambulance (now). Each tier owns its tone and routing. The clinician sees the path at all times.'] }
+    ],
+    integrations: [
+      { with: 'kooper · charts', role: 'NEWS2 panel reads vitals readings as they\'re captured.' },
+      { with: 'kooper · risk', role: 'Active problems may auto-create risk register entries (suicidality → risk to self).' },
+      { with: 'kooper · gp-connect', role: 'FHIR R4 push of problem list and medications to the GP record.' },
+      { with: 'kooper · mar', role: 'Active medications surface in the right rail; refusal logs flow back to the clinical narrative.' }
+    ]
+  },
+
+  charts: {
+    name: 'kooper · charts', group: 'Clinical core', groupHref: 'kooper-apps.html#clinical-core',
+    pricing: '£0.60 / user / month',
+    chips: [{ label: 'VISUALISATION UMBRELLA', cls: 'chip-yellow' }],
+    primary: 'Nurse · Manager · Carer',
+    replaces: 'NEWS2 chart, food / fluid, weight, repositioning, wound, pain, sleep — all umbrella charts',
+    deck: 'One workspace for every clinical chart. Vitals, food and fluid, weight, repositioning, wound, pain, sleep — all driven by the recording event stream and rendered as glanceable trends.',
+    demo: 'kooper-reports.html',
+    sections: [
+      { heading: 'Why one chart app, not seven', body: ['Legacy systems sell vitals, food and fluid, weight, repositioning, and wound charting as five separate apps. Each comes with its own chrome and login. Clinicians end up holding seven tabs open. kooper · charts is one tool that knows how to render every chart type because the underlying recording event stream is universal — a vitals row and a food row are both `recording_events` rows with different `domain_payload` shapes.'] },
+      { heading: 'NEWS2 the moment it changes', body: ['Vitals readings tap into kooper · charts as they\'re captured by recording. NEWS2 score recomputes server-side, the badge updates, and if the score crosses 5 the alert engine fires. No manual re-scoring.'] }
+    ],
+    integrations: [
+      { with: 'kooper · recording', role: 'Every chart line is one or more recording events.' },
+      { with: 'kooper · clinical', role: 'NEWS2 score and trend live on the clinical workspace right rail.' },
+      { with: 'kooper · ai', role: 'AI flags anomalies — sudden weight loss, rising pain scores, sleep fragmentation.' }
+    ]
+  },
+
+  mar: {
+    name: 'kooper · mar', group: 'Clinical core', groupHref: 'kooper-apps.html#clinical-core',
+    pricing: '£0.80 / user / month',
+    chips: [{ label: 'eMAR-READY', cls: 'chip-yellow' }],
+    primary: 'Nurse · Senior Carer',
+    replaces: 'MAR Chart (paper or PCS)',
+    deck: 'Medication administration record. eMAR-ready. Drug rounds, controlled drugs with witness signing, PRN with reason capture, refusal logging, drug interaction warnings.',
+    demo: 'kooper-recording-demo.html',
+    sections: [
+      { heading: 'Drug rounds without paper', body: ['The morning round opens with the resident list, prescribed medications grouped per resident with route, dose, and timing. Tap to administer; the system stamps the time, carer, and witness. Controlled drugs require a second worker to confirm before the dose is logged.'] },
+      { heading: 'PRN with reason and outcome', body: ['Every PRN dose captures the reason (pain, agitation, breakthrough symptom), pre-administration score where applicable (Abbey Pain Scale, behaviour rating), and a 30-minute follow-up prompt to record the outcome. The PRN log feeds the clinical narrative and the audit trail.'] }
+    ],
+    integrations: [
+      { with: 'kooper · clinical', role: 'Active medications populate the clinical workspace right rail; refusals log to the narrative.' },
+      { with: 'kooper · recording', role: 'PRN doses link to the precipitating event in recording_events.' },
+      { with: 'kooper · ai', role: 'AI flags medication-administration patterns that suggest review.' }
+    ]
+  },
+
+  recording: {
+    name: 'kooper · recording', group: 'Day of care', groupHref: 'kooper-apps.html#day-of-care',
+    pricing: '£0.80 / user / month',
+    chips: [{ label: '3-TAP ENGINE · UNIVERSAL', cls: 'chip-yellow' }],
+    primary: 'Carer · Senior Carer · Nurse',
+    replaces: 'Ten legacy domain-specific apps (mobility, continence, personal care, nutrition, mental state, sleep, wound care, pain, vitals, behaviour)',
+    deck: 'One app, every domain. Tap an icon — the AI structures the right schema and writes a CQC-ready narrative. Recording is one app, not ten. The 3-tap flow is the day\'s most-used surface.',
+    demo: 'kooper-recording-demo.html',
+    sections: [
+      { heading: 'Three taps, every interaction', body: ['Step 1: level of support — independent, prompted, assisted, full hands-on. Step 2: consent and dignity — verbal yes, non-verbal, implied, refused; dignity maintained or briefly compromised. Step 3: outcome — routine, near-miss, incident, ABC behaviour. Time captured automatically. Voice optional.', 'Three taps. The AI assembles the structured fields into a CQC-ready paragraph in the provider\'s voice. The carer reviews, locks, moves on. Total recording time on the floor: under 14 seconds for a routine event.'] },
+      { heading: 'Universal recording_events contract', body: ['Behind the icons sits one Postgres table. Every domain — personal care, continence, mobility, nutrition, mental state, behaviour, sleep, wound care, pain, vitals — writes to the same row, distinguished only by the domain_payload type. That uniformity is what lets one app cover ten legacy products and lets the audit trail stay coherent across every event a resident has ever generated.'] },
+      { heading: 'Auto-classifier catches what the carer might miss', body: ['When the carer taps "routine", the AI runs a quick classifier over the domain payload. A falls flag in mobility auto-promotes to "incident" and routes to the manager and risk register. NEWS2 ≥ 5 from a vitals tap auto-promotes to "clinical change" and pages the clinical lead. The carer is shown the proposed reclassification before the lock and can override with a reason.'] }
+    ],
+    integrations: [
+      { with: 'kooper · ai', role: 'AI generates the narrative paragraph and runs the auto-classifier.' },
+      { with: 'kooper · charts', role: 'Vitals, food, fluid, weight events render as chart points.' },
+      { with: 'kooper · risk', role: 'Falls, near-misses, behaviour events link to the risk register.' },
+      { with: 'kooper · care plans', role: 'Each event links to the care-plan element it serves; adherence computed.' }
+    ]
+  },
+
+  risk: {
+    name: 'kooper · risk', group: 'Day of care', groupHref: 'kooper-apps.html#day-of-care',
+    pricing: '£0.50 / user / month',
+    chips: [{ label: '10-CATEGORY REGISTER', cls: 'chip-yellow' }],
+    primary: 'Nurse · Senior Carer · Manager',
+    replaces: 'Risk register, safeguarding referral log, escalation matrix',
+    deck: 'Ten categories of risk, each with safety plan, escalation route, and review cadence. Safeguarding referrals tracked end to end. The risk story always tells itself.',
+    demo: 'kooper-clinical.html',
+    sections: [
+      { heading: 'The 10 risk categories', body: ['Risk to self · risk to others · risk from others · safeguarding concerns · physical health · mental health · drugs and alcohol · environmental · medication · other. Each category has its own assessment template with a severity band, mitigations, escalation route, and review date. Open risks live on the resident\'s clinical workspace right rail and on every recording event so the carer always sees what to watch for.'] },
+      { heading: 'Safeguarding from concern to closure', body: ['A safeguarding-flagged event opens a tracked thread — concern raised, local authority notified, response logged, outcome recorded. The chain is audit-locked end to end so the inspector can trace any concern back from the closing note to the original tap.'] }
+    ],
+    integrations: [
+      { with: 'kooper · recording', role: 'Falls, near-misses, behaviour events open or update risks automatically.' },
+      { with: 'kooper · care plans', role: 'Risks link bidirectionally to the relevant care-plan domain.' },
+      { with: 'kooper · clinical', role: 'Active mental-health problems may auto-create safeguarding flags.' },
+      { with: 'kooper · audit', role: 'Every risk-state change is field-level audit-logged.' }
+    ]
+  },
+
+  activities: {
+    name: 'kooper · activities', group: 'Day of care', groupHref: 'kooper-apps.html#day-of-care',
+    pricing: '£0.40 / user / month',
+    chips: [],
+    primary: 'Activities Coordinator · Carer',
+    replaces: 'Activity log, engagement spreadsheet',
+    deck: 'Engagement log, life-story prompts, group events, mood pre and post each session. Photos that family then see in the family app.',
+    demo: 'kooper-care-dashboards.html?as=activities',
+    sections: [
+      { heading: 'Why this is a CQC weapon', body: ['Caring and Responsive both require evidence of meaningful engagement. Activities is where that evidence is generated. The session log captures who attended, mood before, mood after, level of participation — and the photos auto-flow to the family feed under the resident\'s consent rules.'] }
+    ],
+    integrations: [
+      { with: 'kooper · family', role: 'Activity photos surface in the family stream subject to consent.' },
+      { with: 'kooper · recording', role: 'Mood ratings pre/post sessions are recording events.' },
+      { with: 'kooper · ai', role: 'AI surfaces engagement patterns and suggests prompts based on life-story.' }
+    ]
+  },
+
+  operations: {
+    name: 'kooper · operations', group: 'Operations', groupHref: 'kooper-apps.html#operations',
+    pricing: '£0.50 / user / month',
+    chips: [],
+    primary: 'Manager · Senior Carer',
+    replaces: 'Shift handover sheet, occupancy whiteboard, daybook',
+    deck: 'Shift handover, occupancy, daybook, complaints, rota lite. Where the manager\'s day starts and ends.',
+    demo: 'kooper-care-dashboards.html?as=manager',
+    sections: [
+      { heading: 'Structured handover', body: ['Night-shift carer\'s notes flow into the morning handover screen automatically — every recording event since the last handover, every alert raised, every escalation fired. The manager reads the structured digest, acknowledges, and the floor opens.'] }
+    ],
+    integrations: [
+      { with: 'kooper · hr', role: 'Reads on-shift workers and rota.' },
+      { with: 'kooper · recording', role: 'Pulls the last 12 hours of events for the handover digest.' },
+      { with: 'kooper · ai', role: 'AI summarises the handover events into one paragraph for the manager.' }
+    ]
+  },
+
+  estate: {
+    name: 'kooper · estate', group: 'Operations', groupHref: 'kooper-apps.html#operations',
+    pricing: '£0.30 / resident / month',
+    chips: [{ label: 'CONSOLIDATED', cls: 'chip-yellow' }],
+    primary: 'Maintenance · Cook · Manager',
+    replaces: 'real estate · stock · maintenance — three legacy apps',
+    deck: 'Maintenance tickets, asset register, stock, supplies, household tasks, auto-reorder thresholds. One tool replaces three.',
+    demo: 'kooper-care-dashboards.html?as=maintenance',
+    sections: [
+      { heading: 'Why one estate app', body: ['Legacy systems sold real estate, stock, and maintenance as separate products. They\'re the same system — the maintenance team, the cook, and the housekeeper all need to see the same asset register, raise the same tickets, and run against the same stock thresholds. kooper · estate is one tool that covers the whole housekeeping side.'] }
+    ],
+    integrations: [
+      { with: 'kooper · operations', role: 'Open tickets surface on the manager handover.' },
+      { with: 'kooper · compliance', role: 'PAT testing, fire alarm, lift servicing dates feed the compliance scorecard.' }
+    ]
+  },
+
+  'multi-site': {
+    name: 'kooper · multi-site', group: 'Operations', groupHref: 'kooper-apps.html#operations',
+    pricing: '£0.20 / resident / month',
+    chips: [],
+    primary: 'Owner · Director',
+    replaces: 'Group reporting spreadsheet',
+    deck: 'Group rollup across multiple communities. Cross-facility roster, comparative dashboards, group-level CQC pack.',
+    demo: 'kooper-care-dashboards.html?as=owner',
+    sections: [
+      { heading: 'For groups running two or more', body: ['Once a single owner runs more than one home, the manager-level reports are no longer enough. multi-site provides the executive-tier rollup — comparative occupancy, comparative SAF readiness, comparative incident rates, and one workforce roster across every site.'] }
+    ],
+    integrations: [
+      { with: 'kooper · reports', role: 'Group-level reports build on top of multi-site rollup data.' },
+      { with: 'kooper · hr', role: 'Workforce roster spans every community in the group.' }
+    ]
+  },
+
+  reports: {
+    name: 'kooper · reports', group: 'Insights & evidence', groupHref: 'kooper-apps.html#insights-evidence',
+    pricing: '£0.50 / user / month',
+    chips: [{ label: 'AUDIENCE-CURATED', cls: 'chip-yellow' }],
+    primary: 'Manager · Clinical Lead · Owner',
+    replaces: 'Custom dashboards, weekly board pack, CQC evidence compile',
+    deck: 'Audience-curated. CQC pack, Operations, Clinical, Family, Board. Each tile shows which kooper app feeds it. AI search bar — ask in plain English, get the chart.',
+    demo: 'kooper-reports.html',
+    sections: [
+      { heading: 'Five audiences, one hub', body: ['The CQC inspector wants the SAF pack. The owner wants the board view. The clinical lead wants NEWS2 and MAR exceptions. The manager wants ops. The family wants a daily summary. Reports tabs each audience and pre-curates the tiles each one most needs.'] },
+      { heading: 'Source transparency', body: ['Every tile carries a small mono chip declaring which app feeds it — `⊕ recording · risk` for falls, `⊕ mar` for refusals, `⊕ family` for open rates. No black-box dashboards. Every number is traceable.'] }
+    ],
+    integrations: [
+      { with: 'every recording-producing app', role: 'Pulls aggregations from recording_events and the per-domain rollups.' },
+      { with: 'kooper · ai', role: 'AI search bar generates one-off charts from plain-English prompts.' },
+      { with: 'kooper · audit', role: 'Every report compile / export is audit-logged.' }
+    ]
+  },
+
+  audit: {
+    name: 'kooper · audit', group: 'Insights & evidence', groupHref: 'kooper-apps.html#insights-evidence',
+    pricing: '£0.30 / user / month',
+    chips: [],
+    primary: 'Manager · Owner · Inspector',
+    replaces: 'Audit log spreadsheet, change-tracking add-ons',
+    deck: 'Immutable audit log viewer. Every field-level change captured with who, when, what changed from / to. The proof of integrity that makes inspector reviews a non-event.',
+    demo: 'kooper-reports.html',
+    sections: [
+      { heading: 'Field-level history, every table', body: ['Every kooper app writes a `_history` row alongside every mutation. The audit viewer renders these as a unified timeline filtered by resident, by worker, by app, by date range. Click any row to see the before / after diff.'] }
+    ],
+    integrations: [
+      { with: 'every app that writes', role: 'All mutations write _history rows; audit reads the union.' }
+    ]
+  },
+
+  compliance: {
+    name: 'kooper · compliance', group: 'Insights & evidence', groupHref: 'kooper-apps.html#insights-evidence',
+    pricing: '£0.50 / user / month',
+    chips: [],
+    primary: 'Manager · Owner',
+    replaces: 'DSPT spreadsheet, GDPR toolkit, DoLS tracker',
+    deck: 'DSPT pack auto-compile, GDPR toolkit, retention rules, DoLS automation, CQC SAF readiness scorecard.',
+    demo: 'kooper-reports.html',
+    sections: [
+      { heading: 'CQC SAF readiness, in real time', body: ['The compliance dashboard renders the five SAF quality statements with their evidence currency. Where evidence is stale, the red / amber bar shows up. Where a domain has zero evidence in the last 90 days, the bar reads "no evidence". The manager always knows what the inspector will see before the inspector sees it.'] }
+    ],
+    integrations: [
+      { with: 'kooper · reports', role: 'Compliance reports compile from reports tile aggregations.' },
+      { with: 'kooper · audit', role: 'Reads audit log to evidence retention rule adherence.' }
+    ]
+  },
+
+  ai: {
+    name: 'kooper · ai', group: 'Insights & evidence', groupHref: 'kooper-apps.html#insights-evidence',
+    pricing: '£0.80 / user / month',
+    chips: [{ label: 'AI · PREMIUM LAYER', cls: 'chip-yellow' }],
+    primary: 'Manager · Clinical Lead · all stakeholders (downstream)',
+    replaces: 'No legacy equivalent — kooper-only category',
+    deck: 'The AI brain. Powers Recording\'s narrative, Family\'s daily summary, Reports\' AI search, Clinical\'s anomaly detection. One paid layer; every other app benefits.',
+    demo: 'kooper-recording-demo.html',
+    sections: [
+      { heading: 'What the AI actually does', body: ['Narrative generation — turns the structured recording fields into a CQC-ready paragraph in the provider\'s voice. Anomaly detection — flags the unusual recording pattern in a resident\'s stream (sudden mood drop, rising pain score, sleep fragmentation). Predictive risk — a 14-day-ahead nudge that says "this looks like the lead-up to last winter\'s admission". Daily summary — the family-facing daily digest written for a daughter, not a clinician. Plain-English search — the reports search bar.'] },
+      { heading: 'Source-bound by contract', body: ['The AI never invents detail. Every claim in any AI output traces back to a captured field in the Care Graph. The narrative contract is enforced at the prompt — the model is given only the structured fields and forbidden from adding observations not in the source data. The carer reviews and locks every AI output before it becomes part of the record.'] }
+    ],
+    integrations: [
+      { with: 'kooper · recording', role: 'Generates the narrative paragraph for every recording event.' },
+      { with: 'kooper · family', role: 'Composes the daily summary in plain English.' },
+      { with: 'kooper · reports', role: 'Plans and executes plain-English searches over the Care Graph.' },
+      { with: 'kooper · clinical', role: 'Anomaly detection over vitals and clinical observations.' }
+    ]
+  },
+
+  resident: {
+    name: 'kooper · resident', group: 'Stakeholder', groupHref: 'kooper-apps.html#stakeholder',
+    pricing: 'Bundled in operator subscription',
+    chips: [{ label: 'BUNDLED', cls: 'chip-yellow' }],
+    primary: 'The resident',
+    replaces: 'No legacy equivalent',
+    deck: 'The mobile pictogram-led app for the resident themselves. Big-tap mood selector, "I need help with…" tile grid, family messages, today\'s schedule. Voice-first.',
+    demo: 'kooper-resident.html',
+    sections: [
+      { heading: 'For the person, not the system', body: ['Big tap targets, large emoji, simple words. The resident is the user — not the carer, not the family, not the inspector. A mood tap routes to the team. A "drink" tap routes to the cook. A "family" tap calls Sarah. The carer\'s app fades into the background; the resident\'s agency comes forward.'] }
+    ],
+    integrations: [
+      { with: 'kooper · hr', role: 'Help requests route to the on-shift carer best matched to the request type.' },
+      { with: 'kooper · family', role: 'Mood and activity feed informs the family daily summary.' }
+    ]
+  },
+
+  family: {
+    name: 'kooper · family', group: 'Stakeholder', groupHref: 'kooper-apps.html#stakeholder',
+    pricing: 'Bundled with kooper · resident',
+    chips: [{ label: 'BUNDLED', cls: 'chip-yellow' }, { label: 'PRIVACY-BOUND', cls: 'chip' }],
+    primary: 'Adult children · spouses · close family',
+    replaces: 'No legacy equivalent (was paid add-on in v1; bundled from v2)',
+    deck: 'Family-facing PWA. Daily AI summary written for a daughter, not a clinician. Photos, video calls, About Me public bits, "Help us know Dad better" contribution grid. Privacy boundary built in.',
+    demo: 'kooper-family.html',
+    sections: [
+      { heading: 'The privacy boundary is the design', body: ['The family page leads with a dashed-border pill: "The care plan stays private." Below it, two cards — what the family CAN see (daily life, photos, About Me) and what stays with the clinical team (full plan, MAR, MHA, risks, NEWS2). The family sees what the resident consented to share. Anything else, the family asks for, and the request is logged.'] },
+      { heading: 'Contribute, don\'t consume', body: ['The family contribution grid — what cheers Dad up, foods he loves, stories from the past, a concern for the team — turns the family from passive viewer into active participant. The team uses that context. The resident sees what was shared.'] }
+    ],
+    integrations: [
+      { with: 'kooper · ai', role: 'Composes the daily summary in plain English from the day\'s recording events.' },
+      { with: 'kooper · resident', role: 'Activity photos and mood updates flow under consent rules.' },
+      { with: 'kooper · audit', role: 'Every access request and team response is audit-logged.' }
+    ]
+  },
+
+  partner: {
+    name: 'kooper · partner', group: 'Stakeholder', groupHref: 'kooper-apps.html#stakeholder',
+    pricing: '£0.80 / user / month',
+    chips: [],
+    primary: 'Suppliers · GPs · contractors · allied health',
+    replaces: 'Email threads, paper purchase orders',
+    deck: 'Limited-scope app for suppliers, GPs, contractors, allied health. Audit-logged. Each partner sees only the residents and fields explicitly opened to them.',
+    demo: 'kooper-care-dashboards.html',
+    sections: [
+      { heading: 'Limited-scope, audit-logged', body: ['A pharmacy partner sees medications, deliveries, and refusal logs. They don\'t see the care plan or the family stream. A physio partner sees mobility events and treatment notes for the residents they\'re assigned to. They don\'t see anyone else. Every access is logged.'] }
+    ],
+    integrations: [
+      { with: 'kooper · audit', role: 'All partner reads and writes are audit-logged with reason codes.' },
+      { with: 'kooper · mar', role: 'Pharmacy partners see the medication round and dispense logs.' }
+    ]
+  },
+
+  inspector: {
+    name: 'kooper · inspector', group: 'Stakeholder', groupHref: 'kooper-apps.html#stakeholder',
+    pricing: 'Free',
+    chips: [{ label: 'FREE', cls: 'chip-ok' }, { label: 'TIME-BOUND', cls: 'chip' }],
+    primary: 'CQC inspectors',
+    replaces: 'Read-only spreadsheet exports during inspection',
+    deck: 'CQC inspectors. Read-only, time-bound access (typically 11-14 days from issue). The audit pack. The SAF-readiness scorecard. Free across every operator.',
+    demo: 'kooper-care-dashboards.html?as=inspector',
+    sections: [
+      { heading: 'Free is a feature', body: ['Charging the inspector is the dumbest move you can make as a vendor. The inspector then becomes the procurement blocker every time. kooper · inspector is free across every operator — the inspector signs in to a time-bounded read-only view, runs the inspection, signs out, the access expires. No procurement step, no contract negotiation, no friction.'] }
+    ],
+    integrations: [
+      { with: 'kooper · audit', role: 'Every inspector read is itself audit-logged.' },
+      { with: 'kooper · reports', role: 'The CQC pack is the inspector\'s primary surface.' }
+    ]
+  },
+
+  'gp-connect': {
+    name: 'kooper · gp-connect', group: 'Stakeholder', groupHref: 'kooper-apps.html#stakeholder',
+    pricing: '£0.40 / resident / month',
+    chips: [{ label: 'NHS · FHIR R4', cls: 'chip-yellow' }],
+    primary: 'NHS GPs · community clinicians',
+    replaces: 'Manual medication reconciliation, faxed referrals',
+    deck: 'FHIR R4 NHS interop. Push to GP record, pull medications, PDS lookup. The bridge between residential care and the NHS clinical system.',
+    demo: 'kooper-clinical.html',
+    sections: [
+      { heading: 'Why this matters in 2026', body: ['NHS community-care contracts increasingly require GP-Connect compatibility. Without it, residents fall into a gap — the care home knows the truth, the GP doesn\'t, and the medication reconciliation breaks down on every admission and discharge. kooper · gp-connect closes the loop.'] }
+    ],
+    integrations: [
+      { with: 'kooper · clinical', role: 'Pushes the active problem list and medications via FHIR R4.' },
+      { with: 'kooper · mar', role: 'Pulls the GP-prescribed medication list at admission and on change.' }
+    ]
+  }
+};
+
+// ============================================================
+// RENDER
+// ============================================================
+(function () {
+  const params = new URLSearchParams(window.location.search);
+  const slug = params.get('app') || 'recording';
+  const data = APPS[slug] || APPS.recording;
+
+  document.title = data.name + ' · kooper · care';
+  document.getElementById('bcGroup').innerHTML = '<a href="' + data.groupHref + '">' + data.group + '</a>';
+  document.getElementById('bcName').textContent = data.name;
+
+  const heroChips = document.getElementById('heroChips');
+  heroChips.innerHTML = '<span class="chip chip-outline-light">' + data.group + '</span>';
+  data.chips.forEach(c => {
+    const span = document.createElement('span');
+    span.className = 'chip ' + c.cls;
+    span.textContent = c.label;
+    heroChips.appendChild(span);
+  });
+
+  document.getElementById('heroName').textContent = data.name;
+  document.getElementById('heroDeck').textContent = data.deck;
+  const demo = document.getElementById('heroDemo');
+  demo.href = data.demo;
+  demo.textContent = data.demo === '#' ? 'Coming soon' : 'Open the demo →';
+
+  document.getElementById('statGroup').textContent = data.group;
+  document.getElementById('statUsers').textContent = data.primary;
+  document.getElementById('statReplaces').textContent = data.replaces;
+  document.getElementById('statPricing').textContent = data.pricing;
+
+  const sections = document.getElementById('sections');
+  sections.innerHTML = data.sections.map(s =>
+    '<section class="section-block">' +
+      '<h2 class="section-h">' + s.heading + '</h2>' +
+      '<div class="section-prose">' + s.body.map(p => '<p>' + p + '</p>').join('') + '</div>' +
+    '</section>'
+  ).join('');
+
+  const integrations = document.getElementById('integrations');
+  integrations.innerHTML = data.integrations.map(i =>
+    '<div class="integration-row">' +
+      '<span class="integration-name">' + i.with + '</span>' +
+      '<span class="integration-role">' + i.role + '</span>' +
+    '</div>'
+  ).join('');
+
+  // Other apps in the same group
+  const same = Object.entries(APPS).filter(([s, a]) => a.group === data.group && s !== slug).slice(0, 6);
+  const sameGrid = document.getElementById('sameGroup');
+  sameGrid.innerHTML = same.map(([s, a]) =>
+    '<a href="kooper-app.html?app=' + s + '" class="block bg-white border border-[#ECEAE3] rounded-xl p-4 hover:border-black transition">' +
+      '<div class="font-mono text-[0.625rem] uppercase tracking-[0.12em] text-[#6B7280] mb-1">' + a.group + '</div>' +
+      '<div class="font-display font-semibold text-base">' + a.name + '</div>' +
+      '<div class="font-serif italic text-xs text-[#6B7280] mt-1 line-clamp-2">' + a.deck.slice(0, 100) + '…</div>' +
+    '</a>'
+  ).join('');
+})();
+</script>
+</body>
+</html>

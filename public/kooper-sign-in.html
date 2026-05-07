@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Sign in · kooper · care</title>
+<meta name="description" content="Sign in to kooper · care. Magic-link access for production users; instant demo accounts for tours, pilots, and walkthroughs." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = { theme: { extend: { colors: { kapture: { black:'#0A0A0A',ink:'#111111',coal:'#1A1A1A',ash:'#2A2A2A',smoke:'#3A3A3A',mist:'#9A9A9A',fog:'#D4D4D4',paper:'#F5F5F5',white:'#FFFFFF',yellow:'#FFD400',amber:'#F5B400'}}, fontFamily:{display:['Space Grotesk','sans-serif'],sans:['Inter','sans-serif'],mono:['JetBrains Mono','monospace'],serif:['Source Serif 4','serif']}}}};
+</script>
+<style>
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Inter', sans-serif; background: #FAFAF7; color: #0A0A0A; -webkit-font-smoothing: antialiased; min-height: 100vh; }
+  .font-display { font-family: 'Space Grotesk', sans-serif; }
+  .font-mono { font-family: 'JetBrains Mono', monospace; }
+  .font-serif { font-family: 'Source Serif 4', serif; }
+
+  .input-field { width: 100%; padding: 0.875rem 1rem; background: #FFFFFF; border: 1px solid #D4D4D4; border-radius: 12px; font-size: 0.9375rem; color: #1A1A1A; transition: all 0.15s ease; }
+  .input-field:focus { outline: none; border-color: #0A0A0A; box-shadow: 0 0 0 4px rgba(255,212,0,0.15); }
+
+  .btn-primary { background: #0A0A0A; color: #FFFFFF; border: 1px solid #0A0A0A; padding: 0.75rem 1.25rem; border-radius: 12px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; font-size: 0.9375rem; transition: all 0.15s ease; width: 100%; }
+  .btn-primary:hover { background: #1A1A1A; }
+  .btn-yellow { background: #FFD400; color: #0A0A0A; border: 1px solid #FFD400; padding: 0.5rem 0.875rem; border-radius: 10px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 0.375rem; font-size: 0.8125rem; transition: all 0.15s ease; }
+  .btn-yellow:hover { background: #F5B400; }
+
+  .demo-card { background: #FFFFFF; border: 1px solid #ECEAE3; border-radius: 14px; padding: 1rem 1.125rem; cursor: pointer; transition: all 0.15s ease; display: flex; align-items: center; gap: 0.875rem; text-decoration: none; color: #0A0A0A; }
+  .demo-card:hover { border-color: #0A0A0A; background: #FFFFFF; }
+  .demo-card.featured { background: #0A0A0A; color: #FFFFFF; border-color: #0A0A0A; }
+  .demo-card.featured:hover { background: #1A1A1A; }
+  .demo-card.featured .role-chip { background: #FFD400; color: #0A0A0A; }
+
+  .avatar { width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-family: 'Space Grotesk'; font-weight: 700; font-size: 0.9375rem; }
+
+  .role-chip { font-family: 'JetBrains Mono', monospace; font-size: 0.625rem; padding: 0.125rem 0.5rem; border-radius: 999px; background: #F5F5F5; color: #2A2A2A; font-weight: 600; letter-spacing: 0.04em; }
+  .role-chip.yellow { background: #FFD400; color: #0A0A0A; }
+  .role-chip.green { background: #DCFCE7; color: #047857; }
+  .role-chip.purple { background: #EDE9FE; color: #5B21B6; }
+
+  .ed-kicker { font-family: 'JetBrains Mono', monospace; font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #876300; display: inline-flex; align-items: center; gap: 0.5rem; }
+  .ed-kicker::before { content: ''; width: 18px; height: 2px; background: #FFD400; display: inline-block; }
+  .ed-kicker.on-dark { color: #FFD400; }
+
+  .h-display { font-family: 'Space Grotesk', sans-serif; font-weight: 600; letter-spacing: -0.015em; }
+
+  .pulse-dot { position: relative; width: 8px; height: 8px; border-radius: 999px; background: #10B981; flex-shrink: 0; }
+  .pulse-dot::after { content: ''; position: absolute; inset: -4px; border-radius: 999px; background: #10B981; opacity: 0.4; animation: pulse-out 1.6s ease-out infinite; }
+  @keyframes pulse-out { 0% { transform: scale(0.6); opacity: 0.6; } 100% { transform: scale(1.8); opacity: 0; } }
+</style>
+</head>
+<body>
+
+<!-- ============================================== -->
+<!-- TOP NAV — minimal                                -->
+<!-- ============================================== -->
+<nav class="bg-kapture-black text-white">
+  <div class="max-w-6xl mx-auto px-5 py-3 flex items-center justify-between">
+    <a href="kooper-care-landing.html" class="flex items-center gap-2">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="24" height="24" fill="none" aria-label="kooper" role="img" class="text-white"><path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" d="M255.75 133.125c67.679 0 122.625 54.946 122.625 122.625S323.429 378.375 255.75 378.375 133.125 323.429 133.125 255.75s54.946-122.625 122.625-122.625m0-132.75c18.832 0 34.121 15.289 34.121 34.121s-15.289 34.121-34.121 34.121-34.121-15.289-34.121-34.121S236.918.375 255.75.375M75.173 75.173c13.316-13.316 34.938-13.316 48.254 0s13.316 34.938 0 48.254-34.938 13.316-48.254 0-13.316-34.938 0-48.254M511.125 255.75c0 18.832-15.289 34.121-34.121 34.121s-34.121-15.289-34.121-34.121 15.289-34.121 34.121-34.121 34.121 15.289 34.121 34.121M255.75 442.883c18.832 0 34.121 15.289 34.121 34.121s-15.289 34.121-34.121 34.121-34.121-15.289-34.121-34.121 15.289-34.121 34.121-34.121m132.323-54.81c13.316-13.316 34.938-13.316 48.254 0s13.316 34.938 0 48.254-34.938 13.316-48.254 0-13.316-34.938 0-48.254M68.617 255.75c0 18.832-15.289 34.121-34.121 34.121S.375 274.582.375 255.75s15.289-34.121 34.121-34.121 34.121 15.289 34.121 34.121m54.81 132.323c13.316 13.316 13.316 34.938 0 48.254s-34.938 13.316-48.254 0-13.316-34.938 0-48.254 34.938-13.316 48.254 0"/><path fill="#FFD400" fill-rule="evenodd" clip-rule="evenodd" d="M436.327 75.173c13.316 13.316 13.316 34.938 0 48.254s-34.938 13.316-48.254 0-13.316-34.938 0-48.254 34.938-13.316 48.254 0"/></svg>
+      <span class="font-display lowercase tracking-wide text-sm"><span class="font-semibold">kooper</span><span class="text-white/40 mx-1">·</span><span class="font-medium">care</span></span>
+    </a>
+    <a href="kooper-care-landing.html" class="text-xs text-white/70 hover:text-white">← Back to landing</a>
+  </div>
+</nav>
+
+<!-- ============================================== -->
+<!-- BODY                                             -->
+<!-- ============================================== -->
+<main class="max-w-6xl mx-auto px-5 py-10 lg:py-14">
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16">
+
+    <!-- =========================================== -->
+    <!-- LEFT — Magic-link sign-in                    -->
+    <!-- =========================================== -->
+    <section>
+      <div class="ed-kicker mb-3">SIGN IN</div>
+      <h1 class="h-display text-3xl lg:text-4xl mb-2">Welcome back.</h1>
+      <p class="font-serif italic text-lg text-kapture-smoke leading-relaxed mb-7 max-w-md">A magic link gets you in without a password. Quicker, safer, fewer things to remember.</p>
+
+      <form onsubmit="return submitMagicLink(event)" class="space-y-3 max-w-md">
+        <div>
+          <label class="font-mono text-[0.6875rem] uppercase tracking-[0.12em] text-kapture-smoke font-medium block mb-1.5">Work email</label>
+          <input id="emailField" type="email" required class="input-field" placeholder="sister.anne@draycott.care" autocomplete="email" />
+        </div>
+        <button type="submit" class="btn-primary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          Send magic link
+        </button>
+      </form>
+
+      <div class="mt-6 max-w-md">
+        <div class="text-xs text-kapture-smoke">
+          By signing in you accept the <a href="#" class="underline-offset-4 hover:underline">terms</a> and the
+          <a href="#" class="underline-offset-4 hover:underline">privacy notice</a>. NHS DSPT certified · CQC SAF aligned.
+        </div>
+      </div>
+
+      <div class="mt-8 pt-6 border-t border-[#ECEAE3] max-w-md">
+        <div class="flex items-center gap-2 text-xs">
+          <span class="pulse-dot"></span>
+          <span class="text-kapture-smoke">All systems normal · last incident 0 days ago</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================== -->
+    <!-- RIGHT — Demo accounts                        -->
+    <!-- =========================================== -->
+    <section>
+      <div class="flex items-baseline justify-between mb-3">
+        <div class="ed-kicker">DEMO TOUR · INSTANT</div>
+        <span class="text-xs text-kapture-smoke font-mono">no signup</span>
+      </div>
+      <h2 class="h-display text-2xl mb-2">Or step in as someone.</h2>
+      <p class="font-serif italic text-base text-kapture-smoke leading-relaxed mb-6 max-w-md">Pick a role to walk the product the way that user would. Tap an account, land on the right surface.</p>
+
+      <!-- Featured demo account: Sister Anne -->
+      <a href="kooper-clinical.html" class="demo-card featured mb-3" onclick="kooperToast('Signed in as Sister Anne · Nurse')">
+        <div class="avatar" style="background:#FFD400;color:#0A0A0A">SA</div>
+        <div class="flex-1">
+          <div class="font-semibold text-sm">Sister Anne · Nurse</div>
+          <div class="text-xs text-white/70">Clinical lead view · NEWS2, MHA, problems</div>
+        </div>
+        <span class="role-chip">RECOMMENDED</span>
+      </a>
+
+      <!-- Operator-side demo accounts -->
+      <div class="text-[0.6875rem] uppercase tracking-[0.12em] text-kapture-smoke font-mono mt-5 mb-2">Operator side</div>
+      <div class="space-y-2">
+        <a href="kooper-care-dashboards.html?as=manager" class="demo-card">
+          <div class="avatar" style="background:#0A0A0A;color:#FFD400">LO</div>
+          <div class="flex-1">
+            <div class="font-semibold text-sm">Lola Okonkwo · Registered Manager</div>
+            <div class="text-xs text-kapture-smoke">Multi-resident, alerts, rota, complaints</div>
+          </div>
+          <span class="role-chip">MANAGER</span>
+        </a>
+        <a href="kooper-recording-demo.html" class="demo-card">
+          <div class="avatar" style="background:#FCD34D;color:#0A0A0A">CM</div>
+          <div class="flex-1">
+            <div class="font-semibold text-sm">Craig Musara · Carer</div>
+            <div class="text-xs text-kapture-smoke">Icon-tap recording · 3 taps to evidence</div>
+          </div>
+          <span class="role-chip">CARER</span>
+        </a>
+        <a href="kooper-care-dashboards.html?as=clinical-lead" class="demo-card">
+          <div class="avatar" style="background:#A5B4FC;color:#0A0A0A">CL</div>
+          <div class="flex-1">
+            <div class="font-semibold text-sm">Clinical lead view</div>
+            <div class="text-xs text-kapture-smoke">Cross-resident clinical oversight</div>
+          </div>
+          <span class="role-chip purple">CLIN-LEAD</span>
+        </a>
+        <a href="kooper-reports.html" class="demo-card">
+          <div class="avatar" style="background:#86EFAC;color:#0A0A0A">RO</div>
+          <div class="flex-1">
+            <div class="font-semibold text-sm">Owner · Reports first</div>
+            <div class="text-xs text-kapture-smoke">CQC pack, board, ops, family roll-up</div>
+          </div>
+          <span class="role-chip green">OWNER</span>
+        </a>
+      </div>
+
+      <!-- Stakeholder demo accounts -->
+      <div class="text-[0.6875rem] uppercase tracking-[0.12em] text-kapture-smoke font-mono mt-5 mb-2">Stakeholder side</div>
+      <div class="space-y-2">
+        <a href="kooper-resident.html" class="demo-card">
+          <div class="avatar" style="background:#FFD400;color:#0A0A0A">EB</div>
+          <div class="flex-1">
+            <div class="font-semibold text-sm">Mr Edward Banda · Resident</div>
+            <div class="text-xs text-kapture-smoke">Pictogram-led mobile app · big buttons</div>
+          </div>
+          <span class="role-chip yellow">RESIDENT</span>
+        </a>
+        <a href="kooper-family.html" class="demo-card">
+          <div class="avatar" style="background:#FFE39A;color:#0A0A0A">SB</div>
+          <div class="flex-1">
+            <div class="font-semibold text-sm">Sarah Banda · Family (daughter)</div>
+            <div class="text-xs text-kapture-smoke">Daily summary · photos · privacy boundary</div>
+          </div>
+          <span class="role-chip">FAMILY</span>
+        </a>
+        <a href="kooper-care-dashboards.html?as=inspector" class="demo-card">
+          <div class="avatar" style="background:#FCA5A5;color:#0A0A0A">TJ</div>
+          <div class="flex-1">
+            <div class="font-semibold text-sm">Tomas Jankowski · CQC Inspector</div>
+            <div class="text-xs text-kapture-smoke">Time-bound, read-only audit pack view</div>
+          </div>
+          <span class="role-chip">INSPECTOR</span>
+        </a>
+      </div>
+
+      <p class="text-[0.6875rem] text-kapture-smoke mt-5 italic">Demo accounts use mock data. No real residents, no PII. Production sign-in goes through the magic link.</p>
+    </section>
+
+  </div>
+</main>
+
+<!-- ============================================== -->
+<!-- FOOTER                                           -->
+<!-- ============================================== -->
+<footer class="border-t border-[#ECEAE3] py-6 mt-10">
+  <div class="max-w-6xl mx-auto px-5 flex flex-wrap items-center justify-between gap-3 text-xs text-kapture-smoke">
+    <span class="font-mono">A Kapture product · kooper · care</span>
+    <div class="flex items-center gap-4">
+      <a href="#" class="hover:text-kapture-black underline-offset-4 hover:underline">Status</a>
+      <a href="#" class="hover:text-kapture-black underline-offset-4 hover:underline">Help centre</a>
+      <a href="mailto:studio@thekapture.com" class="hover:text-kapture-black underline-offset-4 hover:underline">Contact</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+function kooperToast(msg){
+  var t = document.createElement('div');
+  t.textContent = msg;
+  t.style.cssText = 'position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:#0A0A0A;color:#FFD400;padding:0.75rem 1.25rem;border-radius:10px;font-size:0.875rem;font-weight:500;z-index:100;box-shadow:0 12px 30px -8px rgba(0,0,0,0.3);font-family:Inter,sans-serif;';
+  document.body.appendChild(t);
+  setTimeout(()=>{ t.style.transition='opacity 0.3s ease'; t.style.opacity='0'; }, 1700);
+  setTimeout(()=>t.remove(), 2100);
+}
+
+function submitMagicLink(e){
+  e.preventDefault();
+  var email = document.getElementById('emailField').value.trim();
+  if (!email) return false;
+  kooperToast('Magic link sent to ' + email + ' · check your inbox');
+  return false;
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>All apps · kooper · care</title>
+<meta name="description" content="The full kooper · care app catalogue. Twenty apps in six groups — Spine, Clinical core, Day of care, Operations, Insights & evidence, Stakeholder." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = { theme: { extend: { colors: { kapture: { black:'#0A0A0A',ink:'#111111',coal:'#1A1A1A',ash:'#2A2A2A',smoke:'#3A3A3A',mist:'#9A9A9A',fog:'#D4D4D4',paper:'#F5F5F5',white:'#FFFFFF',yellow:'#FFD400',amber:'#F5B400'}, status:{critical:'#E5484D',warning:'#FFD400',ok:'#10B981',neutral:'#D4D4D4'}}, fontFamily:{display:['Space Grotesk','sans-serif'],sans:['Inter','sans-serif'],mono:['JetBrains Mono','monospace'],serif:['Source Serif 4','serif']}}}};
+</script>
+<style>
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Inter', sans-serif; background: #FAFAF7; color: #0A0A0A; -webkit-font-smoothing: antialiased; }
+  .font-display { font-family: 'Space Grotesk', sans-serif; }
+  .font-mono { font-family: 'JetBrains Mono', monospace; }
+  .font-serif { font-family: 'Source Serif 4', serif; }
+
+  .container-k { max-width: 1280px; margin-left: auto; margin-right: auto; padding-left: 1rem; padding-right: 1rem; }
+  @media (min-width: 640px) { .container-k { padding-left: 1.5rem; padding-right: 1.5rem; } }
+  @media (min-width: 1024px) { .container-k { padding-left: 2rem; padding-right: 2rem; } }
+
+  .nav-link { padding: 0.5rem 0.75rem; font-size: 0.875rem; font-weight: 500; color: #FFFFFF; opacity: 0.75; border-radius: 8px; transition: all 0.15s ease; text-decoration: none; }
+  .nav-link:hover { opacity: 1; background: #1A1A1A; }
+  .nav-link-active { opacity: 1; background: #1A1A1A; color: #FFD400; }
+
+  .btn-primary { background: #0A0A0A; color: #FFFFFF; border: 1px solid #0A0A0A; padding: 0.5rem 0.875rem; border-radius: 10px; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.8125rem; transition: all 0.15s ease; }
+  .btn-primary:hover { background: transparent; color: #0A0A0A; }
+  .btn-yellow { background: #FFD400; color: #0A0A0A; border: 1px solid #FFD400; padding: 0.5rem 0.875rem; border-radius: 10px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.8125rem; transition: all 0.15s ease; }
+  .btn-yellow:hover { background: #F5B400; }
+  .btn-secondary-on-dark { background: transparent; color: #FFFFFF; border: 1px solid rgba(255,255,255,0.4); padding: 0.5rem 0.875rem; border-radius: 10px; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.8125rem; transition: all 0.15s ease; }
+  .btn-secondary-on-dark:hover { background: rgba(255,255,255,0.1); }
+
+  .chip { display: inline-flex; align-items: center; gap: 0.375rem; padding: 0.25rem 0.625rem; border-radius: 999px; font-size: 0.75rem; font-weight: 500; line-height: 1; background: #FFFFFF; color: #2A2A2A; border: 1px solid #ECEAE3; }
+  .chip-yellow { background: #FFD400; color: #0A0A0A; border-color: #FFD400; }
+  .chip-dark { background: #0A0A0A; color: #FFFFFF; border-color: #0A0A0A; }
+  .chip-ok { background: rgba(16,185,129,0.1); color: #047857; border-color: rgba(16,185,129,0.25); }
+  .chip-outline-light { background: transparent; color: #FFFFFF; border-color: rgba(255,255,255,0.25); }
+
+  .h-display { font-family: 'Space Grotesk', sans-serif; font-weight: 600; letter-spacing: -0.02em; }
+
+  .group-anchor { scroll-margin-top: 5rem; }
+  .group-header { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; padding: 1rem 0 0.875rem; border-bottom: 2px solid #0A0A0A; margin-bottom: 1.5rem; }
+  .group-kicker { font-family: 'JetBrains Mono', monospace; font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #876300; display: inline-flex; align-items: center; gap: 0.5rem; }
+  .group-kicker::before { content: ''; width: 18px; height: 2px; background: #FFD400; display: inline-block; }
+
+  .app-row { display: grid; grid-template-columns: 1fr; gap: 1rem; padding: 1.5rem 0; border-bottom: 1px solid #ECEAE3; }
+  @media (min-width: 768px) { .app-row { grid-template-columns: 280px 1fr 200px; gap: 2rem; align-items: start; } }
+  .app-row:last-child { border-bottom: 0; }
+  .app-row.featured { background: #FFFFFF; border: 1px solid #FCD34D; border-radius: 18px; padding: 1.75rem; margin-bottom: 1rem; }
+  .app-row.required { background: #0A0A0A; color: #FFFFFF; border-radius: 18px; padding: 1.75rem; margin-bottom: 1rem; border: 0; }
+  .app-row.required .app-name { color: #FFFFFF; }
+  .app-row.required .app-meta-label { color: #FFD400; }
+  .app-row.required .app-meta-value { color: #FFFFFF; }
+  .app-row.required .app-prose { color: #D4D4D4; }
+  .app-row.required .group-kicker { color: #FFD400; }
+
+  .app-name { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 1.625rem; line-height: 1.1; letter-spacing: -0.012em; color: #0A0A0A; margin-bottom: 0.375rem; }
+  .app-prose { font-family: 'Source Serif 4', serif; font-size: 1.0625rem; line-height: 1.55; color: #1A1A1A; }
+
+  .app-meta { display: flex; flex-direction: column; gap: 0.625rem; }
+  .app-meta-label { font-family: 'JetBrains Mono', monospace; font-size: 0.625rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #6B7280; margin-bottom: 0.125rem; }
+  .app-meta-value { font-size: 0.875rem; font-weight: 500; color: #1A1A1A; }
+  .app-price { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 1.5rem; line-height: 1; }
+  .app-price-foot { font-size: 0.75rem; color: #6B7280; }
+
+  .group-counter { font-family: 'JetBrains Mono', monospace; font-size: 0.875rem; color: #6B7280; }
+</style>
+</head>
+<body>
+
+<!-- ============================================== -->
+<!-- TOP NAV                                          -->
+<!-- ============================================== -->
+<nav class="bg-kapture-black text-white sticky top-0 z-40">
+  <div class="container-k">
+    <div class="flex items-center justify-between h-16 gap-4">
+      <a href="kooper-care-landing.html" class="flex items-center gap-3" title="Back to landing">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="28" height="28" fill="none" aria-label="kooper" role="img" class="text-white"><path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" d="M255.75 133.125c67.679 0 122.625 54.946 122.625 122.625S323.429 378.375 255.75 378.375 133.125 323.429 133.125 255.75s54.946-122.625 122.625-122.625m0-132.75c18.832 0 34.121 15.289 34.121 34.121s-15.289 34.121-34.121 34.121-34.121-15.289-34.121-34.121S236.918.375 255.75.375M75.173 75.173c13.316-13.316 34.938-13.316 48.254 0s13.316 34.938 0 48.254-34.938 13.316-48.254 0-13.316-34.938 0-48.254M511.125 255.75c0 18.832-15.289 34.121-34.121 34.121s-34.121-15.289-34.121-34.121 15.289-34.121 34.121-34.121 34.121 15.289 34.121 34.121M255.75 442.883c18.832 0 34.121 15.289 34.121 34.121s-15.289 34.121-34.121 34.121-34.121-15.289-34.121-34.121 15.289-34.121 34.121-34.121m132.323-54.81c13.316-13.316 34.938-13.316 48.254 0s13.316 34.938 0 48.254-34.938 13.316-48.254 0-13.316-34.938 0-48.254M68.617 255.75c0 18.832-15.289 34.121-34.121 34.121S.375 274.582.375 255.75s15.289-34.121 34.121-34.121 34.121 15.289 34.121 34.121m54.81 132.323c13.316 13.316 13.316 34.938 0 48.254s-34.938 13.316-48.254 0-13.316-34.938 0-48.254 34.938-13.316 48.254 0"/><path fill="#FFD400" fill-rule="evenodd" clip-rule="evenodd" d="M436.327 75.173c13.316 13.316 13.316 34.938 0 48.254s-34.938 13.316-48.254 0-13.316-34.938 0-48.254 34.938-13.316 48.254 0"/></svg>
+        <span class="hidden sm:flex items-center gap-2 font-display lowercase tracking-wide text-base"><span class="font-semibold">kooper</span><span class="text-white/40">·</span><span class="font-medium">care</span></span>
+      </a>
+      <div class="hidden lg:flex items-center gap-1">
+        <a href="kooper-care-landing.html" class="nav-link">Home</a>
+        <a href="#" class="nav-link nav-link-active">Apps</a>
+        <a href="kooper-care-landing.html#layers" class="nav-link">Architecture</a>
+        <a href="kooper-care-landing.html#users" class="nav-link">Users</a>
+        <a href="kooper-care-landing.html#pricing" class="nav-link">Pricing</a>
+        <a href="kooper-care-landing.html#cta" class="nav-link">Contact</a>
+      </div>
+      <div class="flex items-center gap-2">
+        <a href="kooper-sign-in.html" class="hidden md:inline-flex btn-secondary-on-dark text-sm">Sign in</a>
+        <a href="kooper-care-landing.html#cta" class="btn-yellow text-sm">Book demo</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ============================================== -->
+<!-- HERO                                             -->
+<!-- ============================================== -->
+<section class="bg-black text-white">
+  <div class="container-k py-12 lg:py-16">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-end">
+      <div class="lg:col-span-8">
+        <div class="font-mono text-[0.6875rem] font-semibold uppercase tracking-[0.14em] text-[#FFD400] mb-3 inline-flex items-center gap-2">
+          <span aria-hidden class="inline-block h-[2px] w-[18px] bg-[#FFD400]"></span>
+          THE FULL CATALOGUE
+        </div>
+        <h1 class="h-display text-[clamp(2.5rem,5.5vw,4rem)] leading-[1.05] mb-3">Twenty apps. Six groups. One spine.</h1>
+        <p class="font-serif italic text-base lg:text-lg text-white/75 max-w-2xl leading-relaxed">Every kooper · care app does one job. Take any one on its own; combine any set; drop any when the team rotates. Below — the full catalogue, grouped by purpose, in the order a service typically adopts.</p>
+      </div>
+      <div class="lg:col-span-4">
+        <nav class="bg-[#1A1A1A] border border-[#2A2A2A] rounded-2xl p-4">
+          <div class="font-mono text-[0.6875rem] uppercase tracking-[0.14em] text-[#9A9A9A] mb-2">Jump to</div>
+          <ul class="space-y-1.5 text-sm">
+            <li><a href="#spine" class="text-white/85 hover:text-[#FFD400]">Spine <span class="text-white/40">(1)</span></a></li>
+            <li><a href="#clinical-core" class="text-white/85 hover:text-[#FFD400]">Clinical core <span class="text-white/40">(4)</span></a></li>
+            <li><a href="#day-of-care" class="text-white/85 hover:text-[#FFD400]">Day of care <span class="text-white/40">(3)</span></a></li>
+            <li><a href="#operations" class="text-white/85 hover:text-[#FFD400]">Operations <span class="text-white/40">(3)</span></a></li>
+            <li><a href="#insights-evidence" class="text-white/85 hover:text-[#FFD400]">Insights &amp; evidence <span class="text-white/40">(4)</span></a></li>
+            <li><a href="#stakeholder" class="text-white/85 hover:text-[#FFD400]">Stakeholder <span class="text-white/40">(5)</span></a></li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================== -->
+<!-- SPINE                                            -->
+<!-- ============================================== -->
+<section id="spine" class="container-k py-12 group-anchor">
+  <div class="group-header">
+    <div>
+      <div class="group-kicker">SPINE</div>
+      <h2 class="font-display text-3xl font-semibold mt-1">The required spine.</h2>
+    </div>
+    <span class="group-counter">1 app</span>
+  </div>
+
+  <div class="app-row required">
+    <div>
+      <span class="chip chip-yellow">REQUIRED · CORE</span>
+      <div class="app-name mt-3">kooper · hr</div>
+      <div class="app-prose">The single non-optional app. Every login pulls user role, shift, residents in scope, training currency, RTW + DBS evidence, and access privileges. The auth + RBAC spine that resolves which other apps load for which user.</div>
+    </div>
+    <div class="app-meta md:pt-12">
+      <div><div class="app-meta-label">Primary users</div><div class="app-meta-value">All staff</div></div>
+      <div><div class="app-meta-label">Replaces</div><div class="app-meta-value">Workers, rota, training</div></div>
+      <div><div class="app-meta-label">Try the demo</div><a href="kooper-hr.html" class="app-meta-value underline-offset-4 hover:underline" style="color:#FFD400">Open kooper · hr →</a></div>
+    </div>
+    <div class="md:pt-12 md:text-right">
+      <div class="app-price" style="color:#FFD400">£2.40</div>
+      <div class="app-price-foot" style="color:#9A9A9A">per user / month</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================== -->
+<!-- CLINICAL CORE                                    -->
+<!-- ============================================== -->
+<section id="clinical-core" class="container-k py-12 group-anchor">
+  <div class="group-header">
+    <div>
+      <div class="group-kicker">CLINICAL CORE</div>
+      <h2 class="font-display text-3xl font-semibold mt-1">The clinical heart.</h2>
+    </div>
+    <span class="group-counter">4 apps</span>
+  </div>
+
+  <div class="bg-white rounded-[18px] border border-[#ECEAE3] p-2 lg:p-4">
+    <div class="app-row">
+      <div>
+        <div class="app-name">kooper · care plans</div>
+        <p class="app-prose">62 clinical domains across cognition, psychological, physical, social, end-of-life. Versioned. Diff-aware. Every change captured with the resident in the room. Editorial reading layout — long-form, calm, inspector-ready.</p>
+      </div>
+      <div class="app-meta md:pt-1">
+        <div><div class="app-meta-label">Primary users</div><div class="app-meta-value">Nurse · Clinical Lead · Manager</div></div>
+        <div><div class="app-meta-label">Try the demo</div><a href="kooper-care-plans.html" class="app-meta-value underline-offset-4 hover:underline">Open prototype →</a></div>
+      </div>
+      <div class="md:pt-1 md:text-right">
+        <div class="app-price">£1.20</div>
+        <div class="app-price-foot">per user / month</div>
+      </div>
+    </div>
+    <div class="app-row">
+      <div>
+        <div class="app-name">kooper · clinical</div>
+        <p class="app-prose">Major Active Problems with SNOMED CT codes, MHA Sections, DoLS authorisations, ECT records, pathology results, NEWS2 panel. The SystmOne-pattern workspace, redesigned for residential care.</p>
+      </div>
+      <div class="app-meta md:pt-1">
+        <div><div class="app-meta-label">Primary users</div><div class="app-meta-value">Nurse · Clinical Lead · GP</div></div>
+        <div><div class="app-meta-label">Try the demo</div><a href="kooper-clinical.html" class="app-meta-value underline-offset-4 hover:underline">Open prototype →</a></div>
+      </div>
+      <div class="md:pt-1 md:text-right">
+        <div class="app-price">£0.80</div>
+        <div class="app-price-foot">per user / month</div>
+      </div>
+    </div>
+    <div class="app-row">
+      <div>
+        <div class="app-name">kooper · charts</div>
+        <p class="app-prose">The visualisation umbrella for every clinical chart — vitals, food and fluid, weight, repositioning, wound, pain, sleep. One workspace, multiple chart types, all driven by the recording event stream.</p>
+      </div>
+      <div class="app-meta md:pt-1">
+        <div><div class="app-meta-label">Primary users</div><div class="app-meta-value">Nurse · Manager · Carer</div></div>
+        <div><div class="app-meta-label">Try the demo</div><a href="kooper-reports.html" class="app-meta-value underline-offset-4 hover:underline">Open reports →</a></div>
+      </div>
+      <div class="md:pt-1 md:text-right">
+        <div class="app-price">£0.60</div>
+        <div class="app-price-foot">per user / month</div>
+      </div>
+    </div>
+    <div class="app-row">
+      <div>
+        <div class="app-name">kooper · mar</div>
+        <p class="app-prose">Medication administration record. eMAR-ready. Drug rounds, controlled drugs with witness signing, PRN tracking with reason capture, refusal logging, drug interaction warnings.</p>
+      </div>
+      <div class="app-meta md:pt-1">
+        <div><div class="app-meta-label">Primary users</div><div class="app-meta-value">Nurse · Senior Carer</div></div>
+        <div><div class="app-meta-label">Try the demo</div><a href="kooper-recording-demo.html" class="app-meta-value underline-offset-4 hover:underline">Open recording →</a></div>
+      </div>
+      <div class="md:pt-1 md:text-right">
+        <div class="app-price">£0.80</div>
+        <div class="app-price-foot">per user / month</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================== -->
+<!-- DAY OF CARE                                      -->
+<!-- ============================================== -->
+<section id="day-of-care" class="container-k py-12 group-anchor">
+  <div class="group-header">
+    <div>
+      <div class="group-kicker">DAY OF CARE</div>
+      <h2 class="font-display text-3xl font-semibold mt-1">What happens on the floor.</h2>
+    </div>
+    <span class="group-counter">3 apps</span>
+  </div>
+
+  <div class="app-row featured">
+    <div>
+      <span class="chip chip-yellow">3-TAP ENGINE · UNIVERSAL</span>
+      <div class="app-name mt-3">kooper · recording</div>
+      <p class="app-prose">One app, every domain. Tap an icon — Personal care, Continence, Mobility, Nutrition, Mental state, Behaviour, Sleep, Wound, Pain — the AI structures the right schema and writes a CQC-ready narrative. Recording is one app, not ten. The 3-tap flow is the day's most-used surface.</p>
+    </div>
+    <div class="app-meta md:pt-12">
+      <div><div class="app-meta-label">Primary users</div><div class="app-meta-value">Carer · Senior Carer · Nurse</div></div>
+      <div><div class="app-meta-label">Replaces</div><div class="app-meta-value">10 legacy domain apps</div></div>
+      <div><div class="app-meta-label">Try the demo</div><a href="kooper-recording-demo.html" class="app-meta-value underline-offset-4 hover:underline">Open prototype →</a></div>
+    </div>
+    <div class="md:pt-12 md:text-right">
+      <div class="app-price">£0.80</div>
+      <div class="app-price-foot">per user / month</div>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-[18px] border border-[#ECEAE3] p-2 lg:p-4">
+    <div class="app-row">
+      <div>
+        <div class="app-name">kooper · risk</div>
+        <p class="app-prose">10-category risk register — risk to self, risk to others, risk from others, safeguarding, physical health, mental health, drugs and alcohol, environmental, medication, other. Safety plans, safeguarding referrals, escalation routes, review cadences.</p>
+      </div>
+      <div class="app-meta md:pt-1">
+        <div><div class="app-meta-label">Primary users</div><div class="app-meta-value">Nurse · Senior Carer · Manager</div></div>
+        <div><div class="app-meta-label">Try the demo</div><a href="kooper-clinical.html" class="app-meta-value underline-offset-4 hover:underline">Open clinical →</a></div>
+      </div>
+      <div class="md:pt-1 md:text-right">
+        <div class="app-price">£0.50</div>
+        <div class="app-price-foot">per user / month</div>
+      </div>
+    </div>
+    <div class="app-row">
+      <div>
+        <div class="app-name">kooper · activities</div>
+        <p class="app-prose">Engagement log, life-story prompts, group events, mood pre and post each session. Activities Coordinators photograph the moments that family then see in the family app.</p>
+      </div>
+      <div class="app-meta md:pt-1">
+        <div><div class="app-meta-label">Primary users</div><div class="app-meta-value">Activities Coordinator · Carer</div></div>
+        <div><div class="app-meta-label">Try the demo</div><a href="kooper-care-dashboards.html?as=activities" class="app-meta-value underline-offset-4 hover:underline">Open dashboard →</a></div>
+      </div>
+      <div class="md:pt-1 md:text-right">
+        <div class="app-price">£0.40</div>
+        <div class="app-price-foot">per user / month</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================== -->
+<!-- OPERATIONS                                       -->
+<!-- ============================================== -->
+<section id="operations" class="container-k py-12 group-anchor">
+  <div class="group-header">
+    <div>
+      <div class="group-kicker">OPERATIONS</div>
+      <h2 class="font-display text-3xl font-semibold mt-1">How the home runs.</h2>
+    </div>
+    <span class="group-counter">3 apps</span>
+  </div>
+
+  <div class="bg-white rounded-[18px] border border-[#ECEAE3] p-2 lg:p-4">
+    <div class="app-row">
+      <div>
+        <div class="app-name">kooper · operations</div>
+        <p class="app-prose">Shift handover, occupancy, daybook, complaints, rota lite. Where the manager's day starts and ends. Handover is structured — the night-shift carer's notes flow into the morning-shift screen automatically.</p>
+      </div>
+      <div class="app-meta md:pt-1">
+        <div><div class="app-meta-label">Primary users</div><div class="app-meta-value">Manager · Senior Carer</div></div>
+        <div><div class="app-meta-label">Try the demo</div><a href="kooper-care-dashboards.html?as=manager" class="app-meta-value underline-offset-4 hover:underline">Open manager dashboard →</a></div>
+      </div>
+      <div class="md:pt-1 md:text-right">
+        <div class="app-price">£0.50</div>
+        <div class="app-price-foot">per user / month</div>
+      </div>
+    </div>
+    <div class="app-row">
+      <div>
+        <div class="app-name">kooper · estate</div>
+        <p class="app-prose">Maintenance tickets, asset register, stock, supplies, household tasks, auto-reorder thresholds. Replaces three legacy apps (real estate, stock, maintenance) with one tool.</p>
+      </div>
+      <div class="app-meta md:pt-1">
+        <div><div class="app-meta-label">Primary users</div><div class="app-meta-value">Maintenance · Cook · Manager</div></div>
+        <div><div class="app-meta-label">Replaces</div><div class="app-meta-value">real estate · stock · maintenance</div></div>
+      </div>
+      <div class="md:pt-1 md:text-right">
+        <div class="app-price">£0.30</div>
+        <div class="app-price-foot">per resident / month</div>
+      </div>
+    </div>
+    <div class="app-row">
+      <div>
+        <div class="app-name">kooper · multi-site</div>
+        <p class="app-prose">Group rollup across multiple communities. Cross-facility roster, comparative dashboards, group-level CQC pack. For owners running two or more homes.</p>
+      </div>
+      <div class="app-meta md:pt-1">
+        <div><div class="app-meta-label">Primary users</div><div class="app-meta-value">Owner · Director</div></div>
+      </div>
+      <div class="md:pt-1 md:text-right">
+        <div class="app-price">£0.20</div>
+        <div class="app-price-foot">per resident / month</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================== -->
+<!-- INSIGHTS & EVIDENCE                              -->
+<!-- ============================================== -->
+<section id="insights-evidence" class="container-k py-12 group-anchor">
+  <div class="group-header">
+    <div>
+      <div class="group-kicker">INSIGHTS &amp; EVIDENCE</div>
+      <h2 class="font-display text-3xl font-semibold mt-1">Where every recording lands.</h2>
+    </div>
+    <span class="group-counter">4 apps</span>
+  </div>
+
+  <div class="bg-white rounded-[18px] border border-[#ECEAE3] p-2 lg:p-4">
+    <div class="app-row">
+      <div>
+        <div class="app-name">kooper · reports</div>
+        <p class="app-prose">Audience-curated. CQC pack, Operations, Clinical, Family, Board. Each report tile shows which kooper · X app feeds it. Time-window picker. AI search bar — ask in plain English, get the chart.</p>
+      </div>
+      <div class="app-meta md:pt-1">
+        <div><div class="app-meta-label">Primary users</div><div class="app-meta-value">Manager · Clinical Lead · Owner</div></div>
+        <div><div class="app-meta-label">Try the demo</div><a href="kooper-reports.html" class="app-meta-value underline-offset-4 hover:underline">Open prototype →</a></div>
+      </div>
+      <div class="md:pt-1 md:text-right">
+        <div class="app-price">£0.50</div>
+        <div class="app-price-foot">per user / month</div>
+      </div>
+    </div>
+    <div class="app-row">
+      <div>
+        <div class="app-name">kooper · audit</div>
+        <p class="app-prose">Immutable audit log viewer. Every field-level change captured with who, when, what changed from / to. Manager+ access only. The proof of integrity that makes inspector reviews a non-event.</p>
+      </div>
+      <div class="app-meta md:pt-1">
+        <div><div class="app-meta-label">Primary users</div><div class="app-meta-value">Manager · Owner · Inspector</div></div>
+      </div>
+      <div class="md:pt-1 md:text-right">
+        <div class="app-price">£0.30</div>
+        <div class="app-price-foot">per user / month</div>
+      </div>
+    </div>
+    <div class="app-row">
+      <div>
+        <div class="app-name">kooper · compliance</div>
+        <p class="app-prose">DSPT pack auto-compile, GDPR toolkit, retention rules, DoLS automation, CQC SAF readiness scorecard. Compliance that stays current without spreadsheets.</p>
+      </div>
+      <div class="app-meta md:pt-1">
+        <div><div class="app-meta-label">Primary users</div><div class="app-meta-value">Manager · Owner</div></div>
+      </div>
+      <div class="md:pt-1 md:text-right">
+        <div class="app-price">£0.50</div>
+        <div class="app-price-foot">per user / month</div>
+      </div>
+    </div>
+    <div class="app-row">
+      <div>
+        <span class="chip chip-yellow">AI · PREMIUM LAYER</span>
+        <div class="app-name mt-3">kooper · ai</div>
+        <p class="app-prose">The AI brain. AI narrative for kooper · recording (CQC-ready note from 3 taps). Anomaly detection across the resident's recording stream. Predictive risk. Weekly digest summaries. Plain-English daily summary for the family app.</p>
+      </div>
+      <div class="app-meta md:pt-1">
+        <div><div class="app-meta-label">Primary users</div><div class="app-meta-value">Manager · Clinical Lead · all stakeholders (downstream)</div></div>
+        <div><div class="app-meta-label">Powers</div><div class="app-meta-value">Recording narrative · Family summary · Insights</div></div>
+      </div>
+      <div class="md:pt-1 md:text-right">
+        <div class="app-price">£0.80</div>
+        <div class="app-price-foot">per user / month</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================== -->
+<!-- STAKEHOLDER                                      -->
+<!-- ============================================== -->
+<section id="stakeholder" class="container-k py-12 pb-20 group-anchor">
+  <div class="group-header">
+    <div>
+      <div class="group-kicker">STAKEHOLDER</div>
+      <h2 class="font-display text-3xl font-semibold mt-1">Everyone in the loop, not just staff.</h2>
+    </div>
+    <span class="group-counter">5 apps</span>
+  </div>
+
+  <div class="bg-white rounded-[18px] border border-[#ECEAE3] p-2 lg:p-4">
+    <div class="app-row">
+      <div>
+        <span class="chip chip-yellow">BUNDLED</span>
+        <div class="app-name mt-3">kooper · resident</div>
+        <p class="app-prose">The mobile pictogram-led app for the resident themselves. Big-tap mood selector, "I need help with…" tile grid, family messages, today's schedule, About Me self-edit. Voice-first. Designed for service users with reduced capacity, fluctuating attention, and small screens.</p>
+      </div>
+      <div class="app-meta md:pt-1">
+        <div><div class="app-meta-label">Primary user</div><div class="app-meta-value">The resident</div></div>
+        <div><div class="app-meta-label">Try the demo</div><a href="kooper-resident.html" class="app-meta-value underline-offset-4 hover:underline">Open prototype →</a></div>
+      </div>
+      <div class="md:pt-1 md:text-right">
+        <div class="app-price">Bundled</div>
+        <div class="app-price-foot">in operator subscription</div>
+      </div>
+    </div>
+    <div class="app-row">
+      <div>
+        <span class="chip chip-yellow">BUNDLED WITH RESIDENT</span>
+        <div class="app-name mt-3">kooper · family</div>
+        <p class="app-prose">Family-facing PWA. Daily AI summary written for a daughter, not a clinician. Photos, video calls, About Me public bits, "Help us know Dad better" contribution grid, visit planner. Privacy boundary built in — care plan stays private; family contributes context only.</p>
+      </div>
+      <div class="app-meta md:pt-1">
+        <div><div class="app-meta-label">Primary users</div><div class="app-meta-value">Adult children · spouses · close family</div></div>
+        <div><div class="app-meta-label">Try the demo</div><a href="kooper-family.html" class="app-meta-value underline-offset-4 hover:underline">Open prototype →</a></div>
+      </div>
+      <div class="md:pt-1 md:text-right">
+        <div class="app-price">Bundled</div>
+        <div class="app-price-foot">with kooper · resident</div>
+      </div>
+    </div>
+    <div class="app-row">
+      <div>
+        <div class="app-name">kooper · partner</div>
+        <p class="app-prose">Limited-scope app for suppliers, GPs, contractors, allied health. Audit-logged. Each partner sees only the residents and fields explicitly opened to them. Procurement, deliveries, treatment notes, all traceable.</p>
+      </div>
+      <div class="app-meta md:pt-1">
+        <div><div class="app-meta-label">Primary users</div><div class="app-meta-value">Suppliers · GPs · contractors · allied health</div></div>
+      </div>
+      <div class="md:pt-1 md:text-right">
+        <div class="app-price">£0.80</div>
+        <div class="app-price-foot">per user / month</div>
+      </div>
+    </div>
+    <div class="app-row">
+      <div>
+        <span class="chip chip-ok">FREE</span>
+        <div class="app-name mt-3">kooper · inspector</div>
+        <p class="app-prose">CQC inspectors. Read-only, time-bound access (typically 11-14 days from issue). The audit pack. The SAF-readiness scorecard. The evidence trail. Every inspector action is itself audit-logged. No procurement friction — free across every operator.</p>
+      </div>
+      <div class="app-meta md:pt-1">
+        <div><div class="app-meta-label">Primary users</div><div class="app-meta-value">CQC inspectors</div></div>
+        <div><div class="app-meta-label">Try the demo</div><a href="kooper-care-dashboards.html?as=inspector" class="app-meta-value underline-offset-4 hover:underline">Open inspector view →</a></div>
+      </div>
+      <div class="md:pt-1 md:text-right">
+        <div class="app-price">Free</div>
+        <div class="app-price-foot">no procurement step</div>
+      </div>
+    </div>
+    <div class="app-row">
+      <div>
+        <div class="app-name">kooper · gp-connect</div>
+        <p class="app-prose">FHIR R4 NHS interop. Push to GP record, pull medications, PDS lookup. The bridge between residential care and the NHS clinical system. NHS community-care expectation in 2026.</p>
+      </div>
+      <div class="app-meta md:pt-1">
+        <div><div class="app-meta-label">Primary users</div><div class="app-meta-value">NHS GPs · community clinicians</div></div>
+        <div><div class="app-meta-label">Standards</div><div class="app-meta-value">FHIR R4 · GP Connect · PDS</div></div>
+      </div>
+      <div class="md:pt-1 md:text-right">
+        <div class="app-price">£0.40</div>
+        <div class="app-price-foot">per resident / month</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+// Wire every app row to its deep-dive page based on the app name in .app-name
+(function () {
+  var SLUG_MAP = {
+    'kooper · hr': 'hr',
+    'kooper · care plans': 'care-plans',
+    'kooper · clinical': 'clinical',
+    'kooper · charts': 'charts',
+    'kooper · mar': 'mar',
+    'kooper · recording': 'recording',
+    'kooper · risk': 'risk',
+    'kooper · activities': 'activities',
+    'kooper · operations': 'operations',
+    'kooper · estate': 'estate',
+    'kooper · multi-site': 'multi-site',
+    'kooper · reports': 'reports',
+    'kooper · audit': 'audit',
+    'kooper · compliance': 'compliance',
+    'kooper · ai': 'ai',
+    'kooper · resident': 'resident',
+    'kooper · family': 'family',
+    'kooper · partner': 'partner',
+    'kooper · inspector': 'inspector',
+    'kooper · gp-connect': 'gp-connect'
+  };
+  document.querySelectorAll('.app-row').forEach(function (row) {
+    var nameEl = row.querySelector('.app-name');
+    if (!nameEl) return;
+    var slug = SLUG_MAP[nameEl.textContent.trim()];
+    if (!slug) return;
+    row.style.cursor = 'pointer';
+    row.addEventListener('click', function (e) {
+      if (e.target.closest('a')) return;
+      window.location.href = 'kooper-app.html?app=' + slug;
+    });
+    // Add a "Read more" link to the rightmost meta column
+    var meta = row.querySelectorAll('.app-meta')[0];
+    if (meta) {
+      var more = document.createElement('div');
+      more.innerHTML = '<div class="app-meta-label">Deep dive</div><a href="kooper-app.html?app=' + slug + '" class="app-meta-value underline-offset-4 hover:underline">Read the spec →</a>';
+      meta.appendChild(more);
+    }
+  });
+})();
+</script>
+
+<!-- ============================================== -->
+<!-- BOTTOM CTA                                       -->
+<!-- ============================================== -->
+<section class="bg-kapture-yellow py-16">
+  <div class="container-k">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+      <div class="lg:col-span-7">
+        <h2 class="h-display text-3xl lg:text-4xl text-black">Ready to scope your stack?</h2>
+        <p class="text-black/80 mt-3 max-w-xl">Book a 20-minute demo. We'll walk you through the apps that match your service type, build a custom monthly cost on the call, and confirm a fixed migration timeline within 24 hours.</p>
+      </div>
+      <div class="lg:col-span-5 flex flex-wrap gap-3 lg:justify-end">
+        <a href="kooper-care-landing.html#cta" class="btn-primary text-sm">Book a demo</a>
+        <a href="kooper-sign-in.html" class="bg-black text-white border border-black rounded-[10px] px-3.5 py-2 text-sm font-semibold hover:bg-transparent hover:text-black inline-flex items-center gap-2">Try the demo accounts</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+</body>
+</html>

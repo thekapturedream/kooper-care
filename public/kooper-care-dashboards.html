@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>kooper · care — Logged-in dashboards (per persona)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = { theme: { extend: { colors: { kapture: { black:'#0A0A0A',ink:'#111111',coal:'#1A1A1A',ash:'#2A2A2A',smoke:'#3A3A3A',mist:'#9A9A9A',fog:'#D4D4D4',paper:'#F5F5F5',white:'#FFFFFF',yellow:'#FFD400',amber:'#F5B400'}, status:{critical:'#E5484D',warning:'#FFD400',ok:'#10B981',neutral:'#D4D4D4'}}, fontFamily:{display:['Space Grotesk','sans-serif'],sans:['Inter','sans-serif'],mono:['JetBrains Mono','monospace']}}}};
+</script>
+<style>
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Inter', sans-serif; background: #F5F5F5; color: #0A0A0A; -webkit-font-smoothing: antialiased; }
+  .font-display { font-family: 'Space Grotesk', sans-serif; }
+  .font-mono { font-family: 'JetBrains Mono', monospace; }
+  .surface { background: #FFFFFF; border: 1px solid #D4D4D4; border-radius: 12px; }
+  .btn-primary { background: #0A0A0A; color: #FFFFFF; border: 1px solid #0A0A0A; padding: 0.5rem 1rem; border-radius: 10px; font-weight: 500; transition: all 0.15s ease; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; }
+  .btn-primary:hover { background: transparent; color: #0A0A0A; }
+  .btn-secondary { background: transparent; color: #0A0A0A; border: 1px solid #0A0A0A; padding: 0.5rem 1rem; border-radius: 10px; font-weight: 500; transition: all 0.15s ease; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; }
+  .btn-secondary:hover { background: #0A0A0A; color: #FFFFFF; }
+  .btn-yellow { background: #FFD400; color: #0A0A0A; border: 1px solid #FFD400; padding: 0.5rem 1rem; border-radius: 10px; font-weight: 600; transition: all 0.15s ease; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; }
+  .btn-yellow:hover { background: #F5B400; }
+  .chip { display: inline-flex; align-items: center; gap: 0.375rem; padding: 0.25rem 0.625rem; border-radius: 999px; font-size: 0.75rem; font-weight: 500; line-height: 1; background: #F5F5F5; color: #2A2A2A; border: 1px solid #D4D4D4; }
+  .chip-yellow { background: #FFD400; color: #0A0A0A; border-color: #FFD400; }
+  .chip-dark { background: #0A0A0A; color: #FFFFFF; border-color: #0A0A0A; }
+  .chip-ok { background: rgba(16,185,129,0.1); color: #047857; border-color: rgba(16,185,129,0.25); }
+  .chip-warning { background: rgba(255,212,0,0.2); color: #876300; border-color: rgba(255,212,0,0.5); }
+  .chip-critical { background: rgba(229,72,77,0.1); color: #B42318; border-color: rgba(229,72,77,0.25); }
+  .status-strip { width: 4px; border-radius: 4px; }
+  .status-strip-ok { background: #10B981; }
+  .status-strip-warning { background: #FFD400; }
+  .status-strip-critical { background: #E5484D; }
+  .status-strip-neutral { background: #D4D4D4; }
+  .pulse-dot { position: relative; width: 8px; height: 8px; border-radius: 999px; background: #10B981; flex-shrink: 0; }
+  .pulse-dot::after { content: ''; position: absolute; inset: -4px; border-radius: 999px; background: #10B981; opacity: 0.4; animation: pulse-out 1.6s ease-out infinite; }
+  @keyframes pulse-out { 0% { transform: scale(0.6); opacity: 0.6; } 100% { transform: scale(1.8); opacity: 0; } }
+
+  .role-switcher { background: #1A1A1A; color: #FFFFFF; border: 1px solid #2A2A2A; border-radius: 10px; padding: 0.625rem 1rem; padding-right: 2.75rem; font-size: 0.875rem; font-weight: 500; cursor: pointer; appearance: none; -webkit-appearance: none; min-width: 220px; max-width: 100%; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23FFD400' stroke-width='2.5' stroke-linecap='round'><polyline points='6 9 12 15 18 9'/></svg>"); background-repeat: no-repeat; background-position: right 0.875rem center; background-size: 16px; transition: border-color 0.15s ease; }
+  .role-switcher:focus { outline: none; border-color: #FFD400; }
+
+  .persona-context-strip { background: #FFFFFF; border-bottom: 1px solid #D4D4D4; }
+
+  /* Hide all dashboard panes by default — shown via .active */
+  .dash { display: none; }
+  .dash.active { display: block; }
+
+  /* Pictogram tile for resident app */
+  .pictogram-tile { background: #FFFFFF; border: 2px solid #D4D4D4; border-radius: 16px; aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.375rem; padding: 0.5rem; cursor: pointer; transition: all 0.15s ease; }
+  .pictogram-tile:hover { border-color: #0A0A0A; transform: translateY(-2px); }
+  .pictogram-tile.selected { background: #FFD400; border-color: #0A0A0A; }
+  .pictogram-tile .emoji { font-size: 2rem; line-height: 1; }
+  .pictogram-tile .label { font-size: 0.75rem; font-weight: 600; color: #1A1A1A; text-align: center; line-height: 1.2; }
+
+  /* Sparkline */
+  .spark { display: inline-flex; align-items: end; gap: 2px; height: 24px; }
+  .spark > span { width: 4px; background: #0A0A0A; border-radius: 1px; }
+
+  .h-section { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: clamp(1.5rem, 2.5vw, 2rem); line-height: 1.1; letter-spacing: -0.02em; }
+  .h-greeting { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: clamp(1.875rem, 3vw, 2.5rem); line-height: 1.05; letter-spacing: -0.02em; }
+</style>
+</head>
+<body class="min-h-screen">
+
+<!-- ============================================== -->
+<!-- TOP NAV with role switcher                       -->
+<!-- ============================================== -->
+<nav class="bg-kapture-black text-white sticky top-0 z-50">
+  <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16 gap-4 flex-wrap">
+      <a href="kooper-care-landing.html" class="flex items-center gap-3 shrink-0" title="Back to landing">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="28" height="28" fill="none" aria-label="kooper" role="img" class="shrink-0 text-white"><path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" d="M255.75 133.125c67.679 0 122.625 54.946 122.625 122.625S323.429 378.375 255.75 378.375 133.125 323.429 133.125 255.75s54.946-122.625 122.625-122.625m0-132.75c18.832 0 34.121 15.289 34.121 34.121s-15.289 34.121-34.121 34.121-34.121-15.289-34.121-34.121S236.918.375 255.75.375M75.173 75.173c13.316-13.316 34.938-13.316 48.254 0s13.316 34.938 0 48.254-34.938 13.316-48.254 0-13.316-34.938 0-48.254M511.125 255.75c0 18.832-15.289 34.121-34.121 34.121s-34.121-15.289-34.121-34.121 15.289-34.121 34.121-34.121 34.121 15.289 34.121 34.121M255.75 442.883c18.832 0 34.121 15.289 34.121 34.121s-15.289 34.121-34.121 34.121-34.121-15.289-34.121-34.121 15.289-34.121 34.121-34.121m132.323-54.81c13.316-13.316 34.938-13.316 48.254 0s13.316 34.938 0 48.254-34.938 13.316-48.254 0-13.316-34.938 0-48.254M68.617 255.75c0 18.832-15.289 34.121-34.121 34.121S.375 274.582.375 255.75s15.289-34.121 34.121-34.121 34.121 15.289 34.121 34.121m54.81 132.323c13.316 13.316 13.316 34.938 0 48.254s-34.938 13.316-48.254 0-13.316-34.938 0-48.254 34.938-13.316 48.254 0"/><path fill="#FFD400" fill-rule="evenodd" clip-rule="evenodd" d="M436.327 75.173c13.316 13.316 13.316 34.938 0 48.254s-34.938 13.316-48.254 0-13.316-34.938 0-48.254 34.938-13.316 48.254 0"/></svg>
+        <span class="hidden sm:flex items-center gap-2 font-display lowercase tracking-wide text-base"><span class="font-semibold">kooper</span><span class="text-white/40">·</span><span class="font-medium">care</span></span>
+      </a>
+
+      <div class="hidden lg:flex items-center gap-1">
+        <a href="kooper-care-landing.html" class="px-3 py-1.5 rounded-lg text-sm font-medium text-white/75 hover:text-white hover:bg-kapture-coal transition">Home</a>
+        <a href="kooper-care-dashboards.html" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-kapture-coal text-kapture-yellow">Dashboard</a>
+        <a href="kooper-care-plans.html" class="px-3 py-1.5 rounded-lg text-sm font-medium text-white/75 hover:text-white hover:bg-kapture-coal transition">Care plans</a>
+        <a href="kooper-clinical.html" class="px-3 py-1.5 rounded-lg text-sm font-medium text-white/75 hover:text-white hover:bg-kapture-coal transition">Clinical</a>
+        <a href="kooper-recording-demo.html" class="px-3 py-1.5 rounded-lg text-sm font-medium text-white/75 hover:text-white hover:bg-kapture-coal transition">Recording</a>
+        <a href="kooper-reports.html" class="px-3 py-1.5 rounded-lg text-sm font-medium text-white/75 hover:text-white hover:bg-kapture-coal transition">Reports</a>
+      </div>
+
+      <div class="flex items-center gap-3 flex-1 sm:flex-none justify-end">
+        <a href="kooper-sign-in.html" class="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium text-white/70 hover:text-white hover:bg-kapture-coal transition" title="Sign out">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Sign out
+        </a>
+        <span class="hidden md:inline-block text-[0.6875rem] uppercase tracking-widest text-kapture-mist font-mono">View as</span>
+        <select id="roleSwitcher" class="role-switcher" onchange="switchPersona(this.value)">
+          <optgroup label="Operator side">
+            <option value="owner">Lola Okonkwo · Owner / Director</option>
+            <option value="manager" selected>Lola Okonkwo · Registered Manager</option>
+            <option value="clinical-lead">Sister Anne · Clinical Lead</option>
+            <option value="senior-carer">Rebecca Adesina · Senior Carer</option>
+            <option value="nurse">Sister Anne · Nurse</option>
+            <option value="carer">Craig Musara · Carer</option>
+            <option value="activities">Daniel Kowalski · Activities Coord</option>
+            <option value="cook">Mary Chen · Cook</option>
+            <option value="maintenance">Tomas Bauer · Maintenance</option>
+          </optgroup>
+          <optgroup label="Stakeholder side">
+            <option value="resident">Edward Banda · Resident</option>
+            <option value="family">Sarah Banda · Family (daughter)</option>
+            <option value="inspector">Tomas Jankowski · CQC Inspector</option>
+          </optgroup>
+        </select>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ============================================== -->
+<!-- DASHBOARD VIEWS                                  -->
+<!-- ============================================== -->
+
+<!-- =================================================================== -->
+<!-- 1. OWNER / DIRECTOR — Multi-site executive view                     -->
+<!-- =================================================================== -->
+<section class="dash" data-persona="owner">
+  <div class="persona-context-strip">
+    <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-3 flex-wrap">
+      <div class="flex items-center gap-3 text-sm">
+        <div class="w-9 h-9 rounded-full bg-kapture-coal text-white flex items-center justify-center font-mono text-xs">LO</div>
+        <div>
+          <div class="font-semibold text-kapture-black">Lola Okonkwo</div>
+          <div class="text-xs text-kapture-smoke flex items-center gap-2"><span class="chip chip-dark text-[0.625rem]">Owner / Director</span> · <span>Okonkwo Care Group</span> · <span class="font-mono">3 sites · 78 residents</span></div>
+        </div>
+      </div>
+      <div class="flex items-center gap-1.5 flex-wrap">
+        <span class="chip text-[0.6875rem] font-mono">hr</span>
+        <span class="chip text-[0.6875rem] font-mono">multi-site</span>
+        <span class="chip text-[0.6875rem] font-mono">real estate</span>
+        <span class="chip text-[0.6875rem] font-mono">stock</span>
+        <span class="chip text-[0.6875rem] font-mono">reports</span>
+        <span class="chip text-[0.6875rem] font-mono">audit</span>
+        <span class="chip text-[0.6875rem] font-mono">compliance</span>
+        <span class="chip chip-yellow text-[0.6875rem] font-mono">insights</span>
+      </div>
+    </div>
+  </div>
+
+  <main class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <header>
+      <span class="chip chip-yellow font-mono text-[0.6875rem] tracking-widest mb-3">EXECUTIVE VIEW</span>
+      <h1 class="h-greeting text-kapture-black mt-3">Good evening, Lola.</h1>
+      <p class="text-kapture-smoke mt-2">3 sites · 78 residents · 47 staff active · Group occupancy <span class="font-mono font-semibold text-kapture-black">94%</span></p>
+    </header>
+
+    <!-- Group KPIs -->
+    <section class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div class="surface p-5">
+        <div class="text-xs uppercase tracking-wider text-kapture-mist font-medium">Monthly revenue</div>
+        <div class="font-display text-3xl font-semibold text-kapture-black mt-1"><span class="font-mono">£382k</span></div>
+        <div class="text-xs text-status-ok mt-1">▲ +6.2% vs last month</div>
+      </div>
+      <div class="surface p-5">
+        <div class="text-xs uppercase tracking-wider text-kapture-mist font-medium">CQC group rating</div>
+        <div class="font-display text-3xl font-semibold text-kapture-black mt-1">Good</div>
+        <div class="text-xs text-kapture-smoke mt-1">2× Good · 1× Outstanding</div>
+      </div>
+      <div class="surface p-5">
+        <div class="text-xs uppercase tracking-wider text-kapture-mist font-medium">Open incidents</div>
+        <div class="font-display text-3xl font-semibold text-kapture-black mt-1"><span class="font-mono">3</span></div>
+        <div class="text-xs text-status-warning mt-1">1 awaiting your sign-off</div>
+      </div>
+      <div class="surface p-5">
+        <div class="text-xs uppercase tracking-wider text-kapture-mist font-medium">Staff utilisation</div>
+        <div class="font-display text-3xl font-semibold text-kapture-black mt-1"><span class="font-mono">87%</span></div>
+        <div class="text-xs text-kapture-smoke mt-1">Target 90% · 3 hires open</div>
+      </div>
+    </section>
+
+    <!-- Sites grid -->
+    <section>
+      <h2 class="font-display text-lg font-semibold text-kapture-black mb-4">Your sites</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="surface p-5 flex">
+          <div class="status-strip status-strip-ok"></div>
+          <div class="flex-1 pl-4">
+            <div class="flex items-start justify-between mb-2"><div class="font-display font-semibold">Draycott House</div><span class="chip chip-ok text-[0.6875rem]">Outstanding</span></div>
+            <div class="text-xs text-kapture-smoke">Care home · 30 beds · <span class="font-mono">96% occ.</span></div>
+            <div class="mt-3 grid grid-cols-3 gap-2 text-xs">
+              <div><div class="text-kapture-mist text-[0.6875rem]">Notes today</div><div class="font-mono font-semibold">142</div></div>
+              <div><div class="text-kapture-mist text-[0.6875rem]">Open inc.</div><div class="font-mono font-semibold">0</div></div>
+              <div><div class="text-kapture-mist text-[0.6875rem]">Reviews due</div><div class="font-mono font-semibold">2</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="surface p-5 flex">
+          <div class="status-strip status-strip-warning"></div>
+          <div class="flex-1 pl-4">
+            <div class="flex items-start justify-between mb-2"><div class="font-display font-semibold">Marylebone Court</div><span class="chip chip-warning text-[0.6875rem]">Good · Requires attention</span></div>
+            <div class="text-xs text-kapture-smoke">Nursing home · 24 beds · <span class="font-mono">92% occ.</span></div>
+            <div class="mt-3 grid grid-cols-3 gap-2 text-xs">
+              <div><div class="text-kapture-mist text-[0.6875rem]">Notes today</div><div class="font-mono font-semibold">98</div></div>
+              <div><div class="text-kapture-mist text-[0.6875rem]">Open inc.</div><div class="font-mono font-semibold text-status-critical">3</div></div>
+              <div><div class="text-kapture-mist text-[0.6875rem]">Reviews due</div><div class="font-mono font-semibold">5</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="surface p-5 flex">
+          <div class="status-strip status-strip-ok"></div>
+          <div class="flex-1 pl-4">
+            <div class="flex items-start justify-between mb-2"><div class="font-display font-semibold">Camberwell Lodge</div><span class="chip chip-ok text-[0.6875rem]">Good</span></div>
+            <div class="text-xs text-kapture-smoke">Supported living · 24 tenants · <span class="font-mono">95% occ.</span></div>
+            <div class="mt-3 grid grid-cols-3 gap-2 text-xs">
+              <div><div class="text-kapture-mist text-[0.6875rem]">Notes today</div><div class="font-mono font-semibold">76</div></div>
+              <div><div class="text-kapture-mist text-[0.6875rem]">Open inc.</div><div class="font-mono font-semibold">0</div></div>
+              <div><div class="text-kapture-mist text-[0.6875rem]">Reviews due</div><div class="font-mono font-semibold">1</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Insights AI panel -->
+    <section class="bg-kapture-black text-white rounded-2xl p-7 relative overflow-hidden">
+      <div class="absolute -right-20 -top-20 w-60 h-60 rounded-full bg-kapture-yellow/15 blur-3xl pointer-events-none"></div>
+      <div class="relative">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="chip chip-yellow font-mono text-[0.6875rem] tracking-widest">kooper · insights</span>
+          <span class="text-[0.6875rem] text-kapture-mist font-mono">Updated 18:42</span>
+        </div>
+        <h3 class="font-display text-xl font-semibold mb-2">Three things to know this week</h3>
+        <ul class="space-y-2 text-sm text-kapture-fog mt-4">
+          <li class="flex items-start gap-2"><span class="text-kapture-yellow mt-0.5">→</span><span>Marylebone Court has had <strong class="text-white">3 falls this week</strong>, 2 involving the same resident (Mr H). Pattern suggests evening sundowning. Suggest reviewing his care plan with the clinical lead.</span></li>
+          <li class="flex items-start gap-2"><span class="text-kapture-yellow mt-0.5">→</span><span>Group-wide medication adherence is at <strong class="text-white">99.2%</strong> this month, your highest ever. Top performers: Draycott (100%), Camberwell (99.8%).</span></li>
+          <li class="flex items-start gap-2"><span class="text-kapture-yellow mt-0.5">→</span><span>Stock levels at Draycott trending toward shortage on incontinence pads — auto-reorder triggers in <strong class="text-white">2 days</strong>. £840 forecast.</span></li>
+        </ul>
+      </div>
+    </section>
+  </main>
+</section>
+
+<!-- =================================================================== -->
+<!-- 2. REGISTERED MANAGER                                               -->
+<!-- =================================================================== -->
+<section class="dash active" data-persona="manager">
+  <div class="persona-context-strip">
+    <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-3 flex-wrap">
+      <div class="flex items-center gap-3 text-sm">
+        <div class="w-9 h-9 rounded-full bg-kapture-coal text-white flex items-center justify-center font-mono text-xs">LO</div>
+        <div>
+          <div class="font-semibold text-kapture-black">Lola Okonkwo</div>
+          <div class="text-xs text-kapture-smoke flex items-center gap-2"><span class="chip chip-dark text-[0.625rem]">Registered Manager</span> · <span>Draycott House</span> · <span class="font-mono">30 residents · 15 staff</span></div>
+        </div>
+      </div>
+      <div class="flex items-center gap-1.5 flex-wrap">
+        <span class="chip text-[0.6875rem] font-mono">hr</span>
+        <span class="chip text-[0.6875rem] font-mono">care plans</span>
+        <span class="chip text-[0.6875rem] font-mono">recording</span>
+        <span class="chip text-[0.6875rem] font-mono">mar</span>
+        <span class="chip text-[0.6875rem] font-mono">reports</span>
+        <span class="chip text-[0.6875rem] font-mono">audit</span>
+        <span class="chip text-[0.6875rem] font-mono">compliance</span>
+        <span class="chip text-[0.6875rem] font-mono">operations</span>
+        <span class="chip chip-yellow text-[0.6875rem] font-mono">insights</span>
+      </div>
+    </div>
+  </div>
+
+  <main class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <header class="flex items-end justify-between flex-wrap gap-3">
+      <div>
+        <span class="chip chip-yellow font-mono text-[0.6875rem] tracking-widest mb-3">MANAGER VIEW</span>
+        <h1 class="h-greeting text-kapture-black mt-3">Good afternoon, Lola.</h1>
+        <p class="text-kapture-smoke mt-2"><span class="font-mono">Wed 6 May · 16:42</span> · 4 staff on shift · 28 of 30 residents present · CQC ready <span class="font-semibold text-status-ok">100%</span></p>
+      </div>
+      <div class="flex gap-2"><button class="btn-secondary text-sm">Shift handover</button><button class="btn-primary text-sm">Run audit pack</button></div>
+    </header>
+
+    <!-- Action card -->
+    <section class="bg-kapture-black text-white rounded-2xl p-6 lg:p-8 relative overflow-hidden">
+      <div class="absolute -right-24 -top-24 w-72 h-72 rounded-full bg-kapture-yellow/20 blur-3xl pointer-events-none"></div>
+      <div class="relative flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+        <div class="flex-1">
+          <div class="flex items-center gap-2 mb-2"><span class="font-mono text-xs uppercase tracking-widest text-kapture-yellow">Needs you now</span></div>
+          <h2 class="font-display text-2xl lg:text-3xl font-semibold tracking-tight">5 actions waiting on this shift</h2>
+          <p class="text-kapture-mist mt-2 text-sm max-w-xl">Tap any to jump straight to the resident screen with the action pre-focused.</p>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 lg:w-2/3">
+          <a href="#" class="bg-kapture-coal hover:bg-kapture-ash transition rounded-xl p-4 border border-kapture-ash"><div class="text-[0.6875rem] uppercase tracking-wider text-kapture-yellow mb-1">Sign off</div><div class="font-display font-semibold">Incident #418</div><div class="text-xs text-kapture-mist mt-1">Mr H fall · 2h ago</div></a>
+          <a href="#" class="bg-kapture-coal hover:bg-kapture-ash transition rounded-xl p-4 border border-kapture-ash"><div class="text-[0.6875rem] uppercase tracking-wider text-kapture-yellow mb-1">Review due</div><div class="font-display font-semibold">2 care plans</div><div class="text-xs text-kapture-mist mt-1">Edward · Catherine</div></a>
+          <a href="kooper-hr.html#workers" class="bg-kapture-coal hover:bg-kapture-ash transition rounded-xl p-4 border border-kapture-ash"><div class="text-[0.6875rem] uppercase tracking-wider text-kapture-yellow mb-1">Hire</div><div class="font-display font-semibold">3 applicants</div><div class="text-xs text-kapture-mist mt-1">Carer · night shift</div></a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Stats grid -->
+    <section class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div class="surface p-5"><div class="text-xs uppercase tracking-wider text-kapture-mist font-medium">Notes today</div><div class="font-display text-3xl font-semibold text-kapture-black mt-1 font-mono">142</div><div class="text-xs text-status-ok mt-1">+12% vs yesterday</div></div>
+      <div class="surface p-5"><div class="text-xs uppercase tracking-wider text-kapture-mist font-medium">Voice drafts</div><div class="font-display text-3xl font-semibold text-kapture-black mt-1 font-mono">2</div><div class="text-xs text-kapture-smoke mt-1">Avg confirm <span class="font-mono">14s</span></div></div>
+      <div class="surface p-5"><div class="text-xs uppercase tracking-wider text-kapture-mist font-medium">Reviews due (7d)</div><div class="font-display text-3xl font-semibold text-kapture-black mt-1 font-mono">5</div><div class="text-xs text-kapture-smoke mt-1">Across 3 residents</div></div>
+      <div class="surface p-5"><div class="text-xs uppercase tracking-wider text-kapture-mist font-medium">CQC evidence</div><div class="font-display text-3xl font-semibold text-kapture-black mt-1">100%</div><div class="text-xs text-status-ok mt-1">Last pack 4 May</div></div>
+    </section>
+
+    <!-- Compliance + Workforce -->
+    <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div class="surface p-6">
+        <div class="flex items-center justify-between mb-4"><h3 class="font-display font-semibold">Compliance currency</h3><span class="chip chip-ok text-[0.6875rem]">All current</span></div>
+        <div class="space-y-3 text-sm">
+          <div class="flex items-center justify-between"><span>Mandatory training</span><span class="font-mono text-status-ok">15/15</span></div>
+          <div class="flex items-center justify-between"><span>DBS checks</span><span class="font-mono text-status-ok">15/15</span></div>
+          <div class="flex items-center justify-between"><span>Right-to-work</span><span class="font-mono text-status-ok">15/15</span></div>
+          <div class="flex items-center justify-between"><span>Fire alarm test</span><span class="font-mono text-status-warning">Due in 4d</span></div>
+          <div class="flex items-center justify-between"><span>PAT testing</span><span class="font-mono text-status-ok">23 Jul</span></div>
+        </div>
+      </div>
+      <div class="surface p-6">
+        <div class="flex items-center justify-between mb-4"><h3 class="font-display font-semibold">Workforce on shift</h3><a href="kooper-hr.html#rota" class="text-xs text-kapture-smoke hover:text-kapture-black">Manage rota →</a></div>
+        <div class="space-y-2 text-sm">
+          <div class="flex items-center gap-3 p-2 rounded hover:bg-kapture-paper"><div class="w-8 h-8 rounded-full bg-kapture-coal text-white flex items-center justify-center text-xs font-mono">SA</div><div class="flex-1"><div class="font-medium">Sister Anne</div><div class="text-xs text-kapture-mist">Nurse · 12:00–22:00</div></div><span class="chip chip-ok text-[0.6875rem]"><span class="pulse-dot"></span>On floor</span></div>
+          <div class="flex items-center gap-3 p-2 rounded hover:bg-kapture-paper"><div class="w-8 h-8 rounded-full bg-kapture-coal text-white flex items-center justify-center text-xs font-mono">CM</div><div class="flex-1"><div class="font-medium">Craig Musara</div><div class="text-xs text-kapture-mist">Carer · 14:00–22:00</div></div><span class="chip chip-ok text-[0.6875rem]"><span class="pulse-dot"></span>On floor</span></div>
+          <div class="flex items-center gap-3 p-2 rounded hover:bg-kapture-paper"><div class="w-8 h-8 rounded-full bg-kapture-coal text-white flex items-center justify-center text-xs font-mono">RA</div><div class="flex-1"><div class="font-medium">Rebecca Adesina</div><div class="text-xs text-kapture-mist">Senior Carer · 14:00–22:00</div></div><span class="chip chip-ok text-[0.6875rem]"><span class="pulse-dot"></span>On floor</span></div>
+          <div class="flex items-center gap-3 p-2 rounded hover:bg-kapture-paper"><div class="w-8 h-8 rounded-full bg-kapture-coal text-white flex items-center justify-center text-xs font-mono">DK</div><div class="flex-1"><div class="font-medium">Daniel Kowalski</div><div class="text-xs text-kapture-mist">Activities · 09:00–17:00</div></div><span class="chip text-[0.6875rem]">Ending soon</span></div>
+        </div>
+      </div>
+    </section>
+  </main>
+</section>
+
+<!-- =================================================================== -->
+<!-- 3. CLINICAL LEAD                                                     -->
+<!-- =================================================================== -->
+<section class="dash" data-persona="clinical-lead">
+  <div class="persona-context-strip">
+    <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-3 flex-wrap">
+      <div class="flex items-center gap-3 text-sm">
+        <div class="w-9 h-9 rounded-full bg-kapture-coal text-white flex items-center justify-center font-mono text-xs">SA</div>
+        <div><div class="font-semibold text-kapture-black">Sister Anne Whitfield</div><div class="text-xs text-kapture-smoke flex items-center gap-2"><span class="chip chip-dark text-[0.625rem]">Clinical Lead</span> · <span>Draycott House</span> · <span class="font-mono">RGN PIN 18C0934N</span></div></div>
+      </div>
+      <div class="flex items-center gap-1.5 flex-wrap"><span class="chip text-[0.6875rem] font-mono">hr</span><span class="chip text-[0.6875rem] font-mono">care plans</span><span class="chip text-[0.6875rem] font-mono">mar</span><span class="chip text-[0.6875rem] font-mono">vitals</span><span class="chip text-[0.6875rem] font-mono">wound care</span><span class="chip text-[0.6875rem] font-mono">pain</span><span class="chip text-[0.6875rem] font-mono">mental state</span><span class="chip text-[0.6875rem] font-mono">behaviour</span><span class="chip text-[0.6875rem] font-mono">audit</span></div>
+    </div>
+  </div>
+
+  <main class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <header><span class="chip chip-yellow font-mono text-[0.6875rem] tracking-widest mb-3">CLINICAL VIEW</span><h1 class="h-greeting text-kapture-black mt-3">Good afternoon, Sister.</h1><p class="text-kapture-smoke mt-2"><span class="font-mono">3 residents on watch</span> · <span class="font-mono">2 wounds active</span> · <span class="font-mono">0 infections</span> · <span class="font-mono">98% med adherence</span></p></header>
+
+    <!-- Watch list -->
+    <section>
+      <div class="flex items-center justify-between mb-4"><h2 class="font-display text-lg font-semibold">Clinical watch list</h2><span class="chip chip-warning text-[0.6875rem]">3 residents</span></div>
+      <div class="space-y-3">
+        <div class="surface p-5 flex"><div class="status-strip status-strip-critical"></div><div class="flex-1 pl-4"><div class="flex items-start justify-between mb-1"><div><div class="font-display font-semibold">Mr H, Room 7</div><div class="text-xs text-kapture-smoke">Falls × 2 in 48h · NEWS2 trending up</div></div><span class="chip chip-critical text-[0.6875rem]">High priority</span></div><div class="mt-3 flex gap-2 text-xs"><span class="chip text-[0.6875rem]">Last NEWS2 <span class="font-mono">5</span></span><span class="chip text-[0.6875rem]">Pain <span class="font-mono">6/10</span></span><span class="chip text-[0.6875rem]">Awaiting GP review</span></div></div></div>
+        <div class="surface p-5 flex"><div class="status-strip status-strip-warning"></div><div class="flex-1 pl-4"><div class="flex items-start justify-between mb-1"><div><div class="font-display font-semibold">Mrs C, Room 12</div><div class="text-xs text-kapture-smoke">Stage 2 pressure injury · sacrum</div></div><span class="chip chip-warning text-[0.6875rem]">Wound care</span></div><div class="mt-3 flex gap-2 text-xs"><span class="chip text-[0.6875rem]">Healing trend ↑</span><span class="chip text-[0.6875rem]">Last dressed <span class="font-mono">2h ago</span></span><span class="chip text-[0.6875rem]">SSKIN: 4/5</span></div></div></div>
+        <div class="surface p-5 flex"><div class="status-strip status-strip-warning"></div><div class="flex-1 pl-4"><div class="flex items-start justify-between mb-1"><div><div class="font-display font-semibold">Mr R, Room 4</div><div class="text-xs text-kapture-smoke">Sundowning · agitation 16:00–19:00</div></div><span class="chip chip-warning text-[0.6875rem]">Behaviour</span></div><div class="mt-3 flex gap-2 text-xs"><span class="chip text-[0.6875rem]">ABC logged × 4 this week</span><span class="chip text-[0.6875rem]">Music intervention helping</span></div></div></div>
+      </div>
+    </section>
+
+    <!-- Trends -->
+    <section class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="surface p-5"><div class="text-xs uppercase tracking-wider text-kapture-mist font-medium">Hospital admissions</div><div class="font-display text-3xl font-semibold text-kapture-black mt-1 font-mono">1</div><div class="text-xs text-status-ok mt-1">vs 4 last quarter ▼</div><div class="spark mt-3"><span style="height:18px"></span><span style="height:22px"></span><span style="height:14px"></span><span style="height:16px"></span><span style="height:8px"></span><span style="height:10px"></span><span style="height:6px"></span></div></div>
+      <div class="surface p-5"><div class="text-xs uppercase tracking-wider text-kapture-mist font-medium">Active wounds</div><div class="font-display text-3xl font-semibold text-kapture-black mt-1 font-mono">2</div><div class="text-xs text-kapture-smoke mt-1">Both Stage ≤2 · healing</div></div>
+      <div class="surface p-5"><div class="text-xs uppercase tracking-wider text-kapture-mist font-medium">Infections</div><div class="font-display text-3xl font-semibold text-kapture-black mt-1 font-mono">0</div><div class="text-xs text-status-ok mt-1">No active outbreaks</div></div>
+    </section>
+  </main>
+</section>
+
+<!-- =================================================================== -->
+<!-- 4. SENIOR CARER                                                      -->
+<!-- =================================================================== -->
+<section class="dash" data-persona="senior-carer">
+  <div class="persona-context-strip">
+    <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-3 flex-wrap">
+      <div class="flex items-center gap-3 text-sm"><div class="w-9 h-9 rounded-full bg-kapture-coal text-white flex items-center justify-center font-mono text-xs">RA</div><div><div class="font-semibold text-kapture-black">Rebecca Adesina</div><div class="text-xs text-kapture-smoke flex items-center gap-2"><span class="chip chip-dark text-[0.625rem]">Senior Carer</span> · <span>Shift lead · 14:00–22:00</span></div></div></div>
+      <div class="flex items-center gap-1.5 flex-wrap"><span class="chip text-[0.6875rem] font-mono">hr</span><span class="chip text-[0.6875rem] font-mono">recording</span><span class="chip text-[0.6875rem] font-mono">mobility</span><span class="chip text-[0.6875rem] font-mono">continence</span><span class="chip text-[0.6875rem] font-mono">personal care</span><span class="chip text-[0.6875rem] font-mono">nutrition</span><span class="chip text-[0.6875rem] font-mono">mar</span><span class="chip text-[0.6875rem] font-mono">behaviour</span><span class="chip text-[0.6875rem] font-mono">operations</span></div>
+    </div>
+  </div>
+
+  <main class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <header><span class="chip chip-yellow font-mono text-[0.6875rem] tracking-widest mb-3">SHIFT LEAD VIEW</span><h1 class="h-greeting text-kapture-black mt-3">Welcome to your shift, Rebecca.</h1><p class="text-kapture-smoke mt-2">Hand-over received · 4 hours in · <span class="font-mono">8 tasks</span> remaining · <span class="font-mono">3 voice drafts</span> awaiting your review</p></header>
+
+    <!-- Handover summary -->
+    <section class="surface p-6">
+      <div class="flex items-center justify-between mb-4"><h2 class="font-display font-semibold">Handover from Sister Anne · 14:00</h2><a href="#" class="text-xs text-kapture-smoke hover:text-kapture-black underline-offset-4 hover:underline">View full handover →</a></div>
+      <div class="space-y-2 text-sm text-kapture-smoke">
+        <div class="flex gap-3"><span class="text-status-warning shrink-0">▲</span><span><strong class="text-kapture-black">Mr H</strong> needs hourly welfare checks until end of shift. Pain managed with paracetamol 1g at 13:00. Daughter visiting at 18:00.</span></div>
+        <div class="flex gap-3"><span class="text-status-ok shrink-0">●</span><span><strong class="text-kapture-black">Mrs C</strong> wound dressing changed 13:30. Next change 19:30. Healing well.</span></div>
+        <div class="flex gap-3"><span class="text-kapture-mist shrink-0">●</span><span><strong class="text-kapture-black">Mr R</strong> calm, listening to jazz. Watch for sundowning around 16:30. Music + tea = good intervention.</span></div>
+        <div class="flex gap-3"><span class="text-kapture-mist shrink-0">●</span><span>Lounge chairs cleaned. Fire alarm test scheduled tomorrow 10:00.</span></div>
+      </div>
+    </section>
+
+    <!-- Voice drafts pending -->
+    <section>
+      <div class="flex items-center justify-between mb-4"><h2 class="font-display text-lg font-semibold">Voice drafts awaiting your review</h2><span class="chip chip-yellow text-[0.6875rem]">3 pending</span></div>
+      <div class="space-y-3">
+        <div class="surface p-4 border-l-4 border-kapture-yellow flex gap-3"><div class="w-9 h-9 rounded-lg bg-kapture-yellow text-kapture-black flex items-center justify-center shrink-0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg></div><div class="flex-1"><div class="flex items-center gap-2 flex-wrap text-sm"><span class="font-medium">Craig Musara</span><span class="chip text-[0.6875rem]">Welfare check</span><span class="text-xs text-kapture-mist font-mono">14:32 · Edward</span></div><p class="text-sm text-kapture-smoke mt-1">"Eddie sitting in armchair, listening to jazz. Skin colour normal, breathing even, talking clearly. Asked about dinner..."</p><div class="flex gap-2 mt-2"><button class="btn-yellow text-xs py-1.5">Confirm</button><button class="btn-secondary text-xs py-1.5">Edit</button></div></div></div>
+        <div class="surface p-4 border-l-4 border-kapture-yellow flex gap-3"><div class="w-9 h-9 rounded-lg bg-kapture-yellow text-kapture-black flex items-center justify-center shrink-0"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg></div><div class="flex-1"><div class="flex items-center gap-2 flex-wrap text-sm"><span class="font-medium">Bobby Chibwe</span><span class="chip text-[0.6875rem]">Continence</span><span class="text-xs text-kapture-mist font-mono">15:20 · Mrs C</span></div><p class="text-sm text-kapture-smoke mt-1">"Mrs Cross used commode, pad changed, no soreness noted. Skin checked..."</p></div></div>
+      </div>
+    </section>
+  </main>
+</section>
+
+<!-- =================================================================== -->
+<!-- 5. NURSE                                                             -->
+<!-- =================================================================== -->
+<section class="dash" data-persona="nurse">
+  <div class="persona-context-strip">
+    <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-3 flex-wrap">
+      <div class="flex items-center gap-3 text-sm"><div class="w-9 h-9 rounded-full bg-kapture-coal text-white flex items-center justify-center font-mono text-xs">SA</div><div><div class="font-semibold text-kapture-black">Sister Anne Whitfield</div><div class="text-xs text-kapture-smoke flex items-center gap-2"><span class="chip chip-dark text-[0.625rem]">Nurse</span> · <span>Draycott House · Day shift</span></div></div></div>
+      <div class="flex items-center gap-1.5 flex-wrap"><span class="chip text-[0.6875rem] font-mono">hr</span><span class="chip text-[0.6875rem] font-mono">care plans</span><span class="chip text-[0.6875rem] font-mono">recording</span><span class="chip text-[0.6875rem] font-mono">mar</span><span class="chip text-[0.6875rem] font-mono">vitals</span><span class="chip text-[0.6875rem] font-mono">wound care</span><span class="chip text-[0.6875rem] font-mono">pain</span><span class="chip text-[0.6875rem] font-mono">mental state</span></div>
+    </div>
+  </div>
+
+  <main class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <header><span class="chip chip-yellow font-mono text-[0.6875rem] tracking-widest mb-3">CLINICAL FRONT-LINE</span><h1 class="h-greeting text-kapture-black mt-3">Med round in 18 minutes, Sister.</h1><p class="text-kapture-smoke mt-2">Next round 17:00 · <span class="font-mono">12 residents</span> · 3 PRN flagged · 2 wound dressings due</p></header>
+
+    <!-- Med round preview -->
+    <section class="surface p-6">
+      <div class="flex items-center justify-between mb-4"><h2 class="font-display font-semibold">17:00 round · 12 residents</h2><button class="btn-yellow text-sm">Start round</button></div>
+      <div class="space-y-2 text-sm">
+        <div class="flex items-center gap-3 p-2 rounded hover:bg-kapture-paper"><div class="w-8 h-8 rounded bg-kapture-coal text-white flex items-center justify-center text-[0.6875rem] font-mono">EB</div><div class="flex-1"><div class="font-medium">Edward Banda</div><div class="text-xs text-kapture-mist">Bisoprolol 5mg · Atorvastatin 20mg</div></div><span class="chip text-[0.6875rem]">Room 12</span></div>
+        <div class="flex items-center gap-3 p-2 rounded hover:bg-kapture-paper"><div class="w-8 h-8 rounded bg-kapture-coal text-white flex items-center justify-center text-[0.6875rem] font-mono">CO</div><div class="flex-1"><div class="font-medium">Catherine Okafor</div><div class="text-xs text-kapture-mist">Levothyroxine 50mcg · PRN paracetamol</div></div><span class="chip chip-warning text-[0.6875rem]">PRN flagged</span></div>
+        <div class="flex items-center gap-3 p-2 rounded hover:bg-kapture-paper"><div class="w-8 h-8 rounded bg-kapture-coal text-white flex items-center justify-center text-[0.6875rem] font-mono">YA</div><div class="flex-1"><div class="font-medium">Yanir Ashkenazi</div><div class="text-xs text-kapture-mist">Olanzapine 10mg · Sodium Valproate 500mg</div></div><span class="chip text-[0.6875rem]">Room 7</span></div>
+      </div>
+    </section>
+
+    <!-- Wound + Pain at-a-glance -->
+    <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="surface p-6"><div class="flex items-center justify-between mb-4"><h3 class="font-display font-semibold">Active wounds · 2</h3><a href="#" class="text-xs text-kapture-smoke">View all →</a></div><div class="space-y-3 text-sm"><div class="flex items-center justify-between p-3 bg-kapture-paper rounded-lg"><div><div class="font-medium">Mrs Cross · Sacrum</div><div class="text-xs text-kapture-smoke">Stage 2 · last dressed 13:30</div></div><span class="chip chip-warning text-[0.6875rem]">Due 19:30</span></div><div class="flex items-center justify-between p-3 bg-kapture-paper rounded-lg"><div><div class="font-medium">Mr Rossi · R heel</div><div class="text-xs text-kapture-smoke">Stage 1 · healing</div></div><span class="chip chip-ok text-[0.6875rem]">Due tomorrow</span></div></div></div>
+      <div class="surface p-6"><div class="flex items-center justify-between mb-4"><h3 class="font-display font-semibold">Pain monitoring · 3</h3><a href="#" class="text-xs text-kapture-smoke">PainChek →</a></div><div class="space-y-3 text-sm"><div class="flex items-center justify-between p-3 bg-kapture-paper rounded-lg"><div><div class="font-medium">Mr H</div><div class="text-xs text-kapture-smoke">PainChek 6/10 · 15:00</div></div><span class="chip chip-critical text-[0.6875rem]">PRN given</span></div><div class="flex items-center justify-between p-3 bg-kapture-paper rounded-lg"><div><div class="font-medium">Mrs Cross</div><div class="text-xs text-kapture-smoke">Self-report 3/10</div></div><span class="chip text-[0.6875rem]">Stable</span></div></div></div>
+    </section>
+  </main>
+</section>
+
+<!-- =================================================================== -->
+<!-- 6. CARER                                                             -->
+<!-- =================================================================== -->
+<section class="dash" data-persona="carer">
+  <div class="persona-context-strip">
+    <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-3 flex-wrap">
+      <div class="flex items-center gap-3 text-sm"><div class="w-9 h-9 rounded-full bg-kapture-coal text-white flex items-center justify-center font-mono text-xs">CM</div><div><div class="font-semibold text-kapture-black">Craig Musara</div><div class="text-xs text-kapture-smoke flex items-center gap-2"><span class="chip chip-dark text-[0.625rem]">Carer</span> · <span>Draycott House · 14:00–22:00</span></div></div></div>
+      <div class="flex items-center gap-1.5 flex-wrap"><span class="chip text-[0.6875rem] font-mono">hr</span><span class="chip text-[0.6875rem] font-mono">recording</span><span class="chip text-[0.6875rem] font-mono">mobility</span><span class="chip text-[0.6875rem] font-mono">continence</span><span class="chip text-[0.6875rem] font-mono">personal care</span><span class="chip text-[0.6875rem] font-mono">nutrition</span></div>
+    </div>
+  </div>
+
+  <main class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 pb-32">
+    <header><span class="chip chip-yellow font-mono text-[0.6875rem] tracking-widest mb-3">FRONT-LINE VIEW</span><h1 class="h-greeting text-kapture-black mt-3">Good afternoon, Craig.</h1><p class="text-kapture-smoke mt-2">Your 4 residents this shift · <span class="font-mono">7 tasks</span> done · <span class="font-mono">3</span> coming up · <span class="text-status-ok">on track</span></p></header>
+
+    <!-- Voice quick action -->
+    <section class="bg-kapture-yellow rounded-2xl p-6 lg:p-8 flex flex-col sm:flex-row items-start sm:items-center gap-5">
+      <div class="w-20 h-20 rounded-full bg-kapture-black text-kapture-yellow flex items-center justify-center shrink-0"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg></div>
+      <div class="flex-1"><h2 class="font-display text-2xl font-semibold text-kapture-black">Tap a resident, then speak.</h2><p class="text-sm text-kapture-coal mt-1">kooper · recording will draft, classify, and link to the right care plan. You confirm in 14 seconds.</p></div>
+    </section>
+
+    <!-- Assigned residents -->
+    <section>
+      <h2 class="font-display text-lg font-semibold mb-4">Your residents · 4</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="surface p-4"><div class="flex items-start justify-between mb-3"><div class="w-12 h-12 rounded-xl bg-kapture-coal text-white flex items-center justify-center font-display text-base font-semibold">EB</div><span class="chip chip-warning text-[0.6875rem]">Action</span></div><div class="font-display font-semibold">Edward Banda</div><div class="text-xs text-kapture-smoke">Eddie · Room 12</div><div class="mt-3 pt-3 border-t border-kapture-fog flex items-center justify-between text-[0.6875rem]"><span class="text-kapture-mist">Last note <span class="font-mono">2h</span></span><button class="text-kapture-yellow"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3z"/></svg></button></div></div>
+        <div class="surface p-4"><div class="flex items-start justify-between mb-3"><div class="w-12 h-12 rounded-xl bg-kapture-coal text-white flex items-center justify-center font-display text-base font-semibold">YA</div><span class="chip chip-ok text-[0.6875rem]">Settled</span></div><div class="font-display font-semibold">Yanir Ashkenazi</div><div class="text-xs text-kapture-smoke">Yan · Room 7</div><div class="mt-3 pt-3 border-t border-kapture-fog flex items-center justify-between text-[0.6875rem]"><span class="text-kapture-mist">Last note <span class="font-mono">35m</span></span><button class="text-kapture-yellow"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3z"/></svg></button></div></div>
+        <div class="surface p-4"><div class="flex items-start justify-between mb-3"><div class="w-12 h-12 rounded-xl bg-kapture-coal text-white flex items-center justify-center font-display text-base font-semibold">TF</div><span class="chip chip-critical text-[0.6875rem]">Watch</span></div><div class="font-display font-semibold">Terence Fletcher</div><div class="text-xs text-kapture-smoke">Tel · Room 4</div><div class="mt-3 pt-3 border-t border-kapture-fog flex items-center justify-between text-[0.6875rem]"><span class="text-kapture-mist">Last note <span class="font-mono">12m</span></span><button class="text-kapture-yellow"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3z"/></svg></button></div></div>
+        <div class="surface p-4"><div class="flex items-start justify-between mb-3"><div class="w-12 h-12 rounded-xl bg-kapture-coal text-white flex items-center justify-center font-display text-base font-semibold">CO</div><span class="chip chip-ok text-[0.6875rem]">Settled</span></div><div class="font-display font-semibold">Catherine Okafor</div><div class="text-xs text-kapture-smoke">Cathy · Room 9</div><div class="mt-3 pt-3 border-t border-kapture-fog flex items-center justify-between text-[0.6875rem]"><span class="text-kapture-mist">Last note <span class="font-mono">1h</span></span><button class="text-kapture-yellow"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3z"/></svg></button></div></div>
+      </div>
+    </section>
+
+    <!-- Tasks remaining -->
+    <section class="surface p-6">
+      <h2 class="font-display font-semibold mb-4">Coming up</h2>
+      <div class="space-y-2 text-sm">
+        <div class="flex items-center gap-3 p-2 hover:bg-kapture-paper rounded"><div class="w-2 h-2 rounded-full bg-status-warning"></div><div class="flex-1">Welfare check · Edward · <span class="text-kapture-mist">due in 18 min</span></div><button class="text-kapture-mist hover:text-kapture-black">→</button></div>
+        <div class="flex items-center gap-3 p-2 hover:bg-kapture-paper rounded"><div class="w-2 h-2 rounded-full bg-status-warning"></div><div class="flex-1">Tea round · all residents · <span class="text-kapture-mist">due 17:30</span></div><button class="text-kapture-mist hover:text-kapture-black">→</button></div>
+        <div class="flex items-center gap-3 p-2 hover:bg-kapture-paper rounded"><div class="w-2 h-2 rounded-full bg-status-neutral"></div><div class="flex-1">Repositioning · Mrs Cross · <span class="text-kapture-mist">19:30</span></div><button class="text-kapture-mist hover:text-kapture-black">→</button></div>
+      </div>
+    </section>
+  </main>
+</section>
+
+<!-- =================================================================== -->
+<!-- 7. ACTIVITIES COORDINATOR                                            -->
+<!-- =================================================================== -->
+<section class="dash" data-persona="activities">
+  <div class="persona-context-strip">
+    <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-3 flex-wrap">
+      <div class="flex items-center gap-3 text-sm"><div class="w-9 h-9 rounded-full bg-kapture-coal text-white flex items-center justify-center font-mono text-xs">DK</div><div><div class="font-semibold text-kapture-black">Daniel Kowalski</div><div class="text-xs text-kapture-smoke flex items-center gap-2"><span class="chip chip-dark text-[0.625rem]">Activities Coord</span> · <span>Draycott House</span></div></div></div>
+      <div class="flex items-center gap-1.5 flex-wrap"><span class="chip text-[0.6875rem] font-mono">hr</span><span class="chip text-[0.6875rem] font-mono">activities</span><span class="chip text-[0.6875rem] font-mono">communication</span><span class="chip text-[0.6875rem] font-mono">recording</span></div>
+    </div>
+  </div>
+
+  <main class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <header><span class="chip chip-yellow font-mono text-[0.6875rem] tracking-widest mb-3">ACTIVITIES VIEW</span><h1 class="h-greeting text-kapture-black mt-3">Good afternoon, Daniel.</h1><p class="text-kapture-smoke mt-2"><span class="font-mono">3 activities</span> this afternoon · <span class="font-mono">12 residents</span> joined this morning · Engagement <span class="font-semibold text-status-ok">+18% this month</span></p></header>
+
+    <!-- Today's calendar -->
+    <section>
+      <h2 class="font-display text-lg font-semibold mb-4">Today's plan</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="surface p-5"><div class="font-mono text-xs text-kapture-yellow mb-1">15:00 · NOW</div><div class="font-display font-semibold mb-1">Music & Memory</div><div class="text-xs text-kapture-smoke">Lounge · 8 residents joined · Jazz playlist</div><div class="mt-3 flex gap-2"><span class="chip text-[0.6875rem]">Eddie loves this</span><span class="chip text-[0.6875rem]">Mr R calmer</span></div></div>
+        <div class="surface p-5 border-2 border-kapture-yellow"><div class="font-mono text-xs text-kapture-smoke mb-1">16:00 · UP NEXT</div><div class="font-display font-semibold mb-1">Garden walk</div><div class="text-xs text-kapture-smoke">Garden · Weather permitting · 5 residents signed up</div><div class="mt-3 flex gap-2"><button class="btn-yellow text-xs py-1.5">Start session</button></div></div>
+        <div class="surface p-5"><div class="font-mono text-xs text-kapture-smoke mb-1">17:30</div><div class="font-display font-semibold mb-1">Birthday tea · Mr R</div><div class="text-xs text-kapture-smoke">Lounge · Family invited · 3 RSVP yes</div></div>
+      </div>
+    </section>
+
+    <!-- Engagement leaderboard -->
+    <section class="surface p-6">
+      <div class="flex items-center justify-between mb-4"><h2 class="font-display font-semibold">Engagement this week</h2><span class="chip chip-ok text-[0.6875rem]">+18% vs last</span></div>
+      <div class="space-y-3 text-sm">
+        <div class="flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-kapture-coal text-white flex items-center justify-center text-xs font-mono">EB</div><div class="flex-1"><div class="font-medium">Edward Banda</div><div class="text-xs text-kapture-mist">Music × 4 · Garden × 2 · Reading × 3</div></div><div class="font-mono font-semibold">9 sessions</div></div>
+        <div class="flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-kapture-coal text-white flex items-center justify-center text-xs font-mono">CO</div><div class="flex-1"><div class="font-medium">Catherine Okafor</div><div class="text-xs text-kapture-mist">Knitting × 3 · Tea club × 4</div></div><div class="font-mono font-semibold">7 sessions</div></div>
+        <div class="flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-kapture-coal text-white flex items-center justify-center text-xs font-mono">TF</div><div class="flex-1"><div class="font-medium">Terence Fletcher</div><div class="text-xs text-kapture-mist">Crossword × 2 · Quiet visits</div></div><div class="font-mono font-semibold">2 sessions</div></div>
+      </div>
+    </section>
+  </main>
+</section>
+
+<!-- =================================================================== -->
+<!-- 8. COOK / CATERING                                                   -->
+<!-- =================================================================== -->
+<section class="dash" data-persona="cook">
+  <div class="persona-context-strip">
+    <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-3 flex-wrap">
+      <div class="flex items-center gap-3 text-sm"><div class="w-9 h-9 rounded-full bg-kapture-coal text-white flex items-center justify-center font-mono text-xs">MC</div><div><div class="font-semibold text-kapture-black">Mary Chen</div><div class="text-xs text-kapture-smoke flex items-center gap-2"><span class="chip chip-dark text-[0.625rem]">Cook / Catering Lead</span> · <span>Draycott House</span></div></div></div>
+      <div class="flex items-center gap-1.5 flex-wrap"><span class="chip text-[0.6875rem] font-mono">hr</span><span class="chip text-[0.6875rem] font-mono">nutrition</span><span class="chip text-[0.6875rem] font-mono">stock</span></div>
+    </div>
+  </div>
+
+  <main class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <header><span class="chip chip-yellow font-mono text-[0.6875rem] tracking-widest mb-3">CATERING VIEW</span><h1 class="h-greeting text-kapture-black mt-3">Good afternoon, Mary.</h1><p class="text-kapture-smoke mt-2">Dinner service in <span class="font-mono">2h 15m</span> · <span class="font-mono">28 residents</span> · 3 special diets · <span class="text-status-warning">2 stock items low</span></p></header>
+
+    <!-- Today's menu -->
+    <section class="surface p-6">
+      <div class="flex items-center justify-between mb-4"><h2 class="font-display font-semibold">Tonight's menu · 17:30</h2><button class="btn-secondary text-sm">Edit menu</button></div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-kapture-paper rounded-lg p-4"><div class="text-[0.6875rem] uppercase tracking-wider text-kapture-mist mb-1">Main</div><div class="font-display font-semibold">Cottage pie · peas</div><div class="text-xs text-kapture-smoke mt-1">28 portions · ready by 17:00</div></div>
+        <div class="bg-kapture-paper rounded-lg p-4"><div class="text-[0.6875rem] uppercase tracking-wider text-kapture-mist mb-1">Vegetarian</div><div class="font-display font-semibold">Lentil bake · greens</div><div class="text-xs text-kapture-smoke mt-1">3 portions · Yan · Cathy · Mr R</div></div>
+        <div class="bg-kapture-paper rounded-lg p-4"><div class="text-[0.6875rem] uppercase tracking-wider text-kapture-mist mb-1">Pureed</div><div class="font-display font-semibold">Cottage pie pureed</div><div class="text-xs text-kapture-smoke mt-1">2 portions · Mrs C · Mr H · MUAC tracked</div></div>
+      </div>
+    </section>
+
+    <!-- Special diets -->
+    <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="surface p-6"><h3 class="font-display font-semibold mb-4">Allergens & special diets</h3><div class="space-y-3 text-sm"><div class="flex items-start gap-3 p-3 bg-kapture-paper rounded-lg"><span class="chip chip-critical text-[0.6875rem]">Allergy</span><div class="flex-1"><div class="font-medium">Edward · Penicillin (med-only)</div><div class="text-xs text-kapture-smoke">No food restrictions</div></div></div><div class="flex items-start gap-3 p-3 bg-kapture-paper rounded-lg"><span class="chip chip-warning text-[0.6875rem]">Diet</span><div class="flex-1"><div class="font-medium">Mrs C · Diabetic, soft-textured</div><div class="text-xs text-kapture-smoke">Sugar &lt;15g · pureed mains</div></div></div><div class="flex items-start gap-3 p-3 bg-kapture-paper rounded-lg"><span class="chip chip-warning text-[0.6875rem]">MUAC</span><div class="flex-1"><div class="font-medium">Mr H · &lt;22cm flagged</div><div class="text-xs text-kapture-smoke">High-protein, frequent small meals</div></div></div></div></div>
+      <div class="surface p-6"><div class="flex items-center justify-between mb-4"><h3 class="font-display font-semibold">Stock alerts</h3><button class="text-xs text-kapture-smoke hover:text-kapture-black">Order →</button></div><div class="space-y-3 text-sm"><div class="flex items-center justify-between p-3 bg-kapture-paper rounded-lg"><div><div class="font-medium">Tinned tomatoes</div><div class="text-xs text-kapture-smoke">3 left · auto-reorder Fri</div></div><span class="chip chip-warning text-[0.6875rem]">Low</span></div><div class="flex items-center justify-between p-3 bg-kapture-paper rounded-lg"><div><div class="font-medium">Skimmed milk</div><div class="text-xs text-kapture-smoke">2L left · usage 4L/day</div></div><span class="chip chip-critical text-[0.6875rem]">Critical</span></div><div class="flex items-center justify-between p-3 bg-kapture-paper rounded-lg"><div><div class="font-medium">Ensure protein</div><div class="text-xs text-kapture-smoke">12 cans · 3 day supply</div></div><span class="chip text-[0.6875rem]">OK</span></div></div></div>
+    </section>
+  </main>
+</section>
+
+<!-- =================================================================== -->
+<!-- 9. MAINTENANCE                                                       -->
+<!-- =================================================================== -->
+<section class="dash" data-persona="maintenance">
+  <div class="persona-context-strip">
+    <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-3 flex-wrap">
+      <div class="flex items-center gap-3 text-sm"><div class="w-9 h-9 rounded-full bg-kapture-coal text-white flex items-center justify-center font-mono text-xs">TB</div><div><div class="font-semibold text-kapture-black">Tomas Bauer</div><div class="text-xs text-kapture-smoke flex items-center gap-2"><span class="chip chip-dark text-[0.625rem]">Maintenance</span> · <span>Group-wide · 3 sites</span></div></div></div>
+      <div class="flex items-center gap-1.5 flex-wrap"><span class="chip text-[0.6875rem] font-mono">hr</span><span class="chip text-[0.6875rem] font-mono">real estate</span><span class="chip text-[0.6875rem] font-mono">communication</span></div>
+    </div>
+  </div>
+
+  <main class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <header><span class="chip chip-yellow font-mono text-[0.6875rem] tracking-widest mb-3">FACILITIES VIEW</span><h1 class="h-greeting text-kapture-black mt-3">Good afternoon, Tomas.</h1><p class="text-kapture-smoke mt-2"><span class="font-mono">7 open tickets</span> · <span class="font-mono">2 compliance dates</span> this week · <span class="font-mono">3 sites</span> covered</p></header>
+
+    <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="surface p-6"><h3 class="font-display font-semibold mb-4">Open tickets</h3><div class="space-y-3 text-sm"><div class="flex items-start gap-3 p-3 hover:bg-kapture-paper rounded-lg"><span class="chip chip-critical text-[0.6875rem]">Urgent</span><div class="flex-1"><div class="font-medium">Lift fault · Marylebone</div><div class="text-xs text-kapture-smoke">Reported 14:20 by manager · contractor en route</div></div></div><div class="flex items-start gap-3 p-3 hover:bg-kapture-paper rounded-lg"><span class="chip chip-warning text-[0.6875rem]">Today</span><div class="flex-1"><div class="font-medium">Bedroom 7 heater · Draycott</div><div class="text-xs text-kapture-smoke">Reported 09:15 by Craig</div></div></div><div class="flex items-start gap-3 p-3 hover:bg-kapture-paper rounded-lg"><span class="chip text-[0.6875rem]">This week</span><div class="flex-1"><div class="font-medium">Garden gate hinge · Camberwell</div><div class="text-xs text-kapture-smoke">Reported Mon</div></div></div></div></div>
+      <div class="surface p-6"><h3 class="font-display font-semibold mb-4">Compliance dates</h3><div class="space-y-3 text-sm"><div class="flex items-center justify-between p-3 bg-kapture-paper rounded-lg"><div><div class="font-medium">Fire alarm test · Draycott</div><div class="text-xs text-kapture-smoke">Monthly · last 2 Apr</div></div><span class="chip chip-warning text-[0.6875rem]">In 4 days</span></div><div class="flex items-center justify-between p-3 bg-kapture-paper rounded-lg"><div><div class="font-medium">Legionella check · all sites</div><div class="text-xs text-kapture-smoke">Quarterly</div></div><span class="chip text-[0.6875rem]">23 May</span></div><div class="flex items-center justify-between p-3 bg-kapture-paper rounded-lg"><div><div class="font-medium">PAT testing · Marylebone</div><div class="text-xs text-kapture-smoke">Annual</div></div><span class="chip chip-ok text-[0.6875rem]">23 Jul</span></div></div></div>
+    </section>
+  </main>
+</section>
+
+<!-- =================================================================== -->
+<!-- 10. RESIDENT — MOBILE PICTOGRAM VIEW                                -->
+<!-- =================================================================== -->
+<section class="dash" data-persona="resident">
+  <div class="bg-kapture-paper min-h-screen">
+    <div class="max-w-md mx-auto px-4 py-6 space-y-5 pb-32">
+
+      <!-- Resident header -->
+      <header class="flex items-center gap-3">
+        <div class="w-14 h-14 rounded-2xl bg-kapture-coal text-white flex items-center justify-center font-display text-lg font-semibold">EB</div>
+        <div class="flex-1"><div class="font-display font-semibold text-lg">Hello, Eddie 👋</div><div class="text-xs text-kapture-smoke">Wednesday afternoon · room 12</div></div>
+        <button class="text-kapture-smoke"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
+      </header>
+
+      <!-- Mood selector -->
+      <section class="surface p-5">
+        <h2 class="font-display font-semibold text-base mb-3">How are you feeling?</h2>
+        <div class="grid grid-cols-4 gap-2">
+          <div class="pictogram-tile selected"><span class="emoji">🙂</span><span class="label">Bright</span></div>
+          <div class="pictogram-tile"><span class="emoji">😐</span><span class="label">OK</span></div>
+          <div class="pictogram-tile"><span class="emoji">😟</span><span class="label">Low</span></div>
+          <div class="pictogram-tile"><span class="emoji">😣</span><span class="label">Pain</span></div>
+        </div>
+      </section>
+
+      <!-- Today summary -->
+      <section class="bg-kapture-black text-white rounded-2xl p-5">
+        <div class="flex items-center justify-between mb-2"><div class="text-[0.6875rem] uppercase tracking-widest text-kapture-yellow font-mono">Your today</div><div class="text-xs text-kapture-mist font-mono">14:36</div></div>
+        <div class="space-y-2 text-sm">
+          <div class="flex gap-3"><span>🍳</span><span>Breakfast · porridge & toast · enjoyed</span></div>
+          <div class="flex gap-3"><span>🚿</span><span>Wash and dress · navy cardigan</span></div>
+          <div class="flex gap-3"><span>🎵</span><span>Music & Memory · jazz playlist · joined</span></div>
+          <div class="flex gap-3"><span>💊</span><span>Morning meds · all taken</span></div>
+        </div>
+      </section>
+
+      <!-- I need help with -->
+      <section class="surface p-5">
+        <h2 class="font-display font-semibold text-base mb-3">I need help with…</h2>
+        <div class="grid grid-cols-3 gap-2">
+          <div class="pictogram-tile"><span class="emoji">🚽</span><span class="label">Toilet</span></div>
+          <div class="pictogram-tile"><span class="emoji">🥤</span><span class="label">A drink</span></div>
+          <div class="pictogram-tile"><span class="emoji">🛏️</span><span class="label">Lie down</span></div>
+          <div class="pictogram-tile"><span class="emoji">🩹</span><span class="label">Pain</span></div>
+          <div class="pictogram-tile"><span class="emoji">📞</span><span class="label">Call family</span></div>
+          <div class="pictogram-tile"><span class="emoji">🤝</span><span class="label">Talk</span></div>
+        </div>
+      </section>
+
+      <!-- Family messages -->
+      <section class="surface p-5">
+        <div class="flex items-center justify-between mb-3"><h2 class="font-display font-semibold text-base">Family</h2><span class="chip chip-yellow text-[0.625rem]">2 new</span></div>
+        <div class="space-y-3 text-sm">
+          <div class="flex gap-3"><div class="w-9 h-9 rounded-full bg-kapture-coal text-white flex items-center justify-center text-[0.6875rem] font-mono shrink-0">SB</div><div class="flex-1 bg-kapture-paper rounded-lg p-3"><div class="font-medium text-xs">Sarah · 13:42</div><p class="mt-1">Hi Dad! I'll come visit at 6pm tonight. I'm bringing your favourite biscuits 💛</p></div></div>
+          <div class="flex gap-3"><div class="w-9 h-9 rounded-full bg-kapture-coal text-white flex items-center justify-center text-[0.6875rem] font-mono shrink-0">JB</div><div class="flex-1 bg-kapture-paper rounded-lg p-3"><div class="font-medium text-xs">Jake · 11:20</div><p class="mt-1">Granddad! Pic from football 🏆</p></div></div>
+        </div>
+      </section>
+
+      <!-- Today's activities -->
+      <section class="surface p-5">
+        <h2 class="font-display font-semibold text-base mb-3">Today's activities</h2>
+        <div class="space-y-2 text-sm">
+          <div class="flex items-center gap-3 p-2 rounded bg-kapture-paper"><span>🌳</span><div class="flex-1"><div class="font-medium">Garden walk</div><div class="text-xs text-kapture-smoke">16:00 · weather permitting</div></div><button class="btn-yellow text-xs py-1.5">Join</button></div>
+          <div class="flex items-center gap-3 p-2 rounded bg-kapture-paper"><span>🎂</span><div class="flex-1"><div class="font-medium">Mr R's birthday tea</div><div class="text-xs text-kapture-smoke">17:30 · lounge</div></div><button class="btn-secondary text-xs py-1.5">RSVP</button></div>
+        </div>
+      </section>
+
+      <!-- About me — Holistic Profile Section 2 (resident editable) -->
+      <section class="surface p-5">
+        <div class="flex items-center justify-between mb-3"><h2 class="font-display font-semibold text-base">About me</h2><span class="chip text-[0.625rem]">My voice</span></div>
+        <div class="space-y-3 text-sm">
+          <div class="bg-kapture-paper rounded-lg p-3">
+            <div class="text-[0.6875rem] uppercase tracking-widest text-kapture-mist mb-1">What I need from the care team</div>
+            <p class="text-kapture-black">Patient, gentle prompts. One instruction at a time. Don't rush me when I'm dressing — I take pride in choosing my own clothes.</p>
+          </div>
+          <div class="bg-kapture-paper rounded-lg p-3">
+            <div class="text-[0.6875rem] uppercase tracking-widest text-kapture-mist mb-1">My interests &amp; hobbies</div>
+            <p class="text-kapture-black">Jazz (Frank Sinatra, Ella Fitzgerald), my model railway, telling stories about my driving days, watching football (Arsenal).</p>
+          </div>
+          <div class="bg-kapture-paper rounded-lg p-3">
+            <div class="text-[0.6875rem] uppercase tracking-widest text-kapture-mist mb-1">My favourite food and drinks</div>
+            <p class="text-kapture-black">Fish &amp; chips on a Friday. Strong tea, milk, two sugars. Custard creams. A small sherry on Sundays.</p>
+          </div>
+          <div class="bg-kapture-paper rounded-lg p-3">
+            <div class="text-[0.6875rem] uppercase tracking-widest text-kapture-mist mb-1">When I'm sad, what cheers me up</div>
+            <p class="text-kapture-black">A photo of Margaret. Sitting in the garden if the sun's out. Sarah's voice on a video call. A cup of tea and a custard cream.</p>
+          </div>
+          <button class="btn-secondary text-xs w-full">Edit my About me</button>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</section>
+
+<!-- =================================================================== -->
+<!-- 11. FAMILY                                                           -->
+<!-- =================================================================== -->
+<section class="dash" data-persona="family">
+  <div class="persona-context-strip">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-3 flex-wrap">
+      <div class="flex items-center gap-3 text-sm"><div class="w-9 h-9 rounded-full bg-kapture-coal text-white flex items-center justify-center font-mono text-xs">SB</div><div><div class="font-semibold text-kapture-black">Sarah Banda</div><div class="text-xs text-kapture-smoke flex items-center gap-2"><span class="chip chip-dark text-[0.625rem]">Family</span> · <span>Daughter of Edward Banda</span></div></div></div>
+      <div class="flex items-center gap-1.5"><span class="chip text-[0.6875rem] font-mono">family</span></div>
+    </div>
+  </div>
+
+  <main class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6 pb-20">
+    <header>
+      <h1 class="h-greeting text-kapture-black">Hi Sarah.</h1>
+      <p class="text-kapture-smoke mt-2">Here's how Dad is doing today. Visit booked for 18:00.</p>
+      <div class="mt-3 flex items-center gap-2 flex-wrap">
+        <span class="chip chip-ok text-[0.6875rem]"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg> You can: contribute · message · video call · share photos</span>
+        <span class="chip text-[0.6875rem]" title="Care plan and clinical records are kept private to the care team">Care plan stays private</span>
+      </div>
+    </header>
+
+    <!-- AI daily summary -->
+    <section class="bg-kapture-black text-white rounded-2xl p-7 relative overflow-hidden">
+      <div class="absolute -right-16 -top-16 w-48 h-48 rounded-full bg-kapture-yellow/15 blur-3xl pointer-events-none"></div>
+      <div class="relative">
+        <div class="flex items-center justify-between mb-3"><span class="chip chip-yellow font-mono text-[0.6875rem] tracking-widest">DAILY SUMMARY · AI-DRAFTED</span><span class="text-[0.6875rem] text-kapture-mist font-mono">Wed 14:36</span></div>
+        <p class="text-base leading-relaxed text-kapture-fog">Eddie has had a calm, settled day. He woke at 7am, washed and dressed himself with one prompt and chose the navy cardigan you bought him. He enjoyed a full breakfast and joined the Music & Memory session this morning — Daniel said he sang along to Frank Sinatra. His mood has been bright all day. All medications taken. No concerns from the clinical team.</p>
+      </div>
+    </section>
+
+    <!-- Recent photos -->
+    <section class="surface p-6">
+      <div class="flex items-center justify-between mb-4"><h2 class="font-display font-semibold">Photos from today</h2><span class="chip chip-yellow text-[0.6875rem]">3 new</span></div>
+      <div class="grid grid-cols-3 gap-2">
+        <div class="aspect-square bg-kapture-paper rounded-lg flex items-center justify-center text-3xl">🎶</div>
+        <div class="aspect-square bg-kapture-paper rounded-lg flex items-center justify-center text-3xl">☕</div>
+        <div class="aspect-square bg-kapture-paper rounded-lg flex items-center justify-center text-3xl">🌷</div>
+      </div>
+    </section>
+
+    <!-- Mood + activity trend -->
+    <section class="grid grid-cols-2 gap-4">
+      <div class="surface p-5"><div class="text-xs uppercase tracking-wider text-kapture-mist mb-1">Mood this week</div><div class="font-display text-xl font-semibold mt-1 text-status-ok">Bright most days</div><div class="spark mt-3"><span style="height:18px;background:#10B981"></span><span style="height:22px;background:#10B981"></span><span style="height:14px;background:#FFD400"></span><span style="height:20px;background:#10B981"></span><span style="height:24px;background:#10B981"></span><span style="height:22px;background:#10B981"></span><span style="height:24px;background:#10B981"></span></div></div>
+      <div class="surface p-5"><div class="text-xs uppercase tracking-wider text-kapture-mist mb-1">Activities joined</div><div class="font-display text-xl font-semibold mt-1 font-mono">9</div><div class="text-xs text-kapture-smoke mt-1">Music · Garden · Reading</div></div>
+    </section>
+
+    <!-- Contribute to Dad's care — Holistic Profile Section 2 family contribution -->
+    <section class="surface p-6">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="font-display font-semibold">Help us know Dad better</h2>
+        <span class="chip chip-yellow text-[0.6875rem]">2 prompts</span>
+      </div>
+      <p class="text-sm text-kapture-smoke mb-4">What you share goes into Dad's "About me" profile so every carer who looks after him already knows what makes him him.</p>
+      <div class="space-y-3 text-sm">
+        <div class="bg-kapture-paper rounded-lg p-3 flex items-start justify-between gap-3">
+          <div class="flex-1">
+            <div class="font-medium text-kapture-black">What were Dad's signature meals at home?</div>
+            <div class="text-xs text-kapture-smoke mt-1">The kitchen team uses this to plan favourites in.</div>
+          </div>
+          <button class="btn-yellow text-xs py-1.5 shrink-0">Add</button>
+        </div>
+        <div class="bg-kapture-paper rounded-lg p-3 flex items-start justify-between gap-3">
+          <div class="flex-1">
+            <div class="font-medium text-kapture-black">Any concerns this week we should know about?</div>
+            <div class="text-xs text-kapture-smoke mt-1">Goes straight to the manager. Confidential.</div>
+          </div>
+          <button class="btn-secondary text-xs py-1.5 shrink-0">Share</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Quick actions -->
+    <section class="grid grid-cols-2 gap-3">
+      <button class="surface p-5 text-left hover:border-kapture-black"><div class="text-2xl mb-2">💬</div><div class="font-display font-semibold">Send a message</div><div class="text-xs text-kapture-smoke mt-1">Goes to Dad's app</div></button>
+      <button class="surface p-5 text-left hover:border-kapture-black"><div class="text-2xl mb-2">📞</div><div class="font-display font-semibold">Video call Dad</div><div class="text-xs text-kapture-smoke mt-1">He's free now</div></button>
+      <button class="surface p-5 text-left hover:border-kapture-black"><div class="text-2xl mb-2">📅</div><div class="font-display font-semibold">Book a visit</div><div class="text-xs text-kapture-smoke mt-1">Next slot 18:00 today</div></button>
+      <button class="surface p-5 text-left hover:border-kapture-black"><div class="text-2xl mb-2">📷</div><div class="font-display font-semibold">Share a photo</div><div class="text-xs text-kapture-smoke mt-1">Dad's app + family wall</div></button>
+    </section>
+  </main>
+</section>
+
+<!-- =================================================================== -->
+<!-- 12. INSPECTOR (CQC)                                                  -->
+<!-- =================================================================== -->
+<section class="dash" data-persona="inspector">
+  <!-- Time-bound access banner -->
+  <div class="bg-kapture-yellow text-kapture-black">
+    <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-2 flex items-center justify-between text-xs flex-wrap gap-2">
+      <div class="flex items-center gap-2"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 14"/></svg><strong>Time-bound access:</strong> Read-only · expires <span class="font-mono">17 May 2026, 17:00</span> (in 11 days)</div>
+      <div class="font-mono text-[0.6875rem]">All actions logged to audit trail</div>
+    </div>
+  </div>
+  <div class="persona-context-strip">
+    <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-3 flex-wrap">
+      <div class="flex items-center gap-3 text-sm"><div class="w-9 h-9 rounded-full bg-kapture-coal text-white flex items-center justify-center font-mono text-xs">TJ</div><div><div class="font-semibold text-kapture-black">Tomas Jankowski</div><div class="text-xs text-kapture-smoke flex items-center gap-2"><span class="chip chip-dark text-[0.625rem]">CQC Inspector</span> · <span>Inspecting Draycott House</span></div></div></div>
+      <div class="flex items-center gap-1.5"><span class="chip text-[0.6875rem] font-mono">inspector · read-only</span></div>
+    </div>
+  </div>
+
+  <main class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <header class="flex items-end justify-between flex-wrap gap-3"><div><span class="chip chip-yellow font-mono text-[0.6875rem] tracking-widest mb-3">INSPECTION VIEW</span><h1 class="h-greeting text-kapture-black mt-3">Welcome, Tomas.</h1><p class="text-kapture-smoke mt-2">Draycott House · 30 residents · Last inspection <span class="font-mono">12 Sep 2025 · Outstanding</span></p></div><div class="flex gap-2"><button class="btn-secondary text-sm">Search residents</button><button class="btn-primary text-sm">Export evidence pack</button></div></header>
+
+    <!-- SAF quality statements -->
+    <section>
+      <h2 class="font-display text-lg font-semibold mb-4">CQC Single Assessment Framework · evidence currency</h2>
+      <div class="grid grid-cols-1 md:grid-cols-5 gap-3">
+        <div class="surface p-4"><div class="text-xs uppercase tracking-wider text-kapture-mist">Safe</div><div class="font-display text-2xl font-semibold mt-1 font-mono">98%</div><div class="text-xs text-status-ok mt-1">142 evidence items</div></div>
+        <div class="surface p-4"><div class="text-xs uppercase tracking-wider text-kapture-mist">Effective</div><div class="font-display text-2xl font-semibold mt-1 font-mono">100%</div><div class="text-xs text-status-ok mt-1">96 items</div></div>
+        <div class="surface p-4"><div class="text-xs uppercase tracking-wider text-kapture-mist">Caring</div><div class="font-display text-2xl font-semibold mt-1 font-mono">100%</div><div class="text-xs text-status-ok mt-1">88 items</div></div>
+        <div class="surface p-4"><div class="text-xs uppercase tracking-wider text-kapture-mist">Responsive</div><div class="font-display text-2xl font-semibold mt-1 font-mono">96%</div><div class="text-xs text-status-warning mt-1">2 minor gaps</div></div>
+        <div class="surface p-4"><div class="text-xs uppercase tracking-wider text-kapture-mist">Well-led</div><div class="font-display text-2xl font-semibold mt-1 font-mono">100%</div><div class="text-xs text-status-ok mt-1">All current</div></div>
+      </div>
+    </section>
+
+    <!-- Audit trail viewer -->
+    <section class="surface p-6">
+      <div class="flex items-center justify-between mb-4"><h2 class="font-display font-semibold">Recent audit trail (last 100)</h2><button class="text-xs text-kapture-smoke hover:text-kapture-black">Filter →</button></div>
+      <div class="space-y-2 text-sm">
+        <div class="flex items-center gap-3 p-2 hover:bg-kapture-paper rounded font-mono text-xs"><span class="text-kapture-mist">16:42:18</span><span class="chip text-[0.6875rem]">view</span><span class="flex-1">Lola Okonkwo viewed care_plan_element/Edward/mental_state</span></div>
+        <div class="flex items-center gap-3 p-2 hover:bg-kapture-paper rounded font-mono text-xs"><span class="text-kapture-mist">16:38:02</span><span class="chip text-[0.6875rem]">create</span><span class="flex-1">Craig Musara created care_note/Edward/welfare_check (voice draft)</span></div>
+        <div class="flex items-center gap-3 p-2 hover:bg-kapture-paper rounded font-mono text-xs"><span class="text-kapture-mist">16:32:11</span><span class="chip text-[0.6875rem]">expand_redacted</span><span class="flex-1">Sister Anne expanded clinical_summary/Yanir (audit-logged)</span></div>
+        <div class="flex items-center gap-3 p-2 hover:bg-kapture-paper rounded font-mono text-xs"><span class="text-kapture-mist">16:15:33</span><span class="chip text-[0.6875rem]">update</span><span class="flex-1">Sister Anne updated wound_chart/Mrs Cross/sacrum (Stage 2 → still Stage 2)</span></div>
+        <div class="flex items-center gap-3 p-2 hover:bg-kapture-paper rounded font-mono text-xs"><span class="text-kapture-mist">15:48:09</span><span class="chip text-[0.6875rem]">sign_off</span><span class="flex-1">Lola Okonkwo signed off incident/418 (Mr H fall)</span></div>
+      </div>
+    </section>
+
+    <!-- Search residents -->
+    <section class="surface p-6">
+      <div class="flex items-center justify-between mb-4"><h2 class="font-display font-semibold">Residents · 30</h2><input type="text" placeholder="Search by name, room, condition…" class="px-3 py-2 border border-kapture-fog rounded-lg text-sm w-64"></div>
+      <div class="text-xs text-kapture-smoke">Click any resident to view their full record (read-only). Every view is logged to the audit trail.</div>
+    </section>
+  </main>
+</section>
+
+<!-- ============================================== -->
+<!-- FOOTER                                           -->
+<!-- ============================================== -->
+<footer class="bg-kapture-paper border-t border-kapture-fog py-8 mt-12">
+  <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row md:items-center md:justify-between gap-3 text-xs text-kapture-smoke">
+    <div class="flex items-center gap-3">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="22" height="22" fill="none" aria-label="kooper" role="img" class="shrink-0 text-kapture-black"><path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" d="M255.75 133.125c67.679 0 122.625 54.946 122.625 122.625S323.429 378.375 255.75 378.375 133.125 323.429 133.125 255.75s54.946-122.625 122.625-122.625m0-132.75c18.832 0 34.121 15.289 34.121 34.121s-15.289 34.121-34.121 34.121-34.121-15.289-34.121-34.121S236.918.375 255.75.375M75.173 75.173c13.316-13.316 34.938-13.316 48.254 0s13.316 34.938 0 48.254-34.938 13.316-48.254 0-13.316-34.938 0-48.254M511.125 255.75c0 18.832-15.289 34.121-34.121 34.121s-34.121-15.289-34.121-34.121 15.289-34.121 34.121-34.121 34.121 15.289 34.121 34.121M255.75 442.883c18.832 0 34.121 15.289 34.121 34.121s-15.289 34.121-34.121 34.121-34.121-15.289-34.121-34.121 15.289-34.121 34.121-34.121m132.323-54.81c13.316-13.316 34.938-13.316 48.254 0s13.316 34.938 0 48.254-34.938 13.316-48.254 0-13.316-34.938 0-48.254M68.617 255.75c0 18.832-15.289 34.121-34.121 34.121S.375 274.582.375 255.75s15.289-34.121 34.121-34.121 34.121 15.289 34.121 34.121m54.81 132.323c13.316 13.316 13.316 34.938 0 48.254s-34.938 13.316-48.254 0-13.316-34.938 0-48.254 34.938-13.316 48.254 0"/><path fill="#FFD400" fill-rule="evenodd" clip-rule="evenodd" d="M436.327 75.173c13.316 13.316 13.316 34.938 0 48.254s-34.938 13.316-48.254 0-13.316-34.938 0-48.254 34.938-13.316 48.254 0"/></svg>
+      <div class="flex items-center gap-1.5 font-display lowercase tracking-wide text-sm text-kapture-black"><span class="font-semibold">kooper</span><span class="text-kapture-mist">·</span><span class="font-medium">care</span></div>
+    </div>
+    <div class="flex items-center gap-3 flex-wrap"><span class="font-mono">v0.1 dashboards · 12 personas</span><span aria-hidden>·</span><span>Mock data · no PII</span></div>
+  </div>
+</footer>
+
+<script>
+  function switchPersona(value) {
+    document.querySelectorAll('.dash').forEach(el => {
+      el.classList.toggle('active', el.dataset.persona === value);
+    });
+    var sel = document.getElementById('roleSwitcher');
+    if (sel && sel.value !== value) sel.value = value;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // On load, honour ?as=role from sign-in deep links
+  (function preselectPersonaFromQuery(){
+    var params = new URLSearchParams(window.location.search);
+    var role = params.get('as');
+    var validRoles = ['owner','manager','clinical-lead','senior-carer','nurse','carer','activities','cook','maintenance','resident','family','inspector'];
+    if (role && validRoles.indexOf(role) !== -1) {
+      document.addEventListener('DOMContentLoaded', function(){ switchPersona(role); });
+    }
+  })();
+</script>
+
+
+<script>
+  // Toast helper for dashboard placeholder actions.
+  function kooperToast(msg) {
+    var t = document.createElement('div');
+    t.textContent = msg;
+    t.style.cssText = 'position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:#0A0A0A;color:#FFD400;padding:0.75rem 1.25rem;border-radius:10px;font-size:0.875rem;font-weight:500;z-index:100;box-shadow:0 12px 30px -8px rgba(0,0,0,0.3);font-family:Inter,sans-serif;max-width:90vw;text-align:center;';
+    document.body.appendChild(t);
+    setTimeout(function () { t.style.transition = 'opacity 0.3s ease'; t.style.opacity = '0'; }, 1800);
+    setTimeout(function () { t.remove(); }, 2200);
+  }
+
+  // Wire every button without onclick to a friendly toast describing the action.
+  document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('button:not([onclick]):not([type="submit"])').forEach(function (b) {
+      if (b.id === 'roleSwitcher' || b.closest('select') || b.classList.contains('pictogram-tile')) return;
+      var label = (b.textContent || '').trim().slice(0, 60);
+      if (!label) return;
+      b.addEventListener('click', function () { kooperToast('✓ ' + label + ' — action queued'); });
+    });
+
+    // Pictogram tiles toggle their selected state with feedback.
+    document.querySelectorAll('.pictogram-tile').forEach(function (tile) {
+      tile.addEventListener('click', function () {
+        var siblings = tile.parentNode.querySelectorAll('.pictogram-tile');
+        siblings.forEach(function (s) { s.classList.remove('selected'); });
+        tile.classList.add('selected');
+        var lbl = (tile.querySelector('.label') || {}).textContent || 'choice';
+        kooperToast('✓ Logged: ' + lbl.trim());
+      });
+    });
+
+    // ============================================================
+    // Wire context-strip module chips → real app URLs
+    // ============================================================
+    var APP_URLS = {
+      'hr':            'kooper-hr.html',
+      'care plans':    'kooper-care-plans.html',
+      'care plan':     'kooper-care-plans.html',
+      'recording':     'kooper-recording-demo.html',
+      'clinical':      'kooper-clinical.html',
+      'risk':          'kooper-clinical.html',
+      'resident':      'kooper-resident.html',
+      'family':        'kooper-family.html',
+      'reports':       'kooper-reports.html',
+      'mar':           'kooper-recording-demo.html',
+      'charts':        'kooper-reports.html',
+      'estate':        'kooper-hr.html#account',
+      'operations':    'kooper-hr.html#rota',
+      'multi-site':    'kooper-hr.html#account',
+      'audit':         'kooper-reports.html',
+      'compliance':    'kooper-reports.html',
+      'ai':            'kooper-recording-demo.html',
+      'partner':       'kooper-hr.html#workers',
+      'inspector':     'kooper-care-dashboards.html?as=inspector',
+      'gp-connect':    'kooper-clinical.html',
+      'activities':    'kooper-care-dashboards.html?as=activities'
+    };
+    document.querySelectorAll('.persona-context-strip .chip.font-mono, .persona-context-strip .chip').forEach(function (chip) {
+      var key = (chip.textContent || '').trim().toLowerCase();
+      if (APP_URLS[key]) {
+        chip.style.cursor = 'pointer';
+        chip.title = 'Open kooper · ' + key;
+        chip.addEventListener('click', function () { window.location.href = APP_URLS[key]; });
+      }
+    });
+
+    // ============================================================
+    // Dead-link cleanup: smart-route href="#" anchors based on label,
+    // otherwise fall back to friendly toast.
+    // ============================================================
+    function routeFromLabel(text) {
+      var t = (text || '').toLowerCase();
+      if (t.indexOf('care plan') >= 0)         return 'kooper-care-plans.html';
+      if (t.indexOf('record') >= 0)            return 'kooper-recording-demo.html';
+      if (t.indexOf('clinical') >= 0 || t.indexOf('mha') >= 0 || t.indexOf('news2') >= 0) return 'kooper-clinical.html';
+      if (t.indexOf('family') >= 0)            return 'kooper-family.html';
+      if (t.indexOf('report') >= 0 || t.indexOf('cqc pack') >= 0) return 'kooper-reports.html';
+      if (t.indexOf('resident') >= 0)          return 'kooper-resident.html';
+      return null;
+    }
+    document.querySelectorAll('a[href="#"]').forEach(function (a) {
+      var dest = routeFromLabel(a.textContent);
+      if (dest) {
+        a.setAttribute('href', dest);
+      } else {
+        a.addEventListener('click', function (e) {
+          e.preventDefault();
+          kooperToast('Coming in the live build');
+        });
+      }
+    });
+
+    // Auto-promote resident persona's bottom Help-me button (if any) to direct app
+    var residentPane = document.querySelector('[data-persona="resident"]');
+    if (residentPane) {
+      var openBtn = document.createElement('a');
+      openBtn.href = 'kooper-resident.html';
+      openBtn.className = 'btn-yellow text-xs absolute top-3 right-3 z-10';
+      openBtn.style.cssText = 'background:#FFD400;color:#0A0A0A;padding:0.5rem 0.875rem;border-radius:10px;font-weight:600;text-decoration:none;font-size:0.75rem;display:inline-flex;align-items:center;gap:0.375rem;';
+      openBtn.innerHTML = 'Open resident app →';
+      var strip = residentPane.querySelector('.persona-context-strip');
+      if (strip) { strip.style.position = 'relative'; strip.appendChild(openBtn); }
+    }
+
+    var nursePane = document.querySelector('[data-persona="nurse"]');
+    if (nursePane) {
+      var nb = document.createElement('a');
+      nb.href = 'kooper-clinical.html';
+      nb.style.cssText = 'background:#FFD400;color:#0A0A0A;padding:0.5rem 0.875rem;border-radius:10px;font-weight:600;text-decoration:none;font-size:0.75rem;display:inline-flex;align-items:center;gap:0.375rem;position:absolute;top:0.75rem;right:1rem;';
+      nb.textContent = 'Open clinical app →';
+      var ns = nursePane.querySelector('.persona-context-strip');
+      if (ns) { ns.style.position = 'relative'; ns.appendChild(nb); }
+    }
+    var carerPane = document.querySelector('[data-persona="carer"]');
+    if (carerPane) {
+      var cb = document.createElement('a');
+      cb.href = 'kooper-recording-demo.html';
+      cb.style.cssText = 'background:#FFD400;color:#0A0A0A;padding:0.5rem 0.875rem;border-radius:10px;font-weight:600;text-decoration:none;font-size:0.75rem;display:inline-flex;align-items:center;gap:0.375rem;position:absolute;top:0.75rem;right:1rem;';
+      cb.textContent = 'Open recording app →';
+      var cs = carerPane.querySelector('.persona-context-strip');
+      if (cs) { cs.style.position = 'relative'; cs.appendChild(cb); }
+    }
+    var clPane = document.querySelector('[data-persona="clinical-lead"]');
+    if (clPane) {
+      var clb = document.createElement('a');
+      clb.href = 'kooper-clinical.html';
+      clb.style.cssText = 'background:#FFD400;color:#0A0A0A;padding:0.5rem 0.875rem;border-radius:10px;font-weight:600;text-decoration:none;font-size:0.75rem;display:inline-flex;align-items:center;gap:0.375rem;position:absolute;top:0.75rem;right:1rem;';
+      clb.textContent = 'Open clinical app →';
+      var cls = clPane.querySelector('.persona-context-strip');
+      if (cls) { cls.style.position = 'relative'; cls.appendChild(clb); }
+    }
+    var famPane = document.querySelector('[data-persona="family"]');
+    if (famPane) {
+      var fb = document.createElement('a');
+      fb.href = 'kooper-family.html';
+      fb.style.cssText = 'background:#FFD400;color:#0A0A0A;padding:0.5rem 0.875rem;border-radius:10px;font-weight:600;text-decoration:none;font-size:0.75rem;display:inline-flex;align-items:center;gap:0.375rem;position:absolute;top:0.75rem;right:1rem;';
+      fb.textContent = 'Open family app →';
+      var fs = famPane.querySelector('.persona-context-strip');
+      if (fs) { fs.style.position = 'relative'; fs.appendChild(fb); }
+    }
+    var ownerPane = document.querySelector('[data-persona="owner"]');
+    var managerPane = document.querySelector('[data-persona="manager"]');
+    [ownerPane, managerPane].forEach(function (p) {
+      if (!p) return;
+      var rb = document.createElement('a');
+      rb.href = 'kooper-reports.html';
+      rb.style.cssText = 'background:#FFD400;color:#0A0A0A;padding:0.5rem 0.875rem;border-radius:10px;font-weight:600;text-decoration:none;font-size:0.75rem;display:inline-flex;align-items:center;gap:0.375rem;position:absolute;top:0.75rem;right:1rem;';
+      rb.textContent = 'Open reports →';
+      var s = p.querySelector('.persona-context-strip');
+      if (s) { s.style.position = 'relative'; s.appendChild(rb); }
+    });
+  });
+</script>
+</body>
+</html>
