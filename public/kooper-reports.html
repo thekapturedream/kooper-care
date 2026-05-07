@@ -410,6 +410,48 @@ document.getElementById('aiSearch').addEventListener('keydown', function(e){
     kooperToast('Claude is generating: ' + this.value.trim());
   }
 });
+
+// ============================================================
+// Activate every .report-tile (the 15 individual report cards)
+// Tap → toast the report name and route to the relevant module
+// where the full evidence lives. Don't double-fire on inner btns.
+// ============================================================
+(function activateReportTiles(){
+  // Map kicker domain → most relevant kooper app for drill-in.
+  // (CQC SAF five domains plus 'Insight' synthesis tiles.)
+  var DOMAIN_ROUTE = {
+    'safe':       'kooper-clinical.html',
+    'effective':  'kooper-care-plans.html',
+    'caring':     'kooper-recording-demo.html',
+    'responsive': 'kooper-clinical.html',
+    'well-led':   'kooper-hr.html#compliance',
+    'insight':    'kooper-recording-demo.html',
+    'cqc saf readiness': 'kooper-care-dashboards.html?as=inspector'
+  };
+  document.querySelectorAll('.report-tile').forEach(function(tile){
+    if (tile.dataset.wired === '1') return;
+    tile.dataset.wired = '1';
+    tile.setAttribute('tabindex', '0');
+    tile.setAttribute('role', 'button');
+    var titleEl = tile.querySelector('.stat-big, .font-display, h3, h4');
+    var kickerEl = tile.querySelector('.ed-kicker');
+    var title = titleEl ? (titleEl.textContent || '').trim().slice(0, 64) : 'Report';
+    var domain = kickerEl ? (kickerEl.textContent || '').trim().toLowerCase() : '';
+    var route = DOMAIN_ROUTE[domain] || 'kooper-care-dashboards.html';
+    var fire = function(e){
+      // Skip if click landed on an inner button/anchor/input
+      if (e && e.target && e.target.closest('button, a, input, select, textarea')) return;
+      kooperToast('Opening · ' + title);
+      setTimeout(function(){ window.location.href = route; }, 600);
+    };
+    tile.addEventListener('click', fire);
+    tile.addEventListener('keydown', function(e){
+      if ((e.key === 'Enter' || e.key === ' ') && document.activeElement === tile) {
+        e.preventDefault(); fire(e);
+      }
+    });
+  });
+})();
 </script>
 </body>
 </html>
