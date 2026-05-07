@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { PageHeader } from "@/components/PageHeader";
-import { ImageStrip } from "@/components/ImageStrip";
 import { CTA } from "@/components/CTA";
 import { SITE } from "@/lib/utils";
 
@@ -85,14 +84,6 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
-
-      <ImageStrip
-        src="https://images.unsplash.com/photo-1494412519320-aa613dfb7738?auto=format&fit=crop&w=2000&q=80"
-        alt="Container terminal in operation"
-        eyebrow="Where we work"
-        caption="Across every African corridor and every global gateway that matters."
-        height="medium"
-      />
 
       <section className="bg-kapture-paper dark:bg-kapture-ink">
         <div className="container-kapture py-24 md:py-32">

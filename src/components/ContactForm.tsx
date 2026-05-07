@@ -3,7 +3,6 @@
 import * as React from "react";
 import { motion } from "framer-motion";
 import { Send, CheckCircle2, AlertTriangle, CalendarClock } from "lucide-react";
-import { CalendlyEmbed } from "./CalendlyEmbed";
 
 type Status = "idle" | "submitting" | "success" | "error";
 
@@ -88,18 +87,9 @@ export function ContactForm({ topic = "general" }: { topic?: string }) {
         <div className="flex items-center gap-3 px-1">
           <CalendarClock size={18} className="text-kapture-yellow" />
           <p className="text-sm font-semibold uppercase tracking-wider text-kapture-mist">
-            Pick a slot · Free · 15 minutes
+            We&apos;ll be in touch within one working day.
           </p>
         </div>
-
-        <CalendlyEmbed
-          prefill={{
-            name: submitted.name,
-            email: submitted.email,
-            company: submitted.company,
-            notes: submitted.message,
-          }}
-        />
       </motion.div>
     );
   }

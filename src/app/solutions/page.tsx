@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { PageHeader } from "@/components/PageHeader";
-import { ImageStrip } from "@/components/ImageStrip";
 import { SolutionsGrid } from "@/components/SolutionsGrid";
 import { CTA } from "@/components/CTA";
 
@@ -17,15 +16,8 @@ export default function SolutionsPage() {
     <>
       <PageHeader
         eyebrow="Solutions"
-        title="Tuned for the way your industry actually moves."
-        lede="Retail's peak isn't manufacturing's peak. Mining's lanes aren't pharma's lanes. Kapture Logistics tunes the operating layer to the gravity of your sector."
-      />
-      <ImageStrip
-        src="https://images.unsplash.com/photo-1553413077-190dd305871c?auto=format&fit=crop&w=2000&q=80"
-        alt="Bonded warehousing facility"
-        eyebrow="Industries"
-        caption="From retail peaks to mining corridors — every sector, one operating layer."
-        height="short"
+        title="Tuned for the way your service actually runs."
+        lede="A care home's day isn't a domiciliary visit's day. A supported-living tenancy isn't a complex-needs ward. kooper · care tunes the operating layer to the shape of your service."
       />
       <SolutionsGrid />
       <CTA />
