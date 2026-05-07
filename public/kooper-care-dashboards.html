@@ -57,6 +57,17 @@
   .dash { display: none; }
   .dash.active { display: block; }
 
+  /* Clickable card affordance — applied via JS to surface cards that have a destination */
+  .is-clickable { cursor: pointer; transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease; }
+  .is-clickable:hover { border-color: #0A0A0A; transform: translateY(-1px); box-shadow: 0 6px 16px -8px rgba(0,0,0,0.12); }
+  .is-clickable:active { transform: translateY(0); }
+  .is-clickable:focus-visible { outline: 2px solid #FFD400; outline-offset: 2px; }
+
+  /* Clickable rows (audit trail, list items) get a softer affordance */
+  .is-clickable-row { cursor: pointer; transition: background 0.12s ease; }
+  .is-clickable-row:hover { background: #F5F5F5; }
+  .is-clickable-row:focus-visible { outline: 2px solid #FFD400; outline-offset: -2px; border-radius: 6px; }
+
   /* Pictogram tile for resident app */
   .pictogram-tile { background: #FFFFFF; border: 2px solid #D4D4D4; border-radius: 16px; aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.375rem; padding: 0.5rem; cursor: pointer; transition: all 0.15s ease; }
   .pictogram-tile:hover { border-color: #0A0A0A; transform: translateY(-2px); }
@@ -280,7 +291,7 @@
         <h1 class="h-greeting text-kapture-black mt-3">Good afternoon, Lola.</h1>
         <p class="text-kapture-smoke mt-2"><span class="font-mono">Wed 6 May · 16:42</span> · 4 staff on shift · 28 of 30 residents present · CQC ready <span class="font-semibold text-status-ok">100%</span></p>
       </div>
-      <div class="flex gap-2"><button class="btn-secondary text-sm">Shift handover</button><button class="btn-primary text-sm">Run audit pack</button></div>
+      <div class="flex gap-2 flex-wrap"><a href="kooper-care-plans.html" class="btn-secondary text-sm">Shift handover</a><a href="kooper-reports.html" class="btn-primary text-sm">Run audit pack</a></div>
     </header>
 
     <!-- Action card -->
@@ -293,8 +304,8 @@
           <p class="text-kapture-mist mt-2 text-sm max-w-xl">Tap any to jump straight to the resident screen with the action pre-focused.</p>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 lg:w-2/3">
-          <a href="#" class="bg-kapture-coal hover:bg-kapture-ash transition rounded-xl p-4 border border-kapture-ash"><div class="text-[0.6875rem] uppercase tracking-wider text-kapture-yellow mb-1">Sign off</div><div class="font-display font-semibold">Incident #418</div><div class="text-xs text-kapture-mist mt-1">Mr H fall · 2h ago</div></a>
-          <a href="#" class="bg-kapture-coal hover:bg-kapture-ash transition rounded-xl p-4 border border-kapture-ash"><div class="text-[0.6875rem] uppercase tracking-wider text-kapture-yellow mb-1">Review due</div><div class="font-display font-semibold">2 care plans</div><div class="text-xs text-kapture-mist mt-1">Edward · Catherine</div></a>
+          <a href="kooper-clinical.html" title="Open incident #418" class="bg-kapture-coal hover:bg-kapture-ash transition rounded-xl p-4 border border-kapture-ash"><div class="text-[0.6875rem] uppercase tracking-wider text-kapture-yellow mb-1">Sign off</div><div class="font-display font-semibold">Incident #418</div><div class="text-xs text-kapture-mist mt-1">Mr H fall · 2h ago</div></a>
+          <a href="kooper-care-plans.html" title="Open care plan reviews" class="bg-kapture-coal hover:bg-kapture-ash transition rounded-xl p-4 border border-kapture-ash"><div class="text-[0.6875rem] uppercase tracking-wider text-kapture-yellow mb-1">Review due</div><div class="font-display font-semibold">2 care plans</div><div class="text-xs text-kapture-mist mt-1">Edward · Catherine</div></a>
           <a href="kooper-hr.html#workers" class="bg-kapture-coal hover:bg-kapture-ash transition rounded-xl p-4 border border-kapture-ash"><div class="text-[0.6875rem] uppercase tracking-wider text-kapture-yellow mb-1">Hire</div><div class="font-display font-semibold">3 applicants</div><div class="text-xs text-kapture-mist mt-1">Carer · night shift</div></a>
         </div>
       </div>
@@ -385,7 +396,7 @@
 
     <!-- Handover summary -->
     <section class="surface p-6">
-      <div class="flex items-center justify-between mb-4"><h2 class="font-display font-semibold">Handover from Sister Anne · 14:00</h2><a href="#" class="text-xs text-kapture-smoke hover:text-kapture-black underline-offset-4 hover:underline">View full handover →</a></div>
+      <div class="flex items-center justify-between mb-4"><h2 class="font-display font-semibold">Handover from Sister Anne · 14:00</h2><a href="kooper-care-plans.html" class="text-xs text-kapture-smoke hover:text-kapture-black underline-offset-4 hover:underline">View full handover →</a></div>
       <div class="space-y-2 text-sm text-kapture-smoke">
         <div class="flex gap-3"><span class="text-status-warning shrink-0">▲</span><span><strong class="text-kapture-black">Mr H</strong> needs hourly welfare checks until end of shift. Pain managed with paracetamol 1g at 13:00. Daughter visiting at 18:00.</span></div>
         <div class="flex gap-3"><span class="text-status-ok shrink-0">●</span><span><strong class="text-kapture-black">Mrs C</strong> wound dressing changed 13:30. Next change 19:30. Healing well.</span></div>
@@ -431,8 +442,8 @@
 
     <!-- Wound + Pain at-a-glance -->
     <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <div class="surface p-6"><div class="flex items-center justify-between mb-4"><h3 class="font-display font-semibold">Active wounds · 2</h3><a href="#" class="text-xs text-kapture-smoke">View all →</a></div><div class="space-y-3 text-sm"><div class="flex items-center justify-between p-3 bg-kapture-paper rounded-lg"><div><div class="font-medium">Mrs Cross · Sacrum</div><div class="text-xs text-kapture-smoke">Stage 2 · last dressed 13:30</div></div><span class="chip chip-warning text-[0.6875rem]">Due 19:30</span></div><div class="flex items-center justify-between p-3 bg-kapture-paper rounded-lg"><div><div class="font-medium">Mr Rossi · R heel</div><div class="text-xs text-kapture-smoke">Stage 1 · healing</div></div><span class="chip chip-ok text-[0.6875rem]">Due tomorrow</span></div></div></div>
-      <div class="surface p-6"><div class="flex items-center justify-between mb-4"><h3 class="font-display font-semibold">Pain monitoring · 3</h3><a href="#" class="text-xs text-kapture-smoke">PainChek →</a></div><div class="space-y-3 text-sm"><div class="flex items-center justify-between p-3 bg-kapture-paper rounded-lg"><div><div class="font-medium">Mr H</div><div class="text-xs text-kapture-smoke">PainChek 6/10 · 15:00</div></div><span class="chip chip-critical text-[0.6875rem]">PRN given</span></div><div class="flex items-center justify-between p-3 bg-kapture-paper rounded-lg"><div><div class="font-medium">Mrs Cross</div><div class="text-xs text-kapture-smoke">Self-report 3/10</div></div><span class="chip text-[0.6875rem]">Stable</span></div></div></div>
+      <div class="surface p-6"><div class="flex items-center justify-between mb-4"><h3 class="font-display font-semibold">Active wounds · 2</h3><a href="kooper-clinical.html" class="text-xs text-kapture-smoke hover:text-kapture-black">View all →</a></div><div class="space-y-3 text-sm"><div class="flex items-center justify-between p-3 bg-kapture-paper rounded-lg"><div><div class="font-medium">Mrs Cross · Sacrum</div><div class="text-xs text-kapture-smoke">Stage 2 · last dressed 13:30</div></div><span class="chip chip-warning text-[0.6875rem]">Due 19:30</span></div><div class="flex items-center justify-between p-3 bg-kapture-paper rounded-lg"><div><div class="font-medium">Mr Rossi · R heel</div><div class="text-xs text-kapture-smoke">Stage 1 · healing</div></div><span class="chip chip-ok text-[0.6875rem]">Due tomorrow</span></div></div></div>
+      <div class="surface p-6"><div class="flex items-center justify-between mb-4"><h3 class="font-display font-semibold">Pain monitoring · 3</h3><a href="kooper-clinical.html" class="text-xs text-kapture-smoke hover:text-kapture-black">PainChek →</a></div><div class="space-y-3 text-sm"><div class="flex items-center justify-between p-3 bg-kapture-paper rounded-lg"><div><div class="font-medium">Mr H</div><div class="text-xs text-kapture-smoke">PainChek 6/10 · 15:00</div></div><span class="chip chip-critical text-[0.6875rem]">PRN given</span></div><div class="flex items-center justify-between p-3 bg-kapture-paper rounded-lg"><div><div class="font-medium">Mrs Cross</div><div class="text-xs text-kapture-smoke">Self-report 3/10</div></div><span class="chip text-[0.6875rem]">Stable</span></div></div></div>
     </section>
   </main>
 </section>
@@ -461,10 +472,10 @@
     <section>
       <h2 class="font-display text-lg font-semibold mb-4">Your residents · 4</h2>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div class="surface p-4"><div class="flex items-start justify-between mb-3"><div class="w-12 h-12 rounded-xl bg-kapture-coal text-white flex items-center justify-center font-display text-base font-semibold">EB</div><span class="chip chip-warning text-[0.6875rem]">Action</span></div><div class="font-display font-semibold">Edward Banda</div><div class="text-xs text-kapture-smoke">Eddie · Room 12</div><div class="mt-3 pt-3 border-t border-kapture-fog flex items-center justify-between text-[0.6875rem]"><span class="text-kapture-mist">Last note <span class="font-mono">2h</span></span><button class="text-kapture-yellow"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3z"/></svg></button></div></div>
-        <div class="surface p-4"><div class="flex items-start justify-between mb-3"><div class="w-12 h-12 rounded-xl bg-kapture-coal text-white flex items-center justify-center font-display text-base font-semibold">YA</div><span class="chip chip-ok text-[0.6875rem]">Settled</span></div><div class="font-display font-semibold">Yanir Ashkenazi</div><div class="text-xs text-kapture-smoke">Yan · Room 7</div><div class="mt-3 pt-3 border-t border-kapture-fog flex items-center justify-between text-[0.6875rem]"><span class="text-kapture-mist">Last note <span class="font-mono">35m</span></span><button class="text-kapture-yellow"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3z"/></svg></button></div></div>
-        <div class="surface p-4"><div class="flex items-start justify-between mb-3"><div class="w-12 h-12 rounded-xl bg-kapture-coal text-white flex items-center justify-center font-display text-base font-semibold">TF</div><span class="chip chip-critical text-[0.6875rem]">Watch</span></div><div class="font-display font-semibold">Terence Fletcher</div><div class="text-xs text-kapture-smoke">Tel · Room 4</div><div class="mt-3 pt-3 border-t border-kapture-fog flex items-center justify-between text-[0.6875rem]"><span class="text-kapture-mist">Last note <span class="font-mono">12m</span></span><button class="text-kapture-yellow"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3z"/></svg></button></div></div>
-        <div class="surface p-4"><div class="flex items-start justify-between mb-3"><div class="w-12 h-12 rounded-xl bg-kapture-coal text-white flex items-center justify-center font-display text-base font-semibold">CO</div><span class="chip chip-ok text-[0.6875rem]">Settled</span></div><div class="font-display font-semibold">Catherine Okafor</div><div class="text-xs text-kapture-smoke">Cathy · Room 9</div><div class="mt-3 pt-3 border-t border-kapture-fog flex items-center justify-between text-[0.6875rem]"><span class="text-kapture-mist">Last note <span class="font-mono">1h</span></span><button class="text-kapture-yellow"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3z"/></svg></button></div></div>
+        <div class="surface p-4"><div class="flex items-start justify-between mb-3"><div class="w-12 h-12 rounded-xl bg-kapture-coal text-white flex items-center justify-center font-display text-base font-semibold">EB</div><span class="chip chip-warning text-[0.6875rem]">Action</span></div><div class="font-display font-semibold">Edward Banda</div><div class="text-xs text-kapture-smoke">Eddie · Room 12</div><div class="mt-3 pt-3 border-t border-kapture-fog flex items-center justify-between text-[0.6875rem]"><span class="text-kapture-mist">Last note <span class="font-mono">2h</span></span><span class="text-kapture-yellow" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3z"/></svg></span></div></div>
+        <div class="surface p-4"><div class="flex items-start justify-between mb-3"><div class="w-12 h-12 rounded-xl bg-kapture-coal text-white flex items-center justify-center font-display text-base font-semibold">YA</div><span class="chip chip-ok text-[0.6875rem]">Settled</span></div><div class="font-display font-semibold">Yanir Ashkenazi</div><div class="text-xs text-kapture-smoke">Yan · Room 7</div><div class="mt-3 pt-3 border-t border-kapture-fog flex items-center justify-between text-[0.6875rem]"><span class="text-kapture-mist">Last note <span class="font-mono">35m</span></span><span class="text-kapture-yellow" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3z"/></svg></span></div></div>
+        <div class="surface p-4"><div class="flex items-start justify-between mb-3"><div class="w-12 h-12 rounded-xl bg-kapture-coal text-white flex items-center justify-center font-display text-base font-semibold">TF</div><span class="chip chip-critical text-[0.6875rem]">Watch</span></div><div class="font-display font-semibold">Terence Fletcher</div><div class="text-xs text-kapture-smoke">Tel · Room 4</div><div class="mt-3 pt-3 border-t border-kapture-fog flex items-center justify-between text-[0.6875rem]"><span class="text-kapture-mist">Last note <span class="font-mono">12m</span></span><span class="text-kapture-yellow" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3z"/></svg></span></div></div>
+        <div class="surface p-4"><div class="flex items-start justify-between mb-3"><div class="w-12 h-12 rounded-xl bg-kapture-coal text-white flex items-center justify-center font-display text-base font-semibold">CO</div><span class="chip chip-ok text-[0.6875rem]">Settled</span></div><div class="font-display font-semibold">Catherine Okafor</div><div class="text-xs text-kapture-smoke">Cathy · Room 9</div><div class="mt-3 pt-3 border-t border-kapture-fog flex items-center justify-between text-[0.6875rem]"><span class="text-kapture-mist">Last note <span class="font-mono">1h</span></span><span class="text-kapture-yellow" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3z"/></svg></span></div></div>
       </div>
     </section>
 
@@ -472,9 +483,9 @@
     <section class="surface p-6">
       <h2 class="font-display font-semibold mb-4">Coming up</h2>
       <div class="space-y-2 text-sm">
-        <div class="flex items-center gap-3 p-2 hover:bg-kapture-paper rounded"><div class="w-2 h-2 rounded-full bg-status-warning"></div><div class="flex-1">Welfare check · Edward · <span class="text-kapture-mist">due in 18 min</span></div><button class="text-kapture-mist hover:text-kapture-black">→</button></div>
-        <div class="flex items-center gap-3 p-2 hover:bg-kapture-paper rounded"><div class="w-2 h-2 rounded-full bg-status-warning"></div><div class="flex-1">Tea round · all residents · <span class="text-kapture-mist">due 17:30</span></div><button class="text-kapture-mist hover:text-kapture-black">→</button></div>
-        <div class="flex items-center gap-3 p-2 hover:bg-kapture-paper rounded"><div class="w-2 h-2 rounded-full bg-status-neutral"></div><div class="flex-1">Repositioning · Mrs Cross · <span class="text-kapture-mist">19:30</span></div><button class="text-kapture-mist hover:text-kapture-black">→</button></div>
+        <div class="flex items-center gap-3 p-2 hover:bg-kapture-paper rounded"><div class="w-2 h-2 rounded-full bg-status-warning"></div><div class="flex-1">Welfare check · Edward · <span class="text-kapture-mist">due in 18 min</span></div><span class="text-kapture-mist" aria-hidden="true">→</span></div>
+        <div class="flex items-center gap-3 p-2 hover:bg-kapture-paper rounded"><div class="w-2 h-2 rounded-full bg-status-warning"></div><div class="flex-1">Tea round · all residents · <span class="text-kapture-mist">due 17:30</span></div><span class="text-kapture-mist" aria-hidden="true">→</span></div>
+        <div class="flex items-center gap-3 p-2 hover:bg-kapture-paper rounded"><div class="w-2 h-2 rounded-full bg-status-neutral"></div><div class="flex-1">Repositioning · Mrs Cross · <span class="text-kapture-mist">19:30</span></div><span class="text-kapture-mist" aria-hidden="true">→</span></div>
       </div>
     </section>
   </main>
@@ -764,7 +775,7 @@
   </div>
 
   <main class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-    <header class="flex items-end justify-between flex-wrap gap-3"><div><span class="chip chip-yellow font-mono text-[0.6875rem] tracking-widest mb-3">INSPECTION VIEW</span><h1 class="h-greeting text-kapture-black mt-3">Welcome, Tomas.</h1><p class="text-kapture-smoke mt-2">Draycott House · 30 residents · Last inspection <span class="font-mono">12 Sep 2025 · Outstanding</span></p></div><div class="flex gap-2"><button class="btn-secondary text-sm">Search residents</button><button class="btn-primary text-sm">Export evidence pack</button></div></header>
+    <header class="flex items-end justify-between flex-wrap gap-3"><div><span class="chip chip-yellow font-mono text-[0.6875rem] tracking-widest mb-3">INSPECTION VIEW</span><h1 class="h-greeting text-kapture-black mt-3">Welcome, Tomas.</h1><p class="text-kapture-smoke mt-2">Draycott House · 30 residents · Last inspection <span class="font-mono">12 Sep 2025 · Outstanding</span></p></div><div class="flex gap-2 flex-wrap"><a href="kooper-clinical.html" class="btn-secondary text-sm">Search residents</a><a href="kooper-reports.html" class="btn-primary text-sm">Export evidence pack</a></div></header>
 
     <!-- SAF quality statements -->
     <section>
@@ -983,6 +994,220 @@
       var s = p.querySelector('.persona-context-strip');
       if (s) { s.style.position = 'relative'; s.appendChild(rb); }
     });
+
+    // ============================================================
+    // PANEL-SPECIFIC CARD ACTIVATION
+    // Every surface that looks tappable gets wired to a real route
+    // or a meaningful toast. Scoped per persona to avoid collisions.
+    // ============================================================
+
+    function wireCard(el, handler) {
+      if (!el) return;
+      if (el.dataset.wired === '1') return;
+      el.dataset.wired = '1';
+      el.classList.add('is-clickable');
+      el.setAttribute('tabindex', '0');
+      el.setAttribute('role', 'button');
+      el.addEventListener('click', function (e) {
+        // Don't double-fire when click lands on an inner button/anchor/input
+        if (e.target.closest('button, a, input, select, textarea')) return;
+        handler(e);
+      });
+      el.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          if (document.activeElement !== el) return;
+          e.preventDefault(); handler(e);
+        }
+      });
+    }
+    function wireRow(el, handler) {
+      if (!el) return;
+      if (el.dataset.wired === '1') return;
+      el.dataset.wired = '1';
+      el.classList.add('is-clickable-row');
+      el.setAttribute('tabindex', '0');
+      el.setAttribute('role', 'button');
+      el.addEventListener('click', function (e) {
+        if (e.target.closest('button, a, input, select, textarea')) return;
+        handler(e);
+      });
+      el.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          if (document.activeElement !== el) return;
+          e.preventDefault(); handler(e);
+        }
+      });
+    }
+    function go(url) { return function () { window.location.href = url; }; }
+    function toast(msg) { return function () { kooperToast(msg); }; }
+
+    // ---- OWNER · 3 site cards ----
+    if (ownerPane) {
+      var siteCards = ownerPane.querySelectorAll('main > section:nth-of-type(2) .surface');
+      var siteNames = ['Draycott House', 'Marylebone Court', 'Camberwell Lodge'];
+      siteCards.forEach(function (card, i) {
+        wireCard(card, toast('Filtering dashboard to ' + (siteNames[i] || 'this site') + ' — drill-in opens in production'));
+      });
+    }
+
+    // ---- MANAGER · stats grid + compliance + workforce rows ----
+    if (managerPane) {
+      // Stats grid 4 surfaces — make them filter-tappable
+      var statTiles = managerPane.querySelectorAll('main > section:nth-of-type(2) .surface');
+      var statTargets = [
+        { url: 'kooper-recording-demo.html', msg: 'Opening today\'s notes feed' },
+        { url: 'kooper-recording-demo.html', msg: 'Opening voice draft inbox' },
+        { url: 'kooper-care-plans.html',     msg: 'Opening reviews-due list' },
+        { url: 'kooper-reports.html',        msg: 'Opening last CQC pack' }
+      ];
+      statTiles.forEach(function (tile, i) {
+        var t = statTargets[i]; if (!t) return;
+        wireCard(tile, function () { kooperToast(t.msg); setTimeout(go(t.url), 600); });
+      });
+      // Compliance + Workforce surfaces (section #3 = grid of 2 cards)
+      // Inner rows in workforce → HR rota
+      managerPane.querySelectorAll('main > section:nth-of-type(3) .surface:nth-of-type(2) > .space-y-2 > div').forEach(function (row) {
+        var nameEl = row.querySelector('.font-medium');
+        var name = nameEl ? nameEl.textContent.trim() : 'worker';
+        wireRow(row, function () { kooperToast('Opening rota for ' + name); setTimeout(go('kooper-hr.html#rota'), 500); });
+      });
+      // Compliance currency rows → HR compliance
+      managerPane.querySelectorAll('main > section:nth-of-type(3) .surface:nth-of-type(1) > .space-y-3 > div').forEach(function (row) {
+        wireRow(row, function () { kooperToast('Opening compliance detail'); setTimeout(go('kooper-hr.html#compliance'), 500); });
+      });
+    }
+
+    // ---- CLINICAL LEAD · watch list cards ----
+    var clinicalPane = document.querySelector('[data-persona="clinical-lead"]');
+    if (clinicalPane) {
+      clinicalPane.querySelectorAll('main > section:nth-of-type(1) .surface').forEach(function (card) {
+        wireCard(card, go('kooper-clinical.html'));
+      });
+      // Trends grid → reports
+      clinicalPane.querySelectorAll('main > section:nth-of-type(2) .surface').forEach(function (card) {
+        wireCard(card, function () { kooperToast('Opening trend in reports'); setTimeout(go('kooper-reports.html'), 500); });
+      });
+    }
+
+    // ---- SENIOR CARER · voice draft cards ----
+    var seniorPane = document.querySelector('[data-persona="senior-carer"]');
+    if (seniorPane) {
+      seniorPane.querySelectorAll('main > section:nth-of-type(2) .surface').forEach(function (card) {
+        wireCard(card, go('kooper-recording-demo.html'));
+      });
+    }
+
+    // ---- NURSE · med round rows + wound/pain rows ----
+    var nursePane2 = document.querySelector('[data-persona="nurse"]');
+    if (nursePane2) {
+      nursePane2.querySelectorAll('main > section:nth-of-type(1) > .surface > .space-y-2 > div').forEach(function (row) {
+        wireRow(row, go('kooper-clinical.html'));
+      });
+      nursePane2.querySelectorAll('main > section:nth-of-type(2) .surface .space-y-3 > div').forEach(function (row) {
+        wireRow(row, go('kooper-clinical.html'));
+      });
+    }
+
+    // ---- CARER · resident tiles + tasks remaining ----
+    var carerPane2 = document.querySelector('[data-persona="carer"]');
+    if (carerPane2) {
+      // The 4 resident tiles
+      carerPane2.querySelectorAll('main > section:nth-of-type(2) .surface').forEach(function (tile) {
+        var nameEl = tile.querySelector('.font-display');
+        var name = nameEl ? nameEl.textContent.trim() : 'resident';
+        wireCard(tile, function () {
+          kooperToast('Opening recording for ' + name);
+          setTimeout(go('kooper-recording-demo.html'), 500);
+        });
+      });
+      // The voice quick-action banner
+      var voiceBanner = carerPane2.querySelector('main > section:nth-of-type(1)');
+      if (voiceBanner) {
+        wireCard(voiceBanner, go('kooper-recording-demo.html'));
+      }
+      // Coming up rows
+      carerPane2.querySelectorAll('main > section:nth-of-type(3) .space-y-2 > div').forEach(function (row) {
+        wireRow(row, go('kooper-recording-demo.html'));
+      });
+    }
+
+    // ---- ACTIVITIES · today's plan cards + leaderboard rows ----
+    var activitiesPane = document.querySelector('[data-persona="activities"]');
+    if (activitiesPane) {
+      activitiesPane.querySelectorAll('main > section:nth-of-type(1) .surface').forEach(function (card) {
+        var titleEl = card.querySelector('.font-display');
+        var title = titleEl ? titleEl.textContent.trim() : 'activity';
+        wireCard(card, toast('Opening session log: ' + title));
+      });
+      activitiesPane.querySelectorAll('main > section:nth-of-type(2) .surface > .space-y-3 > div').forEach(function (row) {
+        var nameEl = row.querySelector('.font-medium');
+        var name = nameEl ? nameEl.textContent.trim() : 'resident';
+        wireRow(row, toast('Opening engagement history for ' + name));
+      });
+    }
+
+    // ---- COOK · menu cards + special diet/stock rows ----
+    var cookPane = document.querySelector('[data-persona="cook"]');
+    if (cookPane) {
+      cookPane.querySelectorAll('main > section:nth-of-type(1) .bg-kapture-paper').forEach(function (card) {
+        wireCard(card, toast('Opening menu builder'));
+      });
+      cookPane.querySelectorAll('main > section:nth-of-type(2) .surface .bg-kapture-paper').forEach(function (row) {
+        wireRow(row, toast('Opening detail · stock + diet detail'));
+      });
+    }
+
+    // ---- MAINTENANCE · ticket rows + compliance rows ----
+    var maintPane = document.querySelector('[data-persona="maintenance"]');
+    if (maintPane) {
+      maintPane.querySelectorAll('main .surface > .space-y-3 > div').forEach(function (row) {
+        var titleEl = row.querySelector('.font-medium');
+        var title = titleEl ? titleEl.textContent.trim() : 'ticket';
+        wireRow(row, toast('Opening ticket: ' + title));
+      });
+    }
+
+    // ---- INSPECTOR · SAF 5 cells + audit rows + search input ----
+    var inspectorPane = document.querySelector('[data-persona="inspector"]');
+    if (inspectorPane) {
+      var safCells = inspectorPane.querySelectorAll('main > section:nth-of-type(1) .surface');
+      var safDomains = ['Safe', 'Effective', 'Caring', 'Responsive', 'Well-led'];
+      safCells.forEach(function (cell, i) {
+        wireCard(cell, function () {
+          kooperToast('Drilling into ' + (safDomains[i] || 'domain') + ' evidence');
+          setTimeout(go('kooper-reports.html'), 500);
+        });
+      });
+      // Audit trail rows
+      inspectorPane.querySelectorAll('main > section:nth-of-type(2) .space-y-2 > div').forEach(function (row) {
+        wireRow(row, toast('Opening audit event detail'));
+      });
+      // Search input — wire to live toast on Enter
+      var searchInput = inspectorPane.querySelector('input[type="text"]');
+      if (searchInput) {
+        searchInput.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter') {
+            var q = searchInput.value.trim();
+            kooperToast(q ? 'Searching residents: "' + q + '"' : 'Type a name, room or condition');
+            if (q) setTimeout(go('kooper-clinical.html'), 700);
+          }
+        });
+      }
+    }
+
+    // ---- FAMILY · photo grid (open photo wall) ----
+    // Quick actions are <button class="surface"> already wired by generic toaster.
+    // Help-us-know-dad rows have explicit Add/Share buttons. Only the photos need wiring.
+    var familyPane = document.querySelector('[data-persona="family"]');
+    if (familyPane) {
+      familyPane.querySelectorAll('main > section:nth-of-type(2) .aspect-square').forEach(function (photo) {
+        wireCard(photo, toast('Opening photo wall'));
+      });
+      // Mood + activity surfaces → reports
+      familyPane.querySelectorAll('main > section:nth-of-type(3) .surface').forEach(function (card) {
+        wireCard(card, function () { kooperToast('Opening trend detail'); setTimeout(go('kooper-reports.html'), 500); });
+      });
+    }
   });
 </script>
 </body>
