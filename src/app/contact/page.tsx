@@ -88,9 +88,13 @@ export default function ContactPage({ searchParams }: Props) {
               <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-kapture-paper text-kapture-black dark:bg-kapture-ash dark:text-kapture-white">
                 <MapPin size={16} />
               </div>
-              <p className="mt-5 text-xs font-semibold uppercase tracking-wider text-kapture-mist">Studios</p>
+              <p className="mt-5 text-xs font-semibold uppercase tracking-wider text-kapture-mist">Registered office</p>
               <p className="mt-1 text-sm font-bold text-kapture-black dark:text-kapture-white">
-                {SITE.cities.join(" · ")}
+                {SITE.address.street}
+                <br />
+                {SITE.address.locality}, {SITE.address.postalCode}
+                <br />
+                {SITE.address.country}
               </p>
             </li>
           </ul>

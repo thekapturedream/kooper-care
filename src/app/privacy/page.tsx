@@ -28,7 +28,7 @@ export default function PrivacyPage() {
         <LegalDl
           items={[
             { term: "Controller", def: "Kapture Studio" },
-            { term: "Studios",    def: SITE.cities.join(" · ") },
+            { term: "Office",     def: `${SITE.address.street}, ${SITE.address.locality} ${SITE.address.postalCode}` },
             { term: "Email",      def: <a href={`mailto:${SITE.email}`} className="font-semibold text-kapture-black underline dark:text-kapture-white">{SITE.email}</a> },
             { term: "Phone",      def: SITE.phone },
             { term: "ICO",        def: <span>Registration number to be inserted by the customer once issued.</span> },
