@@ -6,6 +6,15 @@ import { ROLE_LABELS } from "@/lib/rbac";
 import { KaptureSun } from "@/components/KaptureSun";
 
 /**
+ * Authenticated app routes are never statically generated — every render
+ * needs the live session cookie. force-dynamic cascades to every nested
+ * page so /app, /app/care-plans, /app/clinical, etc. all opt out of
+ * prerender automatically.
+ */
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
+/**
  * /app/* layout.
  *
  * Every nested page renders inside this server component. We resolve the

@@ -1,8 +1,12 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { Users, FileText, Mic, TrendingUp, Clock, ShieldCheck, CheckCircle2 } from "lucide-react";
 import { getCurrentSession, isManagerOrAbove } from "@/lib/auth";
 import { ROLE_LABELS } from "@/lib/rbac";
 import { PersonaDashboard } from "@/components/dashboards/PersonaDashboard";
+
+// Belt-and-braces with the layout — never prerender authed pages.
+export const dynamic = "force-dynamic";
 
 /**
  * /app
@@ -20,8 +24,16 @@ import { PersonaDashboard } from "@/components/dashboards/PersonaDashboard";
  */
 export default async function AppHomePage() {
   const session = await getCurrentSession();
-  const worker = session.worker!;
-  const active = session.activeCommunity!;
+
+  // Layout already redirects unauthenticated visitors to /sign-in and shows
+  // the "no community" page when the worker has zero roles, but TypeScript
+  // doesn't know that, so we narrow defensively here too.
+  if (!session.signedIn || !session.worker || !session.activeCommunity) {
+    redirect("/sign-in");
+  }
+
+  const worker = session.worker;
+  const active = session.activeCommunity;
   const greeting = greetingForHour(new Date().getHours());
 
   const showManagerOnly = isManagerOrAbove(session);
