@@ -102,6 +102,58 @@
   .saf-caring { background: rgba(255,212,0,0.2); color: #876300; }
   .saf-responsive { background: rgba(10,10,10,0.06); color: #1A1A1A; }
   .saf-wellled { background: rgba(123,58,237,0.1); color: #5B21B6; }
+
+  /* ============================================================ */
+  /* Modal + Popover                                                */
+  /* ============================================================ */
+  .scrim { position: fixed; inset: 0; background: rgba(10,10,10,0.55); z-index: 90; opacity: 0; pointer-events: none; transition: opacity 0.18s ease; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
+  .scrim.on { opacity: 1; pointer-events: auto; }
+  .modal { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -48%); background: #FFFFFF; border-radius: 18px; max-width: min(720px, 92vw); width: 100%; max-height: 86vh; overflow: hidden; z-index: 95; opacity: 0; pointer-events: none; transition: opacity 0.18s ease, transform 0.18s ease; box-shadow: 0 30px 60px -20px rgba(0,0,0,0.35); display: flex; flex-direction: column; }
+  .modal.on { opacity: 1; pointer-events: auto; transform: translate(-50%, -50%); }
+  .modal-head { padding: 1.125rem 1.25rem; border-bottom: 1px solid #ECEAE3; display: flex; align-items: flex-start; justify-content: space-between; gap: 0.75rem; }
+  .modal-title { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 1.125rem; line-height: 1.2; color: #0A0A0A; }
+  .modal-sub { font-size: 0.8125rem; color: #6B7280; margin-top: 0.25rem; font-style: italic; font-family: 'Source Serif 4', serif; }
+  .modal-x { background: transparent; border: 0; cursor: pointer; color: #6B7280; padding: 0.25rem; border-radius: 6px; line-height: 0; flex-shrink: 0; }
+  .modal-x:hover { color: #0A0A0A; background: #F5F5F5; }
+  .modal-body { padding: 1.25rem; overflow-y: auto; }
+  .modal-foot { padding: 0.875rem 1.25rem; border-top: 1px solid #ECEAE3; background: #FAFAF7; display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; flex-wrap: wrap; }
+
+  /* Popover (Filter, Sort, Export) — lighter than modal */
+  .popover { position: fixed; background: #FFFFFF; border: 1px solid #D4D4D4; border-radius: 14px; box-shadow: 0 18px 40px -14px rgba(0,0,0,0.22); padding: 0.5rem; z-index: 95; min-width: 220px; opacity: 0; pointer-events: none; transition: opacity 0.14s ease, transform 0.14s ease; transform: translateY(-4px); }
+  .popover.on { opacity: 1; pointer-events: auto; transform: translateY(0); }
+  .popover-row { display: flex; align-items: center; gap: 0.625rem; padding: 0.5rem 0.625rem; border-radius: 8px; cursor: pointer; font-size: 0.875rem; color: #1A1A1A; transition: background 0.12s ease; user-select: none; }
+  .popover-row:hover { background: #F5F5F5; }
+  .popover-row.active { background: #FFFBEB; color: #876300; font-weight: 600; }
+  .popover-row .check { width: 14px; height: 14px; border: 1.5px solid #9A9A9A; border-radius: 4px; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; }
+  .popover-row.checked .check { background: #0A0A0A; border-color: #0A0A0A; }
+  .popover-row.checked .check::after { content: '✓'; color: #FFD400; font-size: 0.625rem; line-height: 1; font-weight: 700; }
+  .popover-section-label { font-family: 'JetBrains Mono', monospace; font-size: 0.625rem; text-transform: uppercase; letter-spacing: 0.1em; color: #9A9A9A; padding: 0.375rem 0.625rem 0.25rem; }
+
+  /* Compile pack progress */
+  .pack-step { display: flex; align-items: center; gap: 0.625rem; padding: 0.5rem 0; font-size: 0.875rem; color: #6B7280; }
+  .pack-step.done { color: #0A0A0A; }
+  .pack-step.active { color: #876300; font-weight: 500; }
+  .pack-step .pack-bullet { width: 18px; height: 18px; border-radius: 50%; background: #ECEAE3; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.2s ease; }
+  .pack-step.done .pack-bullet { background: #0A0A0A; }
+  .pack-step.done .pack-bullet::after { content: '✓'; color: #FFD400; font-size: 0.625rem; font-weight: 700; }
+  .pack-step.active .pack-bullet { background: #FFD400; }
+  .pack-step.active .pack-bullet::after { content: ''; width: 6px; height: 6px; border-radius: 50%; background: #0A0A0A; animation: pulse-ring 0.9s ease-out infinite; }
+  @keyframes pulse-ring { 0% { transform: scale(0.8); opacity: 0.6; } 100% { transform: scale(1.6); opacity: 0; } }
+
+  /* Window picker preset chips */
+  .window-preset { padding: 0.5rem 0.75rem; border: 1px solid #D4D4D4; border-radius: 10px; cursor: pointer; font-size: 0.8125rem; color: #2A2A2A; background: #FFFFFF; transition: all 0.12s ease; text-align: center; }
+  .window-preset:hover { border-color: #0A0A0A; }
+  .window-preset.active { background: #0A0A0A; color: #FFFFFF; border-color: #0A0A0A; }
+
+  /* Drill-in details */
+  .drill-event-row { display: flex; align-items: center; gap: 0.625rem; padding: 0.625rem 0.75rem; border-radius: 8px; font-size: 0.8125rem; transition: background 0.1s ease; }
+  .drill-event-row:hover { background: #FAFAF7; }
+  .drill-event-row .drill-time { font-family: 'JetBrains Mono', monospace; font-size: 0.6875rem; color: #6B7280; flex-shrink: 0; min-width: 56px; }
+  .drill-event-row .drill-pill { font-family: 'JetBrains Mono', monospace; font-size: 0.625rem; padding: 0.125rem 0.375rem; border-radius: 4px; background: #ECEAE3; color: #2A2A2A; flex-shrink: 0; }
+  .drill-event-row .drill-text { flex: 1; min-width: 0; color: #1A1A1A; }
+
+  /* Hidden filtered tile */
+  .report-tile.is-hidden { display: none; }
 </style>
 </head>
 <body>
@@ -128,7 +180,7 @@
       </div>
       <div class="flex items-center gap-2">
         <span class="hidden xl:inline-flex chip chip-outline-light text-[0.6875rem] whitespace-nowrap"><span class="pulse-dot"></span> Live · 9d window</span>
-        <button onclick="kooperToast('Export — PDF / XLSX / API · pick a destination')" class="btn-yellow text-xs whitespace-nowrap">Export</button>
+        <button id="exportBtn" onclick="openExportPopover(this)" class="btn-yellow text-xs whitespace-nowrap">Export</button>
         <a href="kooper-sign-in.html" class="hidden md:inline-flex p-1.5 rounded text-white/60 hover:text-white hover:bg-kapture-coal transition" title="Sign out" aria-label="Sign out">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
         </a>
@@ -153,13 +205,13 @@
         <div class="bg-kapture-coal border border-kapture-ash rounded-2xl p-4">
           <div class="flex items-center justify-between mb-2">
             <div class="text-[0.6875rem] uppercase tracking-widest text-kapture-mist font-mono">Window</div>
-            <button onclick="kooperToast('Time-window picker opens')" class="text-xs text-white/70 hover:text-white">Change →</button>
+            <button onclick="openWindowModal()" class="text-xs text-white/70 hover:text-white">Change →</button>
           </div>
-          <div class="font-mono text-sm">28 Apr 2026 → 6 May 2026 · 9 days</div>
+          <div id="windowRange" class="font-mono text-sm">28 Apr 2026 → 6 May 2026 · 9 days</div>
           <div class="grid grid-cols-3 gap-2 mt-3 pt-3 border-t border-kapture-ash text-xs">
-            <div><div class="text-white/50">Events</div><div class="font-mono font-semibold text-base">847</div></div>
-            <div><div class="text-white/50">Alerts</div><div class="font-mono font-semibold text-base">12</div></div>
-            <div><div class="text-white/50">Residents</div><div class="font-mono font-semibold text-base">28</div></div>
+            <div><div class="text-white/50">Events</div><div id="windowEvents" class="font-mono font-semibold text-base">847</div></div>
+            <div><div class="text-white/50">Alerts</div><div id="windowAlerts" class="font-mono font-semibold text-base">12</div></div>
+            <div><div class="text-white/50">Residents</div><div id="windowResidents" class="font-mono font-semibold text-base">28</div></div>
           </div>
         </div>
       </div>
@@ -239,9 +291,9 @@
       <h2 class="h-section" id="boardTitle">22 reports · last 30 days</h2>
     </div>
     <div class="flex items-center gap-2">
-      <button onclick="kooperToast('Filter by SAF / risk / resident / shift')" class="chip">Filter</button>
-      <button onclick="kooperToast('Sort by recency · default')" class="chip">Sort</button>
-      <button onclick="kooperToast('Compile inspector pack — all 22 in one PDF')" class="btn-primary text-xs">Compile pack</button>
+      <button id="filterBtn" onclick="openFilterPopover(this)" class="chip">Filter <span id="filterCount" class="font-mono text-[0.625rem] ml-1 hidden">·</span></button>
+      <button id="sortBtn" onclick="openSortPopover(this)" class="chip">Sort <span id="sortLabel" class="font-mono text-[0.625rem] ml-1">recency</span></button>
+      <button onclick="openCompileModal()" class="btn-primary text-xs">Compile pack</button>
     </div>
   </div>
 
@@ -421,6 +473,161 @@
   </div>
 </section>
 
+<!-- ============================================================ -->
+<!-- MODALS + POPOVERS                                              -->
+<!-- ============================================================ -->
+
+<div id="scrim" class="scrim" onclick="closeAllOverlays()"></div>
+
+<!-- Filter popover -->
+<div id="filterPopover" class="popover" role="dialog" aria-label="Filter">
+  <div class="popover-section-label">CQC SAF domain</div>
+  <div class="popover-row checked" data-filter="safe" onclick="toggleFilter(this)"><span class="check"></span>Safe</div>
+  <div class="popover-row checked" data-filter="effective" onclick="toggleFilter(this)"><span class="check"></span>Effective</div>
+  <div class="popover-row checked" data-filter="caring" onclick="toggleFilter(this)"><span class="check"></span>Caring</div>
+  <div class="popover-row checked" data-filter="responsive" onclick="toggleFilter(this)"><span class="check"></span>Responsive</div>
+  <div class="popover-row checked" data-filter="well-led" onclick="toggleFilter(this)"><span class="check"></span>Well-led</div>
+  <div class="popover-section-label" style="margin-top:0.25rem;border-top:1px solid #ECEAE3;padding-top:0.5rem">Severity</div>
+  <div class="popover-row" data-filter-sev="critical" onclick="toggleFilter(this,'sev')"><span class="check"></span>Critical only</div>
+  <div class="popover-row" data-filter-sev="warning" onclick="toggleFilter(this,'sev')"><span class="check"></span>Warning + critical</div>
+</div>
+
+<!-- Sort popover -->
+<div id="sortPopover" class="popover" role="dialog" aria-label="Sort">
+  <div class="popover-section-label">Sort tiles by</div>
+  <div class="popover-row active" data-sort="recency" onclick="pickSort(this,'recency')">Recency (default)</div>
+  <div class="popover-row" data-sort="severity" onclick="pickSort(this,'severity')">Severity (high → low)</div>
+  <div class="popover-row" data-sort="title" onclick="pickSort(this,'title')">Title (A → Z)</div>
+  <div class="popover-row" data-sort="domain" onclick="pickSort(this,'domain')">Group by SAF domain</div>
+</div>
+
+<!-- Export popover -->
+<div id="exportPopover" class="popover" role="dialog" aria-label="Export">
+  <div class="popover-section-label">Export current view as</div>
+  <div class="popover-row" onclick="doExport('pdf')"><span style="font-family:'JetBrains Mono';font-size:0.625rem;color:#FFD400;background:#0A0A0A;padding:0.0625rem 0.375rem;border-radius:4px;font-weight:700">PDF</span>Inspector pack · watermarked</div>
+  <div class="popover-row" onclick="doExport('xlsx')"><span style="font-family:'JetBrains Mono';font-size:0.625rem;color:#0A0A0A;background:#10B981;padding:0.0625rem 0.375rem;border-radius:4px;font-weight:700">XLSX</span>Spreadsheet · raw rows</div>
+  <div class="popover-row" onclick="doExport('csv')"><span style="font-family:'JetBrains Mono';font-size:0.625rem;color:#0A0A0A;background:#FFD400;padding:0.0625rem 0.375rem;border-radius:4px;font-weight:700">CSV</span>Plain text · interop</div>
+  <div class="popover-row" onclick="doExport('api')"><span style="font-family:'JetBrains Mono';font-size:0.625rem;color:#0A0A0A;background:#A5B4FC;padding:0.0625rem 0.375rem;border-radius:4px;font-weight:700">API</span>JSON endpoint · for ICB integrations</div>
+</div>
+
+<!-- Window picker modal -->
+<div id="windowModal" class="modal" role="dialog" aria-label="Window picker">
+  <div class="modal-head">
+    <div>
+      <div class="modal-title">Reporting window</div>
+      <div class="modal-sub">Pick the time range. Tiles, AI search, and the audit trail all refresh.</div>
+    </div>
+    <button class="modal-x" onclick="closeAllOverlays()" aria-label="Close">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="grid grid-cols-2 sm:grid-cols-5 gap-2">
+      <button class="window-preset" data-days="1" onclick="pickWindow(this,1)">Today</button>
+      <button class="window-preset" data-days="7" onclick="pickWindow(this,7)">Last 7 days</button>
+      <button class="window-preset active" data-days="9" onclick="pickWindow(this,9)">9-day window</button>
+      <button class="window-preset" data-days="30" onclick="pickWindow(this,30)">Last 30 days</button>
+      <button class="window-preset" data-days="90" onclick="pickWindow(this,90)">Last quarter</button>
+    </div>
+    <div class="mt-5 pt-5 border-t border-[#ECEAE3]">
+      <div class="popover-section-label" style="padding-left:0">Custom range</div>
+      <div class="grid grid-cols-2 gap-3 mt-2">
+        <div>
+          <label class="text-xs text-kapture-smoke font-medium block mb-1">From</label>
+          <input id="winFrom" type="date" value="2026-04-28" class="w-full rounded-[10px] border border-[#D4D4D4] px-3 py-2 text-sm">
+        </div>
+        <div>
+          <label class="text-xs text-kapture-smoke font-medium block mb-1">To</label>
+          <input id="winTo" type="date" value="2026-05-06" class="w-full rounded-[10px] border border-[#D4D4D4] px-3 py-2 text-sm">
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-foot">
+    <span class="text-xs text-kapture-smoke" id="winSummary">9 days · 28 Apr 2026 → 6 May 2026</span>
+    <div class="flex gap-2">
+      <button onclick="closeAllOverlays()" class="chip">Cancel</button>
+      <button onclick="applyWindow()" class="btn-primary text-xs">Apply window</button>
+    </div>
+  </div>
+</div>
+
+<!-- Compile pack modal -->
+<div id="compileModal" class="modal" role="dialog" aria-label="Compile pack">
+  <div class="modal-head">
+    <div>
+      <div class="modal-title">Compiling inspector pack</div>
+      <div class="modal-sub" id="compileSub">CQC pack · 22 reports · last 30 days</div>
+    </div>
+    <button class="modal-x" onclick="closeAllOverlays()" aria-label="Close">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div id="packSteps">
+      <div class="pack-step" data-step="1"><span class="pack-bullet"></span>Pulling tiles in current view</div>
+      <div class="pack-step" data-step="2"><span class="pack-bullet"></span>Mapping each event to a SAF quality statement</div>
+      <div class="pack-step" data-step="3"><span class="pack-bullet"></span>Watermarking with audit hash + workspace ID</div>
+      <div class="pack-step" data-step="4"><span class="pack-bullet"></span>Generating signed PDF</div>
+    </div>
+    <div id="packDownload" class="hidden mt-5 pt-5 border-t border-[#ECEAE3]">
+      <div class="rounded-xl bg-kapture-paper p-4 flex items-center gap-3">
+        <div style="width:38px;height:38px;background:#0A0A0A;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#FFD400;font-family:'JetBrains Mono';font-size:0.625rem;font-weight:700">PDF</div>
+        <div class="flex-1 min-w-0">
+          <div class="font-semibold text-sm" id="packFilename">Draycott-CQC-Pack-2026-05-06.pdf</div>
+          <div class="text-xs text-kapture-smoke" id="packSize">Compiled · 18 pages · 2.4 MB</div>
+        </div>
+        <a id="packDownloadLink" download="kooper-care-evidence-pack.txt" href="#" class="btn-yellow text-xs">Download</a>
+      </div>
+    </div>
+  </div>
+  <div class="modal-foot">
+    <span class="text-xs text-kapture-smoke">All exports stamped with audit hash + workspace ID</span>
+    <button onclick="closeAllOverlays()" class="chip">Close</button>
+  </div>
+</div>
+
+<!-- Drill-in modal -->
+<div id="drillModal" class="modal" role="dialog" aria-label="Report detail">
+  <div class="modal-head">
+    <div style="flex:1;min-width:0">
+      <div class="ed-kicker mb-1" id="drillKicker">Safe</div>
+      <div class="modal-title" id="drillTitle">Falls · last 30 days</div>
+      <div class="modal-sub" id="drillSub">3 falls · 1 incident · 2 near miss</div>
+    </div>
+    <button class="modal-x" onclick="closeAllOverlays()" aria-label="Close">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
+    </button>
+  </div>
+  <div class="modal-body">
+    <!-- Spark + summary -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5">
+      <div class="md:col-span-2 rounded-xl border border-[#ECEAE3] p-4">
+        <div class="text-[0.6875rem] uppercase tracking-widest text-kapture-mist font-mono mb-2">Trend</div>
+        <div id="drillSpark" class="spark yellow" style="height:60px"></div>
+        <div id="drillSparkLabels" class="flex justify-between text-[0.6875rem] text-kapture-mist font-mono mt-2"></div>
+      </div>
+      <div class="rounded-xl border border-[#ECEAE3] p-4">
+        <div class="text-[0.6875rem] uppercase tracking-widest text-kapture-mist font-mono mb-2">Source apps</div>
+        <div id="drillSources" class="flex flex-wrap gap-1.5"></div>
+        <div class="text-[0.6875rem] uppercase tracking-widest text-kapture-mist font-mono mt-3 mb-2">Stat</div>
+        <div id="drillStat" class="font-display text-3xl font-semibold text-kapture-black"></div>
+      </div>
+    </div>
+    <!-- Recent events -->
+    <div class="text-[0.6875rem] uppercase tracking-widest text-kapture-mist font-mono mb-2">Recent events</div>
+    <div id="drillEvents" class="space-y-1"></div>
+  </div>
+  <div class="modal-foot">
+    <span class="text-xs text-kapture-smoke" id="drillFooter">All events audit-logged</span>
+    <div class="flex gap-2 flex-wrap">
+      <a id="drillOpenApp" href="#" class="chip">Open in app →</a>
+      <button onclick="kooperToast('Adding tile to compile pack queue')" class="chip">Add to pack</button>
+      <button onclick="closeAllOverlays()" class="btn-primary text-xs">Done</button>
+    </div>
+  </div>
+</div>
+
 <div id="toast" class="toast">Saved</div>
 
 <script>
@@ -433,15 +640,393 @@ const AUDIENCE_META = {
   family:   { label: 'FAMILY',       title: '5 family-facing summaries', deck: 'Plain-English daily and weekly summaries the family can open in seconds.' },
   board:    { label: 'BOARD',        title: '8 board pack reports', deck: 'Outcomes, finance proxies, incident counts, regulatory standing.' }
 };
+// Tile config — built from inspecting the actual DOM tiles. Each tile gets
+// audiences, severity, recency rank, source apps, and recent events for drill-in.
+const TILE_CONFIG = [
+  { match: 'CQC SAF readiness',                kicker:'CQC SAF readiness', stat:'99%',     audience:['cqc','board'],          domain:'all',        severity:5, sort:0, sources:['hr','care plans','clinical','reports','audit'], openIn:'kooper-clinical.html',
+    sparkData:[92,93,95,94,96,98,99], events:[
+      ['16:42','SAF','Lola Okonkwo · viewed CQC SAF readiness panel'],
+      ['15:48','SIGN-OFF','Lola Okonkwo · signed off Incident #418 (Mr H fall)'],
+      ['12:30','EVIDENCE','Sister Anne · uploaded best-interest assessment for Mr H'],
+      ['09:18','REVIEW','Manager · approved care plan v4 for Edward Banda']
+    ] },
+  { match: 'falls in 30 days',                 kicker:'Safe',           stat:'3',          audience:['cqc','ops','clinical'], domain:'safe',       severity:5, sort:1, sources:['recording','risk'], openIn:'kooper-recording-demo.html',
+    sparkData:[18,22,14,30,22,18,42], events:[
+      ['14:08','INCIDENT','Mr H · fall in lounge · 2 May · no injury'],
+      ['09:22','NEAR-MISS','Mr Banda · steadied on rail · 4 May · no injury'],
+      ['16:14','NEAR-MISS','Mrs Cross · slipped on damp floor · 28 Apr · no injury']
+    ] },
+  { match: 'medication refusals',              kicker:'Effective',      stat:'4',          audience:['cqc','clinical','ops'], domain:'effective',  severity:3, sort:2, sources:['mar','recording'], openIn:'kooper-recording-demo.html',
+    sparkData:[30,0,50,20,40,60,20], events:[
+      ['08:14','REFUSAL','Mr R · refused antihypertensive · GP escalation logged'],
+      ['07:48','PRN','Mrs Okafor · PRN paracetamol given for headache'],
+      ['12:02','REFUSAL','Edward · declined evening med, retried 30 min later · taken'],
+      ['09:30','PRN','Mr H · PRN administered after fall · within protocol']
+    ] },
+  { match: 'personal-care episodes carry a dignity tap', kicker:'Caring', stat:'100%',     audience:['cqc','family'],         domain:'caring',     severity:1, sort:3, sources:['recording'], openIn:'kooper-recording-demo.html',
+    sparkData:[96,100,100,100,100,100,100], events:[
+      ['07:42','TAP','Personal care · Edward · dignity tap captured'],
+      ['08:12','TAP','Personal care · Catherine · dignity tap captured'],
+      ['08:45','TAP','Personal care · Yanir · dignity tap captured']
+    ] },
+  { match: 'events match the care plan',       kicker:'Effective',      stat:'94%',        audience:['cqc','clinical','board'], domain:'effective', severity:2, sort:4, sources:['care plans','recording'], openIn:'kooper-care-plans.html',
+    sparkData:[88,90,92,91,93,96,94], events:[
+      ['11:32','MATCH','Welfare check · Edward · matches plan baseline (Assisted)'],
+      ['10:14','DEVIATION','Mobility · Mr R · deviated from plan, reason captured'],
+      ['09:08','MATCH','Continence · Mrs C · matches plan']
+    ] },
+  { match: 'residents above NEWS2 score 3',    kicker:'Responsive',     stat:'2',          audience:['cqc','clinical'],       domain:'responsive', severity:5, sort:5, sources:['vitals','clinical'], openIn:'kooper-clinical.html',
+    sparkData:[2,3,4,3,2,3,5], events:[
+      ['16:05','NEWS2 5','Mrs Cross · paged · GP review pending'],
+      ['14:12','NEWS2 2','Mr Banda · stable · weekly watch'],
+      ['08:30','NEWS2 0','All other 26 residents · within range']
+    ] },
+  { match: 'care plan reviews due',            kicker:'Well-led',       stat:'7',          audience:['cqc','ops','board'],    domain:'well-led',   severity:3, sort:6, sources:['care plans'], openIn:'kooper-care-plans.html',
+    sparkData:[2,3,4,5,5,6,7], events:[
+      ['Today','OVERDUE','Edward · mental state review · was due 2 May'],
+      ['Tomorrow','DUE','Catherine · nutrition review'],
+      ['+3d','DUE','Mr R · behaviour plan review']
+    ] },
+  { match: 'ABC behaviour entries',            kicker:'Responsive',     stat:'11',         audience:['cqc','clinical'],       domain:'responsive', severity:3, sort:7, sources:['behaviour'], openIn:'kooper-clinical.html',
+    sparkData:[30,50,80,60,40,35,55], events:[
+      ['16:32','ABC','Mr R · sundowning · music intervention worked'],
+      ['16:48','ABC','Mr R · agitation · de-escalated within 8 min'],
+      ['14:14','ABC','Mrs C · brief anxiety · settled with reassurance']
+    ] },
+  { match: 'pressure injuries healing',        kicker:'Effective',      stat:'2 / 2',      audience:['cqc','clinical'],       domain:'effective',  severity:2, sort:8, sources:['wound care'], openIn:'kooper-clinical.html',
+    sparkData:[60,55,50,48,45,42,40], events:[
+      ['13:30','DRESSED','Mrs Cross · sacrum Stage 2 · clean, no exudate'],
+      ['12:15','DRESSED','Mr Rossi · R heel Stage 1 · healing'],
+      ['Yesterday','SSKIN 4/5','Mrs Cross · scoring stable']
+    ] },
+  { match: 'family daily summaries opened',    kicker:'Caring · Family',stat:'87%',        audience:['cqc','family','board'], domain:'caring',     severity:1, sort:9, sources:['family'], openIn:'kooper-family.html',
+    sparkData:[75,78,81,84,86,85,87], events:[
+      ['13:42','OPEN','Sarah Banda · opened daily summary for Edward'],
+      ['11:20','OPEN','Jake Banda · opened photos from Edward'],
+      ['09:08','SENT','22 daily summaries delivered, 6 awaiting carer confirm']
+    ] },
+  { match: 'mandatory training current',       kicker:'Well-led',       stat:'96%',        audience:['cqc','ops','board'],    domain:'well-led',   severity:2, sort:10, sources:['hr'], openIn:'kooper-hr.html',
+    sparkData:[88,90,92,94,95,95,96], events:[
+      ['Today','EXPIRING','3 staff training items due in 14 days'],
+      ['+4d','SCHEDULED','Fire alarm test · Draycott'],
+      ['23 Jul','PAT','PAT testing · Marylebone']
+    ] },
+  { match: 'open complaints',                  kicker:'Caring',         stat:'0',          audience:['cqc','ops','family'],   domain:'caring',     severity:1, sort:11, sources:['comms'], openIn:'kooper-family.html',
+    sparkData:[2,1,1,0,0,0,0], events:[
+      ['28 Apr','RESOLVED','Complaint #017 · resolved within SLA · 4 days'],
+      ['Today','OPEN','0 active complaints']
+    ] }
+];
+
+const AUDIENCE_COUNTS = { cqc:22, ops:14, clinical:11, family:5, board:8 };
+
+// Apply config to each .report-tile by content match — adds data attributes
+function tagReportTiles() {
+  const tiles = Array.from(document.querySelectorAll('.report-tile'));
+  tiles.forEach((tile, i) => {
+    const txt = tile.textContent.toLowerCase();
+    const cfg = TILE_CONFIG.find(c => txt.includes(c.match.toLowerCase()));
+    if (!cfg) return;
+    tile.dataset.audiences = cfg.audience.join(',');
+    tile.dataset.domain = cfg.domain;
+    tile.dataset.severity = cfg.severity;
+    tile.dataset.sort = cfg.sort;
+    tile.dataset.title = cfg.kicker + ' · ' + cfg.stat;
+    tile.dataset.tileIdx = i;
+  });
+}
+tagReportTiles();
+
+// Active state — what filters / sort / audience are applied
+const STATE = {
+  audience: 'cqc',
+  filters: { domains: new Set(['safe','effective','caring','responsive','well-led']), sevMin: 0 },
+  sort: 'recency',
+  windowDays: 9,
+  windowFrom: '2026-04-28',
+  windowTo: '2026-05-06'
+};
+
+// ============================================================
+// AUDIENCE TAB → filter tiles
+// ============================================================
 function pickAudience(el, key){
   document.querySelectorAll('.audience-tab').forEach(t=>t.classList.remove('active'));
   el.classList.add('active');
-  var m = AUDIENCE_META[key];
-  if (!m) return;
-  document.getElementById('boardKicker').textContent = m.label;
-  document.getElementById('boardTitle').textContent = m.title;
-  kooperToast(m.label + ' loaded · ' + m.deck);
+  STATE.audience = key;
+  applyAllFilters();
+  const counts = AUDIENCE_COUNTS[key] || 0;
+  const labelMap = { cqc:'CQC PACK', ops:'OPERATIONS', clinical:'CLINICAL', family:'FAMILY', board:'BOARD' };
+  const titleMap = {
+    cqc:`${counts} reports · ${windowLabel()}`,
+    ops:`${counts} ops reports`,
+    clinical:`${counts} clinical reports`,
+    family:`${counts} family-facing summaries`,
+    board:`${counts} board pack reports`
+  };
+  document.getElementById('boardKicker').textContent = labelMap[key] || 'REPORTS';
+  document.getElementById('boardTitle').textContent = titleMap[key] || `${counts} reports`;
 }
+function windowLabel(){ return `last ${STATE.windowDays} days`; }
+
+// ============================================================
+// FILTER + SORT — orchestrates all visibility / order
+// ============================================================
+function applyAllFilters() {
+  const grid = document.getElementById('tileGrid');
+  const tiles = Array.from(grid.querySelectorAll('.report-tile'));
+  let visible = 0;
+  tiles.forEach(tile => {
+    const audiences = (tile.dataset.audiences || '').split(',');
+    const domain = tile.dataset.domain || '';
+    const severity = parseInt(tile.dataset.severity || '0', 10);
+    let show = true;
+    // Audience
+    if (!audiences.includes(STATE.audience)) show = false;
+    // SAF domain filter (universal "all" passes)
+    if (show && domain !== 'all' && !STATE.filters.domains.has(domain)) show = false;
+    // Severity
+    if (show && severity < STATE.filters.sevMin) show = false;
+    tile.classList.toggle('is-hidden', !show);
+    if (show) visible++;
+  });
+  // Sort
+  const order = STATE.sort;
+  const visibleTiles = tiles.filter(t => !t.classList.contains('is-hidden'));
+  visibleTiles.sort((a,b) => {
+    if (order === 'severity') return (parseInt(b.dataset.severity)||0) - (parseInt(a.dataset.severity)||0);
+    if (order === 'title')    return (a.dataset.title||'').localeCompare(b.dataset.title||'');
+    if (order === 'domain')   return (a.dataset.domain||'').localeCompare(b.dataset.domain||'');
+    return (parseInt(a.dataset.sort)||0) - (parseInt(b.dataset.sort)||0); // recency = original sort
+  });
+  visibleTiles.forEach(t => grid.appendChild(t));
+  // Update title count
+  const title = document.getElementById('boardTitle');
+  if (title && visible > 0) {
+    title.textContent = `${visible} ${visible === 1 ? 'report' : 'reports'} · ${windowLabel()}`;
+  }
+}
+
+// ============================================================
+// POPOVERS — Filter / Sort / Export
+// ============================================================
+function placePopover(pop, anchor){
+  const r = anchor.getBoundingClientRect();
+  pop.style.top = (r.bottom + window.scrollY + 6) + 'px';
+  pop.style.left = (r.left + window.scrollX) + 'px';
+  // Keep on-screen on right edge
+  setTimeout(() => {
+    const pr = pop.getBoundingClientRect();
+    if (pr.right > window.innerWidth - 12) {
+      pop.style.left = (window.innerWidth - pr.width - 12 + window.scrollX) + 'px';
+    }
+  }, 0);
+}
+function openFilterPopover(anchor){ closeAllOverlays(); placePopover(document.getElementById('filterPopover'), anchor); document.getElementById('filterPopover').classList.add('on'); }
+function openSortPopover(anchor){ closeAllOverlays(); placePopover(document.getElementById('sortPopover'), anchor); document.getElementById('sortPopover').classList.add('on'); }
+function openExportPopover(anchor){ closeAllOverlays(); placePopover(document.getElementById('exportPopover'), anchor); document.getElementById('exportPopover').classList.add('on'); }
+
+function toggleFilter(el, group){
+  if (group === 'sev') {
+    // Severity is single-select
+    document.querySelectorAll('[data-filter-sev]').forEach(r => r.classList.remove('checked'));
+    el.classList.add('checked');
+    STATE.filters.sevMin = el.dataset.filterSev === 'critical' ? 5 : (el.dataset.filterSev === 'warning' ? 3 : 0);
+  } else {
+    el.classList.toggle('checked');
+    const k = el.dataset.filter;
+    if (el.classList.contains('checked')) STATE.filters.domains.add(k);
+    else STATE.filters.domains.delete(k);
+  }
+  applyAllFilters();
+  updateFilterBadge();
+}
+function updateFilterBadge(){
+  const badge = document.getElementById('filterCount');
+  const totalDomains = 5;
+  const active = STATE.filters.domains.size;
+  if (active < totalDomains || STATE.filters.sevMin > 0) {
+    badge.classList.remove('hidden');
+    badge.textContent = '· ' + active + '/' + totalDomains + (STATE.filters.sevMin > 0 ? ' · sev' : '');
+  } else { badge.classList.add('hidden'); }
+}
+function pickSort(el, key){
+  document.querySelectorAll('#sortPopover .popover-row').forEach(r => r.classList.remove('active'));
+  el.classList.add('active');
+  STATE.sort = key;
+  document.getElementById('sortLabel').textContent = key;
+  applyAllFilters();
+  closeAllOverlays();
+}
+function doExport(format){
+  closeAllOverlays();
+  const grid = document.getElementById('tileGrid');
+  const visible = Array.from(grid.querySelectorAll('.report-tile:not(.is-hidden)'));
+  const audience = STATE.audience.toUpperCase();
+  // Build a real text blob and offer download for the format
+  const filename = `kooper-${STATE.audience}-pack-${STATE.windowTo}.${format}`;
+  const lines = [
+    `kooper · care · ${audience} pack`,
+    `Window: ${STATE.windowFrom} → ${STATE.windowTo} (${STATE.windowDays} days)`,
+    `Format: ${format.toUpperCase()}`,
+    `Compiled: ${new Date().toISOString()}`,
+    `Tiles in this pack: ${visible.length}`,
+    '',
+    '— Tile titles —'
+  ].concat(visible.map((t,i) => {
+    const k = (t.querySelector('.ed-kicker')?.textContent || '').trim();
+    const s = (t.querySelector('.stat-big')?.textContent || '').trim();
+    return `${i+1}. ${k} · ${s}`;
+  }));
+  const blob = new Blob([lines.join('\n')], { type:'text/plain' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  kooperToast(`${format.toUpperCase()} export · ${visible.length} tiles · ${filename}`);
+}
+
+// ============================================================
+// WINDOW PICKER MODAL
+// ============================================================
+let pendingDays = 9;
+function openWindowModal(){ closeAllOverlays(); document.getElementById('scrim').classList.add('on'); document.getElementById('windowModal').classList.add('on'); }
+function pickWindow(el, days){
+  document.querySelectorAll('.window-preset').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  pendingDays = days;
+  // Update from/to inputs
+  const to = new Date('2026-05-06');
+  const from = new Date(to); from.setDate(to.getDate() - days + 1);
+  document.getElementById('winFrom').value = from.toISOString().slice(0,10);
+  document.getElementById('winTo').value   = to.toISOString().slice(0,10);
+  document.getElementById('winSummary').textContent = `${days} days · ${formatDate(from)} → ${formatDate(to)}`;
+}
+function formatDate(d){
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+}
+function applyWindow(){
+  const fromStr = document.getElementById('winFrom').value;
+  const toStr = document.getElementById('winTo').value;
+  const from = new Date(fromStr); const to = new Date(toStr);
+  const days = Math.max(1, Math.round((to - from) / 86400000) + 1);
+  STATE.windowDays = days;
+  STATE.windowFrom = fromStr;
+  STATE.windowTo = toStr;
+  // Update hero panel
+  document.getElementById('windowRange').textContent = `${formatDate(from)} → ${formatDate(to)} · ${days} day${days===1?'':'s'}`;
+  // Scale events / alerts proportionally for demo realism (baseline 9d = 847 / 12 / 28)
+  const scale = days / 9;
+  document.getElementById('windowEvents').textContent = Math.round(847 * scale);
+  document.getElementById('windowAlerts').textContent = Math.max(0, Math.round(12 * scale));
+  // residents stays 28
+  applyAllFilters();
+  closeAllOverlays();
+  kooperToast(`Window updated · ${days} day${days===1?'':'s'} · tiles refreshed`);
+}
+
+// ============================================================
+// COMPILE PACK MODAL
+// ============================================================
+function openCompileModal(){
+  closeAllOverlays();
+  const visible = document.querySelectorAll('.report-tile:not(.is-hidden)').length;
+  document.getElementById('compileSub').textContent = `${STATE.audience.toUpperCase()} pack · ${visible} reports · ${windowLabel()}`;
+  document.getElementById('packDownload').classList.add('hidden');
+  // Reset steps
+  document.querySelectorAll('#packSteps .pack-step').forEach(s => s.classList.remove('done','active'));
+  document.getElementById('scrim').classList.add('on');
+  document.getElementById('compileModal').classList.add('on');
+  // Animate the steps
+  const steps = document.querySelectorAll('#packSteps .pack-step');
+  steps.forEach((step, i) => {
+    setTimeout(() => {
+      steps.forEach(s => s.classList.remove('active'));
+      step.classList.add('active');
+      if (i > 0) steps[i-1].classList.add('done');
+    }, i * 600);
+  });
+  setTimeout(() => {
+    steps.forEach(s => { s.classList.remove('active'); s.classList.add('done'); });
+    // Generate the actual download blob
+    const visibleTiles = Array.from(document.querySelectorAll('.report-tile:not(.is-hidden)'));
+    const lines = [
+      `kooper · care · ${STATE.audience.toUpperCase()} pack`,
+      `Window: ${STATE.windowFrom} → ${STATE.windowTo} (${STATE.windowDays} days)`,
+      `Compiled: ${new Date().toISOString()}`,
+      `Audit hash: ${Math.random().toString(36).slice(2,11)}`,
+      `Workspace: draycott-house-001`,
+      ``,
+      `— ${visibleTiles.length} tiles —`,
+      ...visibleTiles.map((t,i) => {
+        const k = (t.querySelector('.ed-kicker')?.textContent || '').trim();
+        const s = (t.querySelector('.stat-big')?.textContent || '').trim();
+        return `${i+1}. ${k} · ${s}`;
+      })
+    ];
+    const blob = new Blob([lines.join('\n')], { type:'text/plain' });
+    const link = document.getElementById('packDownloadLink');
+    link.href = URL.createObjectURL(blob);
+    link.download = `Draycott-${STATE.audience.toUpperCase()}-Pack-${STATE.windowTo}.txt`;
+    document.getElementById('packFilename').textContent = link.download;
+    document.getElementById('packSize').textContent = `Compiled · ${visibleTiles.length} tiles · audit-hashed`;
+    document.getElementById('packDownload').classList.remove('hidden');
+  }, steps.length * 600 + 200);
+}
+
+// ============================================================
+// DRILL-IN MODAL — opens on tile click
+// ============================================================
+function openDrillModal(tile){
+  const idx = parseInt(tile.dataset.tileIdx, 10);
+  const cfg = TILE_CONFIG[idx];
+  if (!cfg) return;
+  document.getElementById('drillKicker').textContent = cfg.kicker;
+  document.getElementById('drillTitle').textContent = `${cfg.kicker} · ${windowLabel()}`;
+  document.getElementById('drillSub').textContent = (tile.querySelector('.font-serif')?.textContent || '').trim();
+  document.getElementById('drillStat').textContent = cfg.stat;
+  // Sources
+  const srcHost = document.getElementById('drillSources');
+  srcHost.innerHTML = cfg.sources.map(s => `<span class="chip text-[0.625rem]">⊕ ${s}</span>`).join('');
+  // Spark
+  const sparkHost = document.getElementById('drillSpark');
+  sparkHost.innerHTML = cfg.sparkData.map(v => `<span style="height:${Math.max(4,v)}%"></span>`).join('');
+  // Spark labels
+  const labelHost = document.getElementById('drillSparkLabels');
+  labelHost.innerHTML = ['7d ago','6d','5d','4d','3d','2d','today'].map(l => `<span>${l}</span>`).join('');
+  // Events
+  const evHost = document.getElementById('drillEvents');
+  evHost.innerHTML = cfg.events.map(e => `<div class="drill-event-row"><span class="drill-time">${e[0]}</span><span class="drill-pill">${e[1]}</span><span class="drill-text">${e[2]}</span></div>`).join('');
+  // Open in app link
+  const openLink = document.getElementById('drillOpenApp');
+  openLink.href = cfg.openIn;
+  openLink.textContent = `Open in ${cfg.sources[0]} →`;
+  // Footer
+  document.getElementById('drillFooter').textContent = `${cfg.events.length} events visible · all audit-logged`;
+  // Show
+  document.getElementById('scrim').classList.add('on');
+  document.getElementById('drillModal').classList.add('on');
+}
+
+function closeAllOverlays(){
+  document.getElementById('scrim').classList.remove('on');
+  document.querySelectorAll('.modal').forEach(m => m.classList.remove('on'));
+  document.querySelectorAll('.popover').forEach(p => p.classList.remove('on'));
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAllOverlays(); });
+// Close popovers on outside click
+document.addEventListener('click', (e) => {
+  const pop = e.target.closest('.popover');
+  const trigger = e.target.closest('#filterBtn, #sortBtn, #exportBtn');
+  if (!pop && !trigger) {
+    document.querySelectorAll('.popover.on').forEach(p => p.classList.remove('on'));
+  }
+});
+
+// Init initial sort + filters
+applyAllFilters();
+updateFilterBadge();
 
 // ============================================================
 // AI search — pattern-matches the query against report tiles
@@ -611,37 +1196,19 @@ function toggleMoreExamples() {
 }
 
 // ============================================================
-// Activate every .report-tile (the 15 individual report cards)
-// Tap → toast the report name and route to the relevant module
-// where the full evidence lives. Don't double-fire on inner btns.
+// Activate every .report-tile — tap opens the drill-in detail modal.
+// Featured tile's inline buttons (Drill into Safe, Compile pack)
+// route to dedicated handlers via inline onclick.
 // ============================================================
 (function activateReportTiles(){
-  // Map kicker domain → most relevant kooper app for drill-in.
-  // (CQC SAF five domains plus 'Insight' synthesis tiles.)
-  var DOMAIN_ROUTE = {
-    'safe':       'kooper-clinical.html',
-    'effective':  'kooper-care-plans.html',
-    'caring':     'kooper-recording-demo.html',
-    'responsive': 'kooper-clinical.html',
-    'well-led':   'kooper-hr.html#compliance',
-    'insight':    'kooper-recording-demo.html',
-    'cqc saf readiness': 'kooper-care-dashboards.html?as=inspector'
-  };
   document.querySelectorAll('.report-tile').forEach(function(tile){
     if (tile.dataset.wired === '1') return;
     tile.dataset.wired = '1';
     tile.setAttribute('tabindex', '0');
     tile.setAttribute('role', 'button');
-    var titleEl = tile.querySelector('.stat-big, .font-display, h3, h4');
-    var kickerEl = tile.querySelector('.ed-kicker');
-    var title = titleEl ? (titleEl.textContent || '').trim().slice(0, 64) : 'Report';
-    var domain = kickerEl ? (kickerEl.textContent || '').trim().toLowerCase() : '';
-    var route = DOMAIN_ROUTE[domain] || 'kooper-care-dashboards.html';
     var fire = function(e){
-      // Skip if click landed on an inner button/anchor/input
       if (e && e.target && e.target.closest('button, a, input, select, textarea')) return;
-      kooperToast('Opening · ' + title);
-      setTimeout(function(){ window.location.href = route; }, 600);
+      openDrillModal(tile);
     };
     tile.addEventListener('click', fire);
     tile.addEventListener('keydown', function(e){
@@ -649,6 +1216,15 @@ function toggleMoreExamples() {
         e.preventDefault(); fire(e);
       }
     });
+  });
+  // Re-wire featured tile's inline buttons to use new handlers
+  document.querySelectorAll('.report-tile.featured button').forEach(function(b){
+    var label = (b.textContent || '').trim().toLowerCase();
+    if (label.indexOf('drill') >= 0) {
+      b.setAttribute('onclick', 'event.stopPropagation(); openDrillModal(this.closest(".report-tile"))');
+    } else if (label.indexOf('compile') >= 0) {
+      b.setAttribute('onclick', 'event.stopPropagation(); openCompileModal()');
+    }
   });
 })();
 </script>
