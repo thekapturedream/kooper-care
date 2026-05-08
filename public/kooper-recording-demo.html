@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>kooper · recording — Tap to evidence</title>
-<meta name="description" content="3-tap icon recording. AI writes the CQC-ready note. Every tap rolls up to a CQC-ready evidence pack — the simplest care recording in the UK." />
+<title>kooper · reporting — Tap. Narrate. Generate.</title>
+<meta name="description" content="3-tap icon reporting. AI writes the CQC-ready note. Tap any event and generate a print-ready report. The simplest care reporting in the UK." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -75,6 +75,42 @@
 
   .question-card { background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 12px; padding: 1rem 1.125rem; transition: all 0.15s ease; }
   .question-card.answered { border-color: #10B981; background: linear-gradient(180deg, #F0FDF4 0%, #FFFFFF 100%); }
+
+  /* USER TYPE SWITCHER ---------------------------------- */
+  .user-pill { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.4375rem 0.625rem 0.4375rem 0.4375rem; border-radius: 999px; border: 1px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.85); font-size: 0.8125rem; font-weight: 500; cursor: pointer; transition: all 0.15s ease; white-space: nowrap; }
+  .user-pill:hover { border-color: rgba(255,255,255,0.45); background: rgba(255,255,255,0.08); }
+  .user-pill.active { background: #FFD400; border-color: #FFD400; color: #0A0A0A; }
+  .user-pill.active .up-avatar { background: #0A0A0A; color: #FFD400; }
+  .user-pill .up-avatar { width: 24px; height: 24px; border-radius: 50%; background: rgba(255,212,0,0.18); color: #FFD400; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 0.625rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .user-pill .up-name { line-height: 1; }
+
+  /* EVENTS FEED ---------------------------------------- */
+  .event-row { display: flex; gap: 0.75rem; align-items: center; padding: 0.875rem 1rem; border-bottom: 1px solid #ECEAE3; cursor: pointer; transition: background 0.12s ease; }
+  .event-row:last-child { border-bottom: 0; }
+  .event-row:hover { background: #FAFAF7; }
+  .event-row.is-open { background: #FFFBEB; }
+  .event-row .ev-time { font-family: 'JetBrains Mono', monospace; font-size: 0.6875rem; color: #6B7280; flex-shrink: 0; min-width: 50px; }
+  .event-row .ev-icon { width: 32px; height: 32px; border-radius: 8px; background: #FFD400; color: #0A0A0A; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-family: 'JetBrains Mono', monospace; font-size: 0.625rem; font-weight: 700; }
+  .event-row .ev-icon.flag { background: #E5484D; color: #FFFFFF; }
+  .event-row .ev-icon.draft { background: rgba(255,212,0,0.18); color: #876300; border: 1px dashed #FFD400; }
+  .event-row .ev-icon.locked { background: #10B981; color: #FFFFFF; }
+  .event-row .ev-text { flex: 1; min-width: 0; font-size: 0.8125rem; line-height: 1.4; }
+  .event-row .ev-text strong { color: #0A0A0A; }
+  .event-row .ev-meta { font-size: 0.6875rem; color: #6B7280; margin-top: 0.125rem; font-style: italic; }
+  .event-row .ev-arrow { color: #9A9A9A; font-size: 1rem; flex-shrink: 0; transition: transform 0.12s ease; }
+  .event-row:hover .ev-arrow { color: #0A0A0A; transform: translateX(3px); }
+  .event-row.is-open .ev-arrow { transform: rotate(90deg); color: #0A0A0A; }
+
+  /* Event detail panel — slides under the row when opened */
+  .event-detail { padding: 0; max-height: 0; overflow: hidden; transition: max-height 0.32s ease; background: #FAFAF7; border-bottom: 1px solid #ECEAE3; }
+  .event-detail.is-open { max-height: 600px; padding: 1rem 1.125rem 1.25rem; }
+  .event-detail .ed-prose { font-family: 'Source Serif 4', serif; font-size: 0.875rem; line-height: 1.5; color: #1A1A1A; }
+  .event-detail .ed-row { display: flex; gap: 0.5rem; align-items: flex-start; font-size: 0.75rem; color: #6B7280; }
+  .event-detail .ed-row .ed-key { font-family: 'JetBrains Mono', monospace; font-size: 0.625rem; text-transform: uppercase; letter-spacing: 0.08em; min-width: 88px; color: #9A9A9A; padding-top: 0.125rem; }
+
+  .filter-pill { padding: 0.375rem 0.625rem; border-radius: 8px; border: 1px solid #D4D4D4; background: #FFFFFF; font-size: 0.6875rem; font-family: 'JetBrains Mono', monospace; color: #6B7280; cursor: pointer; transition: all 0.12s ease; }
+  .filter-pill:hover { border-color: #0A0A0A; color: #0A0A0A; }
+  .filter-pill.active { background: #0A0A0A; color: #FFD400; border-color: #0A0A0A; }
 </style>
 </head>
 <body>
@@ -87,14 +123,14 @@
     <div class="flex items-center justify-between h-16">
       <a href="kooper-care-landing.html" class="flex items-center gap-3" title="Back to landing">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="28" height="28" fill="none" aria-label="kooper" role="img" class="shrink-0 text-white"><path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" d="M255.75 133.125c67.679 0 122.625 54.946 122.625 122.625S323.429 378.375 255.75 378.375 133.125 323.429 133.125 255.75s54.946-122.625 122.625-122.625m0-132.75c18.832 0 34.121 15.289 34.121 34.121s-15.289 34.121-34.121 34.121-34.121-15.289-34.121-34.121S236.918.375 255.75.375M75.173 75.173c13.316-13.316 34.938-13.316 48.254 0s13.316 34.938 0 48.254-34.938 13.316-48.254 0-13.316-34.938 0-48.254M511.125 255.75c0 18.832-15.289 34.121-34.121 34.121s-34.121-15.289-34.121-34.121 15.289-34.121 34.121-34.121 34.121 15.289 34.121 34.121M255.75 442.883c18.832 0 34.121 15.289 34.121 34.121s-15.289 34.121-34.121 34.121-34.121-15.289-34.121-34.121 15.289-34.121 34.121-34.121m132.323-54.81c13.316-13.316 34.938-13.316 48.254 0s13.316 34.938 0 48.254-34.938 13.316-48.254 0-13.316-34.938 0-48.254M68.617 255.75c0 18.832-15.289 34.121-34.121 34.121S.375 274.582.375 255.75s15.289-34.121 34.121-34.121 34.121 15.289 34.121 34.121m54.81 132.323c13.316 13.316 13.316 34.938 0 48.254s-34.938 13.316-48.254 0-13.316-34.938 0-48.254 34.938-13.316 48.254 0"/><path fill="#FFD400" fill-rule="evenodd" clip-rule="evenodd" d="M436.327 75.173c13.316 13.316 13.316 34.938 0 48.254s-34.938 13.316-48.254 0-13.316-34.938 0-48.254 34.938-13.316 48.254 0"/></svg>
-        <span class="flex items-center gap-2 font-display lowercase tracking-wide text-base"><span class="font-semibold">kooper</span><span class="text-white/40">·</span><span class="font-medium">recording</span></span>
+        <span class="flex items-center gap-2 font-display lowercase tracking-wide text-base"><span class="font-semibold">kooper</span><span class="text-white/40">·</span><span class="font-medium">reporting</span></span>
       </a>
       <div class="hidden md:flex items-center gap-1">
         <a href="kooper-care-landing.html" class="nav-link">Home</a>
         <a href="kooper-care-dashboards.html" class="nav-link">Dashboard</a>
         <a href="kooper-care-plans.html" class="nav-link">Care plans</a>
         <a href="kooper-clinical.html" class="nav-link">Clinical</a>
-        <a href="kooper-recording-demo.html" class="nav-link" style="opacity:1;background:#1A1A1A;color:#FFD400">Recording</a>
+        <a href="kooper-recording-demo.html" class="nav-link" style="opacity:1;background:#1A1A1A;color:#FFD400">Reporting</a>
         <a href="kooper-reports.html" class="nav-link">Reports</a>
       </div>
       <div class="flex items-center gap-2">
@@ -117,20 +153,36 @@
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
       <div class="lg:col-span-8">
         <div class="flex flex-wrap items-center gap-2 mb-4">
-          <span class="chip chip-yellow font-mono text-[0.6875rem] tracking-widest">3 TAPS · AI NARRATIVE · CQC EVIDENCE</span>
-          <span class="chip chip-outline-light"><span class="pulse-dot"></span> Recording shift</span>
+          <span class="chip chip-yellow font-mono text-[0.6875rem] tracking-widest">3 TAPS · AI NARRATIVE · PRINT-READY REPORTS</span>
+          <span class="chip chip-outline-light"><span class="pulse-dot"></span> <span id="heroShiftLabel">Reporting shift</span></span>
         </div>
-        <h1 class="h-hero text-white mb-3">Tap the icons. The note writes itself.</h1>
-        <p class="text-white/75 max-w-2xl text-base lg:text-lg">Every interaction captures <strong class="text-white">how</strong> care was delivered — level of support, consent, dignity, risks, outcomes, time. AI turns the taps into a CQC-ready narrative. Inspector questions get answered before they're asked.</p>
+        <h1 class="h-hero text-white mb-3">Tap the icons. The report writes itself.</h1>
+        <p class="text-white/75 max-w-2xl text-base lg:text-lg">Every event captures <strong class="text-white">how</strong> care was delivered — level of support, consent, dignity, risks, outcomes, time. AI turns the taps into a CQC-ready narrative. Tap any saved event to <strong class="text-white">generate a print-ready report</strong> in one click.</p>
+
+        <!-- USER TYPE SWITCHER -->
+        <div class="mt-6">
+          <div class="text-[0.6875rem] uppercase tracking-widest text-kapture-mist font-mono mb-2">Reporting as</div>
+          <div class="flex flex-wrap gap-2" id="userTypeRail">
+            <button class="user-pill active" data-user="carer" onclick="switchUser(this,'carer')"><span class="up-avatar">CM</span><span class="up-name">Craig · Carer</span></button>
+            <button class="user-pill" data-user="senior" onclick="switchUser(this,'senior')"><span class="up-avatar">RA</span><span class="up-name">Rebecca · Senior Carer</span></button>
+            <button class="user-pill" data-user="nurse" onclick="switchUser(this,'nurse')"><span class="up-avatar">SA</span><span class="up-name">Sister Anne · Nurse</span></button>
+            <button class="user-pill" data-user="manager" onclick="switchUser(this,'manager')"><span class="up-avatar">LO</span><span class="up-name">Lola · Manager</span></button>
+            <button class="user-pill" data-user="activities" onclick="switchUser(this,'activities')"><span class="up-avatar">DM</span><span class="up-name">Daniel · Activities</span></button>
+          </div>
+        </div>
       </div>
       <div class="lg:col-span-4">
         <div class="bg-kapture-coal border border-kapture-ash rounded-2xl p-5">
           <div class="text-[0.6875rem] uppercase tracking-widest text-kapture-mist font-medium mb-3">Active context</div>
-          <div class="space-y-2.5 text-sm">
-            <div class="flex items-center justify-between"><span class="text-white/60">Carer</span><span class="font-medium">Craig Musara</span></div>
-            <div class="flex items-center justify-between"><span class="text-white/60">Resident</span><span class="font-medium">Edward Banda</span></div>
-            <div class="flex items-center justify-between"><span class="text-white/60">Visit</span><span class="font-mono text-xs">07:42 · Morning round</span></div>
-            <div class="flex items-center justify-between"><span class="text-white/60">Care plan</span><span class="font-medium">v4 (current)</span></div>
+          <div class="space-y-2.5 text-sm" id="activeContext">
+            <div class="flex items-center justify-between"><span class="text-white/60" id="ctxRoleLabel">Carer</span><span class="font-medium" id="ctxName">Craig Musara</span></div>
+            <div class="flex items-center justify-between"><span class="text-white/60">Resident</span><span class="font-medium" id="ctxResident">Edward Banda</span></div>
+            <div class="flex items-center justify-between"><span class="text-white/60">Visit</span><span class="font-mono text-xs" id="ctxVisit">07:42 · Morning round</span></div>
+            <div class="flex items-center justify-between"><span class="text-white/60">Care plan</span><span class="font-medium" id="ctxPlan">v4 (current)</span></div>
+          </div>
+          <div class="mt-4 pt-4 border-t border-kapture-ash flex items-center justify-between">
+            <span class="text-[0.6875rem] text-kapture-mist font-mono">Today's events</span>
+            <a href="#eventsToday" class="text-xs text-kapture-yellow hover:text-white">Jump to feed →</a>
           </div>
         </div>
       </div>
@@ -388,6 +440,97 @@
 </section>
 
 <!-- ============================================== -->
+<!-- EVENTS CAPTURED TODAY                            -->
+<!-- ============================================== -->
+<section id="eventsToday" class="bg-kapture-paper border-y border-kapture-fog py-12 lg:py-16">
+  <div class="container-kapture">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-end mb-6">
+      <div class="lg:col-span-7">
+        <span class="chip chip-yellow font-mono text-[0.6875rem] tracking-widest mb-3">EVENTS · TODAY · TAP TO REPORT</span>
+        <h2 class="h-section mt-3">Every event captured. Every report ready.</h2>
+        <p class="text-kapture-smoke mt-3 text-base max-w-2xl">Tap any event below to expand the structured detail. Hit <strong class="text-kapture-coal">Generate Report</strong> and a print-ready file opens in a new tab — already formatted for the CQC, family, GP, or insurer.</p>
+      </div>
+      <div class="lg:col-span-5 flex flex-wrap gap-2 justify-start lg:justify-end">
+        <span class="text-[0.6875rem] uppercase tracking-widest text-kapture-mist font-mono mr-2">Filter</span>
+        <button class="filter-pill active" data-event-filter="all" onclick="filterEvents(this,'all')">All <span id="evCountAll" class="ml-1">8</span></button>
+        <button class="filter-pill" data-event-filter="locked" onclick="filterEvents(this,'locked')">Locked</button>
+        <button class="filter-pill" data-event-filter="draft" onclick="filterEvents(this,'draft')">Drafts</button>
+        <button class="filter-pill" data-event-filter="flag" onclick="filterEvents(this,'flag')">Flags</button>
+      </div>
+    </div>
+
+    <div class="bg-white border border-kapture-fog rounded-2xl overflow-hidden shadow-[0_18px_40px_-20px_rgba(0,0,0,0.10)]" id="eventsList">
+      <!-- 8 sample events captured today; populated dynamically per persona too -->
+      <div class="event-row" data-event-id="ev-1" data-event-type="locked" onclick="toggleEvent(this)">
+        <span class="ev-time">07:42</span>
+        <span class="ev-icon locked">LOCK</span>
+        <div class="ev-text"><strong>Personal care · Edward Banda</strong> · Assisted, verbal consent, dignity maintained, routine outcome.<div class="ev-meta">22 min · carer Craig Musara · journal v4</div></div>
+        <span class="ev-arrow">→</span>
+      </div>
+      <div class="event-detail" data-event-detail="ev-1"></div>
+
+      <div class="event-row" data-event-id="ev-2" data-event-type="locked" onclick="toggleEvent(this)">
+        <span class="ev-time">08:14</span>
+        <span class="ev-icon locked">LOCK</span>
+        <div class="ev-text"><strong>Continence · Catherine Okafor</strong> · Pad change, no soreness noted, dignity maintained.<div class="ev-meta">8 min · carer Rebecca Adesina · journal v3</div></div>
+        <span class="ev-arrow">→</span>
+      </div>
+      <div class="event-detail" data-event-detail="ev-2"></div>
+
+      <div class="event-row" data-event-id="ev-3" data-event-type="flag" onclick="toggleEvent(this)">
+        <span class="ev-time">09:18</span>
+        <span class="ev-icon flag">FLAG</span>
+        <div class="ev-text"><strong>NEWS2 5 · Mr H</strong> · Escalation triggered. GP paged. Family contact opened. Hourly checks set.<div class="ev-meta">3 min · nurse Sister Anne · audit-hashed</div></div>
+        <span class="ev-arrow">→</span>
+      </div>
+      <div class="event-detail" data-event-detail="ev-3"></div>
+
+      <div class="event-row" data-event-id="ev-4" data-event-type="locked" onclick="toggleEvent(this)">
+        <span class="ev-time">11:00</span>
+        <span class="ev-icon locked">LOCK</span>
+        <div class="ev-text"><strong>Activity · Music & Memory · 8 residents</strong> · Edward sang along to Sinatra. Mr R settled. Joined ABC chart.<div class="ev-meta">45 min · activities Daniel Kowalski · plan v2</div></div>
+        <span class="ev-arrow">→</span>
+      </div>
+      <div class="event-detail" data-event-detail="ev-4"></div>
+
+      <div class="event-row" data-event-id="ev-5" data-event-type="locked" onclick="toggleEvent(this)">
+        <span class="ev-time">13:30</span>
+        <span class="ev-icon locked">LOCK</span>
+        <div class="ev-text"><strong>Wound dressing · Mrs Cross sacrum</strong> · Stage 2, clean, no exudate. SSKIN 4/5. Next due 19:30.<div class="ev-meta">12 min · nurse Sister Anne · clinical journal</div></div>
+        <span class="ev-arrow">→</span>
+      </div>
+      <div class="event-detail" data-event-detail="ev-5"></div>
+
+      <div class="event-row" data-event-id="ev-6" data-event-type="draft" onclick="toggleEvent(this)">
+        <span class="ev-time">14:32</span>
+        <span class="ev-icon draft">DRAFT</span>
+        <div class="ev-text"><strong>Welfare check · Edward Banda</strong> · Eddie sitting in armchair, listening to jazz. Mood bright.<div class="ev-meta">awaiting carer confirm · 14s draft time · 0.96 confidence</div></div>
+        <span class="ev-arrow">→</span>
+      </div>
+      <div class="event-detail" data-event-detail="ev-6"></div>
+
+      <div class="event-row" data-event-id="ev-7" data-event-type="flag" onclick="toggleEvent(this)">
+        <span class="ev-time">16:30</span>
+        <span class="ev-icon flag">FLAG</span>
+        <div class="ev-text"><strong>Behaviour · Mr R sundowning</strong> · Agitation 16:30. Music + tea intervention. Settled within 10 min. ABC chart updated.<div class="ev-meta">14 min · senior Rebecca Adesina · 4-day pattern flagged</div></div>
+        <span class="ev-arrow">→</span>
+      </div>
+      <div class="event-detail" data-event-detail="ev-7"></div>
+
+      <div class="event-row" data-event-id="ev-8" data-event-type="draft" onclick="toggleEvent(this)">
+        <span class="ev-time">15:00</span>
+        <span class="ev-icon draft">DRAFT</span>
+        <div class="ev-text"><strong>Family digest · 22 residents · today</strong> · Plain-English daily summaries drafted. Privacy boundary respected. 6 awaiting carer confirm.<div class="ev-meta">2 min · auto-drafted by kooper · ai · ready for sign-off</div></div>
+        <span class="ev-arrow">→</span>
+      </div>
+      <div class="event-detail" data-event-detail="ev-8"></div>
+    </div>
+
+    <p class="text-xs text-kapture-smoke mt-4 italic">Tap any event row · expanded detail shows the full report data and a Generate Report button. The generated file opens in a new tab and is print-ready (Cmd+P / Ctrl+P).</p>
+  </div>
+</section>
+
+<!-- ============================================== -->
 <!-- INSPECTOR QUESTIONS                              -->
 <!-- ============================================== -->
 <section class="bg-white border-y border-kapture-fog py-12 lg:py-16">
@@ -503,7 +646,7 @@
     <div class="flex flex-wrap items-center justify-between gap-6">
       <a href="kooper-care-landing.html" class="flex items-center gap-3">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="24" height="24" fill="none" class="shrink-0 text-white"><path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" d="M255.75 133.125c67.679 0 122.625 54.946 122.625 122.625S323.429 378.375 255.75 378.375 133.125 323.429 133.125 255.75s54.946-122.625 122.625-122.625m0-132.75c18.832 0 34.121 15.289 34.121 34.121s-15.289 34.121-34.121 34.121-34.121-15.289-34.121-34.121S236.918.375 255.75.375M75.173 75.173c13.316-13.316 34.938-13.316 48.254 0s13.316 34.938 0 48.254-34.938 13.316-48.254 0-13.316-34.938 0-48.254M511.125 255.75c0 18.832-15.289 34.121-34.121 34.121s-34.121-15.289-34.121-34.121 15.289-34.121 34.121-34.121 34.121 15.289 34.121 34.121M255.75 442.883c18.832 0 34.121 15.289 34.121 34.121s-15.289 34.121-34.121 34.121-34.121-15.289-34.121-34.121 15.289-34.121 34.121-34.121m132.323-54.81c13.316-13.316 34.938-13.316 48.254 0s13.316 34.938 0 48.254-34.938 13.316-48.254 0-13.316-34.938 0-48.254M68.617 255.75c0 18.832-15.289 34.121-34.121 34.121S.375 274.582.375 255.75s15.289-34.121 34.121-34.121 34.121 15.289 34.121 34.121m54.81 132.323c13.316 13.316 13.316 34.938 0 48.254s-34.938 13.316-48.254 0-13.316-34.938 0-48.254 34.938-13.316 48.254 0"/><path fill="#FFD400" fill-rule="evenodd" clip-rule="evenodd" d="M436.327 75.173c13.316 13.316 13.316 34.938 0 48.254s-34.938 13.316-48.254 0-13.316-34.938 0-48.254 34.938-13.316 48.254 0"/></svg>
-        <span class="flex items-center gap-2 font-display lowercase tracking-wide text-base"><span class="font-semibold">kooper</span><span class="text-white/40">·</span><span class="font-medium">recording</span></span>
+        <span class="flex items-center gap-2 font-display lowercase tracking-wide text-base"><span class="font-semibold">kooper</span><span class="text-white/40">·</span><span class="font-medium">reporting</span></span>
       </a>
       <div class="text-xs text-white/50 font-mono">A Kapture product · Tap to evidence · CQC ready</div>
     </div>
@@ -823,6 +966,304 @@ document.addEventListener('DOMContentLoaded', function(){
   // Initial render so prose reflects defaults cleanly
   rerender();
 });
+
+// ============================================================
+// USER TYPE SWITCHER — switches the active context + persona
+// ============================================================
+const USER_TYPES = {
+  carer:      { name:'Craig Musara',     role:'Carer',         resident:'Edward Banda', visit:'07:42 · Morning round',     plan:'v4 (current)',   shiftLabel:'Carer shift' },
+  senior:     { name:'Rebecca Adesina',  role:'Senior Carer',  resident:'Catherine Okafor', visit:'14:00 · Shift lead',     plan:'v3 (current)',   shiftLabel:'Senior carer shift' },
+  nurse:      { name:'Sister Anne Whitfield', role:'Nurse',    resident:'Mr H',         visit:'13:00 · Med round',         plan:'v6 (current)',   shiftLabel:'Clinical shift' },
+  manager:    { name:'Lola Okonkwo',     role:'Registered Manager', resident:'Draycott House (30 residents)', visit:'09:00 · Daily review', plan:'all current', shiftLabel:'Manager review' },
+  activities: { name:'Daniel Kowalski',  role:'Activities Coord', resident:'Music & Memory · 8 joined', visit:'11:00 · Group session', plan:'activities plan v2', shiftLabel:'Activities slot' }
+};
+function switchUser(btn, key) {
+  const u = USER_TYPES[key]; if (!u) return;
+  document.querySelectorAll('.user-pill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('ctxRoleLabel').textContent = u.role;
+  document.getElementById('ctxName').textContent = u.name;
+  document.getElementById('ctxResident').textContent = u.resident;
+  document.getElementById('ctxVisit').textContent = u.visit;
+  document.getElementById('ctxPlan').textContent = u.plan;
+  const sl = document.getElementById('heroShiftLabel'); if (sl) sl.textContent = u.shiftLabel;
+  // Update STATE so the AI prose engine reflects the new persona
+  if (typeof STATE !== 'undefined') { STATE.carer = u.name; if (typeof rerender === 'function') rerender(); }
+  kooperToast('Reporting as ' + u.role + ' · ' + u.name);
+}
+
+// ============================================================
+// EVENTS FEED — toggle detail + filter + Generate Report
+// ============================================================
+const EVENT_DATA = {
+  'ev-1': {
+    title:'Personal care · Edward Banda',
+    domain:'Personal care', resident:'Edward Banda · age 78 · Room 12',
+    by:'Craig Musara · Carer', startedAt:'07:42', endedAt:'08:04', durationMin:22,
+    consent:'Verbal yes · before the wash',
+    dignity:'Maintained · privacy curtain drawn, room temperature checked',
+    support:'Assisted',
+    outcome:'Routine · skin observed, no new redness on sacrum or heels',
+    saf:'Caring · Effective',
+    prose:'At 07:42 on 6 May 2026, Mr Banda received assisted personal care from carer Craig Musara. He gave verbal consent before the wash. Edward received hand-over-hand support with the wash, shave and oral care. Dignity was maintained throughout — privacy curtain drawn, room temperature checked. His preferred talc and body wash were used. Skin observed: no new redness on sacrum or heels. Mood was bright; he asked after Sister Anne. Care concluded at 08:04 (22 minutes) with Edward dressed, comfortable and seated for breakfast.'
+  },
+  'ev-2': {
+    title:'Continence · Catherine Okafor',
+    domain:'Continence', resident:'Catherine Okafor · age 84 · Room 9',
+    by:'Rebecca Adesina · Senior Carer', startedAt:'08:14', endedAt:'08:22', durationMin:8,
+    consent:'Implied · care anticipated and welcomed',
+    dignity:'Maintained · skin checked, no soreness',
+    support:'Pad change',
+    outcome:'Routine · no concerns',
+    saf:'Caring · Safe',
+    prose:'At 08:14 on 6 May 2026, Mrs Okafor received continence care from senior carer Rebecca Adesina. Implied consent (care was anticipated and welcomed). Pad change completed, no soreness noted, skin checked. Dignity maintained. Routine outcome, no concerns. Care concluded at 08:22 (8 minutes).'
+  },
+  'ev-3': {
+    title:'NEWS2 escalation · Mr H',
+    domain:'Vitals · NEWS2', resident:'Mr H · Room 7',
+    by:'Sister Anne Whitfield · Nurse', startedAt:'09:18', endedAt:'09:21', durationMin:3,
+    consent:'Implied · clinical observation',
+    dignity:'Maintained',
+    support:'Full clinical assessment',
+    outcome:'Critical · NEWS2 score 5 · escalation triggered',
+    saf:'Safe · Responsive',
+    prose:'At 09:18 on 6 May 2026, Sister Anne Whitfield captured a NEWS2 reading of 5 for Mr H, Room 7. Auto-escalation policy fired (NEWS2 ≥ 5): GP paged, on-call notified, family contact opened, hourly welfare checks set until end of shift. Pain rated 6/10 (PainChek), PRN paracetamol 1g administered at 09:20. Audit hash recorded. Manager Lola Okonkwo notified within 12 seconds.'
+  },
+  'ev-4': {
+    title:'Activity · Music & Memory',
+    domain:'Activities', resident:'Group · 8 residents joined',
+    by:'Daniel Kowalski · Activities Coord', startedAt:'11:00', endedAt:'11:45', durationMin:45,
+    consent:'Verbal · all participants',
+    dignity:'Maintained',
+    support:'Group facilitation',
+    outcome:'Routine · positive engagement · 0 distress events',
+    saf:'Caring · Responsive',
+    prose:'At 11:00 on 6 May 2026, Daniel Kowalski facilitated the Music & Memory session in the lounge. Eight residents joined: Edward Banda (sang along to Sinatra), Catherine Okafor, Mr R (settled, music intervention working), Mrs Cross, Mr Rossi, plus three others. All gave verbal consent. Jazz playlist used (Sinatra, Ella Fitzgerald). Engagement strong; ABC chart for Mr R updated (calm). Session closed at 11:45 (45 minutes).'
+  },
+  'ev-5': {
+    title:'Wound dressing · Mrs Cross · sacrum',
+    domain:'Wound care', resident:'Mrs Cross · age 79 · Room 14',
+    by:'Sister Anne Whitfield · Nurse', startedAt:'13:30', endedAt:'13:42', durationMin:12,
+    consent:'Verbal · before dressing change',
+    dignity:'Maintained · privacy curtain drawn',
+    support:'Full clinical assessment',
+    outcome:'Routine · Stage 2, clean, no exudate, SSKIN 4/5',
+    saf:'Effective · Safe',
+    prose:'At 13:30 on 6 May 2026, Sister Anne changed the dressing on Mrs Cross\'s sacral pressure injury (Stage 2). Verbal consent given. Privacy curtain drawn. Wound assessed: clean, no exudate, no surrounding redness, healing edges. SSKIN score 4/5 stable. Dressing applied per protocol (foam + barrier). Next change due 19:30. Photo captured to wound chart. Care concluded at 13:42 (12 minutes).'
+  },
+  'ev-6': {
+    title:'Welfare check · Edward Banda (DRAFT)',
+    domain:'Welfare check', resident:'Edward Banda · Room 12',
+    by:'Craig Musara · Carer', startedAt:'14:32', endedAt:'14:35', durationMin:3,
+    consent:'Implied · welfare observation',
+    dignity:'Maintained',
+    support:'Light supervision',
+    outcome:'Pending confirm · routine · bright mood',
+    saf:'Caring',
+    prose:'(DRAFT — awaiting carer confirm) At 14:32 on 6 May 2026, Craig Musara performed a welfare check on Edward Banda. Eddie sitting in armchair, listening to jazz. Skin colour normal, breathing even, talking clearly. Asked about dinner. Mood bright. No concerns. Confidence 0.96. Carer confirm pending.'
+  },
+  'ev-7': {
+    title:'Behaviour · Mr R sundowning',
+    domain:'Behaviour', resident:'Mr R · Room 4',
+    by:'Rebecca Adesina · Senior Carer', startedAt:'16:30', endedAt:'16:44', durationMin:14,
+    consent:'Implied · behaviour support',
+    dignity:'Maintained throughout de-escalation',
+    support:'Full hands-on intervention',
+    outcome:'Behaviour · settled within 10 min · pattern flagged · 4-day streak',
+    saf:'Responsive · Caring',
+    prose:'At 16:30 on 6 May 2026, Rebecca Adesina logged a behaviour event for Mr R. Antecedent: end of afternoon, lighting changing, normal sundowning window. Behaviour: pacing, raised voice, anxious. Consequence: music + tea intervention applied, Mr R settled within 10 minutes. ABC chart updated. Pattern flagged (4th consecutive day in 16:30–17:00 window). Recommendation queued: extend afternoon activity slot to bridge 16:00–18:00. Care concluded at 16:44 (14 minutes).'
+  },
+  'ev-8': {
+    title:'Family digest · 22 residents (DRAFT)',
+    domain:'Family digest', resident:'Group · 22 residents',
+    by:'kooper · ai · auto-drafted', startedAt:'15:00', endedAt:'15:02', durationMin:2,
+    consent:'N/A · auto-generated summary',
+    dignity:'Privacy boundary enforced · no clinical detail',
+    support:'AI synthesis',
+    outcome:'Drafted · 6 awaiting carer confirm · 16 ready to send',
+    saf:'Caring · Family',
+    prose:'(DRAFT — auto-drafted by kooper · ai at 15:00) Daily family digests for 22 residents drafted. Each digest covers: mood (bright/settled/needs support), meals (full/most/some/refused), activities joined (named), family contact (messages, photos), no clinical detail. Privacy boundary verified — zero clinical leakage. 16 digests ready for send, 6 awaiting carer confirm. Average draft time: 14 seconds per resident. Confidence: 0.92.'
+  }
+};
+
+function toggleEvent(row) {
+  const id = row.dataset.eventId;
+  const detail = document.querySelector(`[data-event-detail="${id}"]`);
+  if (!detail) return;
+  // Close any other open detail first
+  document.querySelectorAll('.event-detail.is-open').forEach(d => {
+    if (d !== detail) { d.classList.remove('is-open'); d.innerHTML = ''; }
+  });
+  document.querySelectorAll('.event-row.is-open').forEach(r => { if (r !== row) r.classList.remove('is-open'); });
+  // Toggle this one
+  const isOpen = detail.classList.contains('is-open');
+  if (isOpen) {
+    detail.classList.remove('is-open');
+    setTimeout(() => { detail.innerHTML = ''; }, 320);
+    row.classList.remove('is-open');
+    return;
+  }
+  // Build content
+  const data = EVENT_DATA[id];
+  if (!data) return;
+  detail.innerHTML = `
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="md:col-span-2">
+        <div class="text-[0.6875rem] uppercase tracking-widest text-kapture-mist font-mono mb-2">AI narrative</div>
+        <p class="ed-prose">${data.prose}</p>
+      </div>
+      <div class="space-y-2">
+        <div class="ed-row"><span class="ed-key">Domain</span><span>${data.domain}</span></div>
+        <div class="ed-row"><span class="ed-key">Subject</span><span>${data.resident}</span></div>
+        <div class="ed-row"><span class="ed-key">Captured by</span><span>${data.by}</span></div>
+        <div class="ed-row"><span class="ed-key">Time</span><span>${data.startedAt} → ${data.endedAt} · ${data.durationMin}m</span></div>
+        <div class="ed-row"><span class="ed-key">Consent</span><span>${data.consent}</span></div>
+        <div class="ed-row"><span class="ed-key">Dignity</span><span>${data.dignity}</span></div>
+        <div class="ed-row"><span class="ed-key">Support</span><span>${data.support}</span></div>
+        <div class="ed-row"><span class="ed-key">Outcome</span><span>${data.outcome}</span></div>
+        <div class="ed-row"><span class="ed-key">SAF tag</span><span class="font-mono">${data.saf}</span></div>
+      </div>
+    </div>
+    <div class="mt-4 pt-4 border-t border-[#ECEAE3] flex items-center justify-between flex-wrap gap-2">
+      <span class="text-xs text-kapture-smoke">Audit-logged · audit hash <span class="font-mono">a${id}-2026-05-06</span></span>
+      <div class="flex gap-2 flex-wrap">
+        <button onclick="kooperToast('Event copied to clipboard')" class="filter-pill">Copy summary</button>
+        <button onclick="kooperToast('Sent to clinical lead')" class="filter-pill">Notify lead</button>
+        <button onclick="generateReport('${id}')" class="btn-yellow text-xs">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Generate report
+        </button>
+      </div>
+    </div>
+  `;
+  detail.classList.add('is-open');
+  row.classList.add('is-open');
+}
+
+function filterEvents(btn, type) {
+  document.querySelectorAll('[data-event-filter]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.event-row').forEach(row => {
+    const t = row.dataset.eventType;
+    const show = (type === 'all' || t === type);
+    row.style.display = show ? '' : 'none';
+    // Also hide the matching detail
+    const id = row.dataset.eventId;
+    const detail = document.querySelector(`[data-event-detail="${id}"]`);
+    if (detail) detail.style.display = show ? '' : 'none';
+  });
+}
+
+// ============================================================
+// GENERATE REPORT — opens a print-ready HTML in a new tab
+// ============================================================
+function generateReport(eventId) {
+  const data = EVENT_DATA[eventId];
+  if (!data) { kooperToast('Event not found'); return; }
+  const today = '6 May 2026';
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Care Report · ${data.title} · ${today}</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm; }
+  * { box-sizing: border-box; }
+  body { font-family: 'Source Serif 4', Georgia, serif; color: #0A0A0A; line-height: 1.55; max-width: 800px; margin: 24px auto; padding: 0 24px; -webkit-font-smoothing: antialiased; }
+  .head { border-bottom: 2px solid #0A0A0A; padding-bottom: 1rem; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 1rem; }
+  .brand { font-family: -apple-system, system-ui, sans-serif; font-weight: 600; font-size: 1.125rem; letter-spacing: -0.01em; }
+  .brand span { color: #876300; }
+  .doc-meta { text-align: right; font-family: 'Courier New', monospace; font-size: 0.75rem; color: #6B7280; line-height: 1.5; }
+  h1 { font-family: -apple-system, system-ui, sans-serif; font-weight: 700; font-size: 1.625rem; line-height: 1.1; letter-spacing: -0.02em; margin: 0.25rem 0 0.5rem; color: #0A0A0A; }
+  .kicker { font-family: 'Courier New', monospace; font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.12em; color: #876300; font-weight: 700; }
+  .meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem 1.5rem; margin: 1.5rem 0; padding: 1rem 1.25rem; border: 1px solid #ECEAE3; border-radius: 8px; background: #FAFAF7; }
+  .meta-grid .row { font-size: 0.875rem; }
+  .meta-grid .label { font-family: 'Courier New', monospace; font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.08em; color: #6B7280; display: block; margin-bottom: 0.0625rem; }
+  .meta-grid .value { font-weight: 500; }
+  h2 { font-family: -apple-system, system-ui, sans-serif; font-weight: 600; font-size: 1.0625rem; margin: 1.5rem 0 0.5rem; color: #0A0A0A; border-bottom: 1px solid #ECEAE3; padding-bottom: 0.375rem; }
+  .narrative { font-size: 0.9375rem; line-height: 1.65; color: #1A1A1A; }
+  .saf-row { display: flex; gap: 0.625rem; align-items: center; margin: 1rem 0; padding: 0.625rem 0.875rem; background: #FFFBEB; border-left: 3px solid #FFD400; font-size: 0.875rem; }
+  .saf-tag { font-family: 'Courier New', monospace; font-size: 0.625rem; padding: 0.125rem 0.5rem; border-radius: 999px; background: #0A0A0A; color: #FFD400; font-weight: 700; letter-spacing: 0.04em; }
+  .signoff { margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid #ECEAE3; display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; font-size: 0.8125rem; }
+  .sig-block .lbl { font-family: 'Courier New', monospace; font-size: 0.6875rem; text-transform: uppercase; letter-spacing: 0.08em; color: #6B7280; margin-bottom: 0.5rem; }
+  .sig-block .line { border-bottom: 1px solid #0A0A0A; height: 2.5rem; }
+  footer { margin-top: 1.5rem; padding-top: 0.75rem; border-top: 1px solid #ECEAE3; font-family: 'Courier New', monospace; font-size: 0.625rem; color: #9A9A9A; text-align: center; }
+  .toolbar { position: fixed; top: 12px; right: 12px; display: flex; gap: 0.5rem; z-index: 50; }
+  .toolbar button { padding: 0.5rem 0.875rem; border-radius: 8px; border: 1px solid #0A0A0A; background: #0A0A0A; color: #FFD400; font-size: 0.8125rem; font-weight: 600; cursor: pointer; font-family: -apple-system, system-ui, sans-serif; }
+  .toolbar button.alt { background: #FFFFFF; color: #0A0A0A; }
+  @media print { .toolbar { display: none; } body { margin: 0; padding: 0; } }
+</style>
+</head>
+<body>
+  <div class="toolbar">
+    <button onclick="window.print()">Print / Save as PDF</button>
+    <button onclick="window.close()" class="alt">Close</button>
+  </div>
+  <div class="head">
+    <div>
+      <div class="brand">kooper <span>·</span> reporting</div>
+      <div class="kicker" style="margin-top:0.25rem">CARE EVENT REPORT</div>
+    </div>
+    <div class="doc-meta">
+      Doc ID · KR-${eventId.toUpperCase()}-2026-05-06<br>
+      Generated · ${new Date().toLocaleString('en-GB')}<br>
+      Workspace · Draycott House · 001
+    </div>
+  </div>
+
+  <div class="kicker">${data.domain}</div>
+  <h1>${data.title}</h1>
+
+  <div class="saf-row">
+    <span class="saf-tag">SAF</span>
+    <span><strong>${data.saf}</strong> · this event maps to the listed CQC quality statements</span>
+  </div>
+
+  <div class="meta-grid">
+    <div class="row"><span class="label">Subject</span><span class="value">${data.resident}</span></div>
+    <div class="row"><span class="label">Captured by</span><span class="value">${data.by}</span></div>
+    <div class="row"><span class="label">Time window</span><span class="value">${data.startedAt} → ${data.endedAt} · ${data.durationMin} minutes</span></div>
+    <div class="row"><span class="label">Date</span><span class="value">${today}</span></div>
+    <div class="row"><span class="label">Consent</span><span class="value">${data.consent}</span></div>
+    <div class="row"><span class="label">Dignity</span><span class="value">${data.dignity}</span></div>
+    <div class="row"><span class="label">Support level</span><span class="value">${data.support}</span></div>
+    <div class="row"><span class="label">Outcome</span><span class="value">${data.outcome}</span></div>
+  </div>
+
+  <h2>Narrative</h2>
+  <p class="narrative">${data.prose}</p>
+
+  <h2>Audit & provenance</h2>
+  <p style="font-size:0.8125rem;color:#6B7280;line-height:1.6">Event captured live in kooper · reporting using the 3-tap flow (level of support · consent + dignity · outcome). AI narrative drafted from structured taps, verified by the named carer before lock. Every change is audit-logged and immutable. Audit hash <code style="font-family:'Courier New',monospace;background:#F5F5F5;padding:0.0625rem 0.25rem;border-radius:3px">a${eventId}-2026-05-06</code>.</p>
+
+  <div class="signoff">
+    <div class="sig-block">
+      <div class="lbl">Signed (carer)</div>
+      <div class="line"></div>
+      <div style="margin-top:0.25rem;color:#6B7280">${data.by}</div>
+    </div>
+    <div class="sig-block">
+      <div class="lbl">Counter-signed</div>
+      <div class="line"></div>
+      <div style="margin-top:0.25rem;color:#6B7280">Manager / Clinical Lead</div>
+    </div>
+  </div>
+
+  <footer>
+    kooper · reporting · v0.1 · Draycott Demo House · No PII · Mock data · Page 1 of 1
+  </footer>
+</body>
+</html>`;
+  // Open in new tab via blob URL — print-ready immediately
+  const blob = new Blob([html], { type:'text/html' });
+  const url = URL.createObjectURL(blob);
+  const win = window.open(url, '_blank');
+  if (!win) {
+    kooperToast('Pop-up blocked · enable pop-ups to view report');
+  } else {
+    kooperToast('Report opened · ⌘P to print or save as PDF');
+  }
+}
 </script>
 </body>
 </html>
