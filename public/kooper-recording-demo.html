@@ -461,7 +461,7 @@
 
     <div class="bg-white border border-kapture-fog rounded-2xl overflow-hidden shadow-[0_18px_40px_-20px_rgba(0,0,0,0.10)]" id="eventsList">
       <!-- 8 sample events captured today; populated dynamically per persona too -->
-      <div class="event-row" data-event-id="ev-1" data-event-type="locked" onclick="toggleEvent(this)">
+      <div class="event-row" data-event-id="ev-1" data-event-type="locked" data-event-by="carer" onclick="toggleEvent(this)">
         <span class="ev-time">07:42</span>
         <span class="ev-icon locked">LOCK</span>
         <div class="ev-text"><strong>Personal care · Edward Banda</strong> · Assisted, verbal consent, dignity maintained, routine outcome.<div class="ev-meta">22 min · carer Craig Musara · journal v4</div></div>
@@ -469,15 +469,15 @@
       </div>
       <div class="event-detail" data-event-detail="ev-1"></div>
 
-      <div class="event-row" data-event-id="ev-2" data-event-type="locked" onclick="toggleEvent(this)">
+      <div class="event-row" data-event-id="ev-2" data-event-type="locked" data-event-by="senior" onclick="toggleEvent(this)">
         <span class="ev-time">08:14</span>
         <span class="ev-icon locked">LOCK</span>
-        <div class="ev-text"><strong>Continence · Catherine Okafor</strong> · Pad change, no soreness noted, dignity maintained.<div class="ev-meta">8 min · carer Rebecca Adesina · journal v3</div></div>
+        <div class="ev-text"><strong>Continence · Catherine Okafor</strong> · Pad change, no soreness noted, dignity maintained.<div class="ev-meta">8 min · senior carer Rebecca Adesina · journal v3</div></div>
         <span class="ev-arrow">→</span>
       </div>
       <div class="event-detail" data-event-detail="ev-2"></div>
 
-      <div class="event-row" data-event-id="ev-3" data-event-type="flag" onclick="toggleEvent(this)">
+      <div class="event-row" data-event-id="ev-3" data-event-type="flag" data-event-by="nurse" onclick="toggleEvent(this)">
         <span class="ev-time">09:18</span>
         <span class="ev-icon flag">FLAG</span>
         <div class="ev-text"><strong>NEWS2 5 · Mr H</strong> · Escalation triggered. GP paged. Family contact opened. Hourly checks set.<div class="ev-meta">3 min · nurse Sister Anne · audit-hashed</div></div>
@@ -485,7 +485,7 @@
       </div>
       <div class="event-detail" data-event-detail="ev-3"></div>
 
-      <div class="event-row" data-event-id="ev-4" data-event-type="locked" onclick="toggleEvent(this)">
+      <div class="event-row" data-event-id="ev-4" data-event-type="locked" data-event-by="activities" onclick="toggleEvent(this)">
         <span class="ev-time">11:00</span>
         <span class="ev-icon locked">LOCK</span>
         <div class="ev-text"><strong>Activity · Music & Memory · 8 residents</strong> · Edward sang along to Sinatra. Mr R settled. Joined ABC chart.<div class="ev-meta">45 min · activities Daniel Kowalski · plan v2</div></div>
@@ -493,7 +493,7 @@
       </div>
       <div class="event-detail" data-event-detail="ev-4"></div>
 
-      <div class="event-row" data-event-id="ev-5" data-event-type="locked" onclick="toggleEvent(this)">
+      <div class="event-row" data-event-id="ev-5" data-event-type="locked" data-event-by="nurse" onclick="toggleEvent(this)">
         <span class="ev-time">13:30</span>
         <span class="ev-icon locked">LOCK</span>
         <div class="ev-text"><strong>Wound dressing · Mrs Cross sacrum</strong> · Stage 2, clean, no exudate. SSKIN 4/5. Next due 19:30.<div class="ev-meta">12 min · nurse Sister Anne · clinical journal</div></div>
@@ -501,7 +501,7 @@
       </div>
       <div class="event-detail" data-event-detail="ev-5"></div>
 
-      <div class="event-row" data-event-id="ev-6" data-event-type="draft" onclick="toggleEvent(this)">
+      <div class="event-row" data-event-id="ev-6" data-event-type="draft" data-event-by="carer" onclick="toggleEvent(this)">
         <span class="ev-time">14:32</span>
         <span class="ev-icon draft">DRAFT</span>
         <div class="ev-text"><strong>Welfare check · Edward Banda</strong> · Eddie sitting in armchair, listening to jazz. Mood bright.<div class="ev-meta">awaiting carer confirm · 14s draft time · 0.96 confidence</div></div>
@@ -509,7 +509,7 @@
       </div>
       <div class="event-detail" data-event-detail="ev-6"></div>
 
-      <div class="event-row" data-event-id="ev-7" data-event-type="flag" onclick="toggleEvent(this)">
+      <div class="event-row" data-event-id="ev-7" data-event-type="flag" data-event-by="senior" onclick="toggleEvent(this)">
         <span class="ev-time">16:30</span>
         <span class="ev-icon flag">FLAG</span>
         <div class="ev-text"><strong>Behaviour · Mr R sundowning</strong> · Agitation 16:30. Music + tea intervention. Settled within 10 min. ABC chart updated.<div class="ev-meta">14 min · senior Rebecca Adesina · 4-day pattern flagged</div></div>
@@ -517,7 +517,7 @@
       </div>
       <div class="event-detail" data-event-detail="ev-7"></div>
 
-      <div class="event-row" data-event-id="ev-8" data-event-type="draft" onclick="toggleEvent(this)">
+      <div class="event-row" data-event-id="ev-8" data-event-type="draft" data-event-by="manager" onclick="toggleEvent(this)">
         <span class="ev-time">15:00</span>
         <span class="ev-icon draft">DRAFT</span>
         <div class="ev-text"><strong>Family digest · 22 residents · today</strong> · Plain-English daily summaries drafted. Privacy boundary respected. 6 awaiting carer confirm.<div class="ev-meta">2 min · auto-drafted by kooper · ai · ready for sign-off</div></div>
@@ -965,18 +965,30 @@ document.addEventListener('DOMContentLoaded', function(){
 
   // Initial render so prose reflects defaults cleanly
   rerender();
+  // Apply the initial events filter (defaults to carer scope · all types)
+  if (typeof applyEventsFilter === 'function') applyEventsFilter();
 });
 
 // ============================================================
 // USER TYPE SWITCHER — switches the active context + persona
 // ============================================================
+// Each persona sees a different slice of the events feed:
+// - carer: own personal care + welfare checks
+// - senior: own + relevant team
+// - nurse: own clinical events
+// - manager: full oversight (all events)
+// - activities: own activity sessions only
 const USER_TYPES = {
-  carer:      { name:'Craig Musara',     role:'Carer',         resident:'Edward Banda', visit:'07:42 · Morning round',     plan:'v4 (current)',   shiftLabel:'Carer shift' },
-  senior:     { name:'Rebecca Adesina',  role:'Senior Carer',  resident:'Catherine Okafor', visit:'14:00 · Shift lead',     plan:'v3 (current)',   shiftLabel:'Senior carer shift' },
-  nurse:      { name:'Sister Anne Whitfield', role:'Nurse',    resident:'Mr H',         visit:'13:00 · Med round',         plan:'v6 (current)',   shiftLabel:'Clinical shift' },
-  manager:    { name:'Lola Okonkwo',     role:'Registered Manager', resident:'Draycott House (30 residents)', visit:'09:00 · Daily review', plan:'all current', shiftLabel:'Manager review' },
-  activities: { name:'Daniel Kowalski',  role:'Activities Coord', resident:'Music & Memory · 8 joined', visit:'11:00 · Group session', plan:'activities plan v2', shiftLabel:'Activities slot' }
+  carer:      { name:'Craig Musara',     role:'Carer',              resident:'Edward Banda',                  visit:'07:42 · Morning round',  plan:'v4 (current)',         shiftLabel:'Carer shift',          eventScope:['carer'] },
+  senior:     { name:'Rebecca Adesina',  role:'Senior Carer',       resident:'Catherine Okafor',              visit:'14:00 · Shift lead',     plan:'v3 (current)',         shiftLabel:'Senior carer shift',   eventScope:['senior','carer'] },
+  nurse:      { name:'Sister Anne Whitfield', role:'Nurse',         resident:'Mr H',                          visit:'13:00 · Med round',      plan:'v6 (current)',         shiftLabel:'Clinical shift',       eventScope:['nurse'] },
+  manager:    { name:'Lola Okonkwo',     role:'Registered Manager', resident:'Draycott House (30 residents)', visit:'09:00 · Daily review',   plan:'all current',          shiftLabel:'Manager review',       eventScope:['carer','senior','nurse','manager','activities'] },
+  activities: { name:'Daniel Kowalski',  role:'Activities Coord',   resident:'Music & Memory · 8 joined',      visit:'11:00 · Group session',  plan:'activities plan v2',   shiftLabel:'Activities slot',      eventScope:['activities'] }
 };
+
+// Active filter state — both type filter and persona scope apply together
+const FEED_STATE = { type: 'all', personaScope: USER_TYPES.carer.eventScope };
+
 function switchUser(btn, key) {
   const u = USER_TYPES[key]; if (!u) return;
   document.querySelectorAll('.user-pill').forEach(p => p.classList.remove('active'));
@@ -989,7 +1001,63 @@ function switchUser(btn, key) {
   const sl = document.getElementById('heroShiftLabel'); if (sl) sl.textContent = u.shiftLabel;
   // Update STATE so the AI prose engine reflects the new persona
   if (typeof STATE !== 'undefined') { STATE.carer = u.name; if (typeof rerender === 'function') rerender(); }
-  kooperToast('Reporting as ' + u.role + ' · ' + u.name);
+  // Update events feed scope and re-apply combined filter
+  FEED_STATE.personaScope = u.eventScope;
+  applyEventsFilter();
+  // Build a clearer toast that says how many events that persona will see
+  const visibleCount = countVisibleEvents();
+  kooperToast('Reporting as ' + u.role + ' · ' + visibleCount + ' event' + (visibleCount === 1 ? '' : 's') + ' in your feed');
+}
+
+function countVisibleEvents() {
+  return Array.from(document.querySelectorAll('#eventsList .event-row')).filter(r => {
+    const by = r.dataset.eventBy || '';
+    const type = r.dataset.eventType || '';
+    const inScope = FEED_STATE.personaScope.includes(by);
+    const matchesType = (FEED_STATE.type === 'all' || FEED_STATE.type === type);
+    return inScope && matchesType;
+  }).length;
+}
+
+function applyEventsFilter() {
+  let visible = 0;
+  document.querySelectorAll('#eventsList .event-row').forEach(row => {
+    const by = row.dataset.eventBy || '';
+    const type = row.dataset.eventType || '';
+    const inScope = FEED_STATE.personaScope.includes(by);
+    const matchesType = (FEED_STATE.type === 'all' || FEED_STATE.type === type);
+    const show = inScope && matchesType;
+    row.style.display = show ? '' : 'none';
+    const id = row.dataset.eventId;
+    const detail = document.querySelector(`[data-event-detail="${id}"]`);
+    if (detail) {
+      detail.style.display = show ? '' : 'none';
+      // Auto-collapse hidden details
+      if (!show && detail.classList.contains('is-open')) {
+        detail.classList.remove('is-open');
+        detail.innerHTML = '';
+        row.classList.remove('is-open');
+      }
+    }
+    if (show) visible++;
+  });
+  // Update the All count badge
+  const allCountEl = document.getElementById('evCountAll');
+  if (allCountEl) allCountEl.textContent = visible;
+  // Show empty state if nothing visible
+  const list = document.getElementById('eventsList');
+  let empty = document.getElementById('evEmpty');
+  if (visible === 0) {
+    if (!empty) {
+      empty = document.createElement('div');
+      empty.id = 'evEmpty';
+      empty.style.cssText = 'padding:1.75rem 1rem;text-align:center;font-size:0.8125rem;color:#6B7280;font-style:italic';
+      empty.textContent = 'No events match this persona + filter combination. Try the All filter or switch personas.';
+      list.appendChild(empty);
+    }
+  } else if (empty) {
+    empty.remove();
+  }
 }
 
 // ============================================================
@@ -1143,15 +1211,8 @@ function toggleEvent(row) {
 function filterEvents(btn, type) {
   document.querySelectorAll('[data-event-filter]').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  document.querySelectorAll('.event-row').forEach(row => {
-    const t = row.dataset.eventType;
-    const show = (type === 'all' || t === type);
-    row.style.display = show ? '' : 'none';
-    // Also hide the matching detail
-    const id = row.dataset.eventId;
-    const detail = document.querySelector(`[data-event-detail="${id}"]`);
-    if (detail) detail.style.display = show ? '' : 'none';
-  });
+  FEED_STATE.type = type;
+  applyEventsFilter();
 }
 
 // ============================================================
