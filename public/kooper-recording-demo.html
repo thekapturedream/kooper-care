@@ -145,15 +145,15 @@
   <div class="container-kapture">
     <div class="flex items-center gap-2 overflow-x-auto pb-1">
       <span class="text-[0.6875rem] uppercase tracking-widest text-kapture-smoke font-mono mr-2 shrink-0">RECORDING DOMAIN</span>
-      <button class="domain-pill active">Personal care</button>
-      <button class="domain-pill" onclick="kooperToast('Continence recording opens here')">Continence</button>
-      <button class="domain-pill" onclick="kooperToast('Nutrition recording opens here')">Nutrition</button>
-      <button class="domain-pill" onclick="kooperToast('Mobility recording opens here')">Mobility</button>
-      <button class="domain-pill" onclick="kooperToast('MAR opens here')">Medication</button>
-      <button class="domain-pill" onclick="kooperToast('Mental state recording opens here')">Mental state</button>
-      <button class="domain-pill" onclick="kooperToast('Behaviour / ABC chart opens here')">Behaviour</button>
-      <button class="domain-pill" onclick="kooperToast('Vitals / NEWS2 opens here')">Vitals</button>
-      <button class="domain-pill" onclick="kooperToast('Wound care opens here')">Wound care</button>
+      <button class="domain-pill active" data-domain="personal" onclick="switchDomain(this,'personal')">Personal care</button>
+      <button class="domain-pill" data-domain="continence" onclick="switchDomain(this,'continence')">Continence</button>
+      <button class="domain-pill" data-domain="nutrition" onclick="switchDomain(this,'nutrition')">Nutrition</button>
+      <button class="domain-pill" data-domain="mobility" onclick="switchDomain(this,'mobility')">Mobility</button>
+      <button class="domain-pill" data-domain="medication" onclick="switchDomain(this,'medication')">Medication</button>
+      <button class="domain-pill" data-domain="mental" onclick="switchDomain(this,'mental')">Mental state</button>
+      <button class="domain-pill" data-domain="behaviour" onclick="switchDomain(this,'behaviour')">Behaviour</button>
+      <button class="domain-pill" data-domain="vitals" onclick="switchDomain(this,'vitals')">Vitals</button>
+      <button class="domain-pill" data-domain="wound" onclick="switchDomain(this,'wound')">Wound care</button>
     </div>
   </div>
 </section>
@@ -169,19 +169,19 @@
       <!-- LEFT: 3-step icon tap recording -->
       <div class="lg:col-span-7 space-y-6">
 
-        <!-- Step 1 - Level of support -->
+        <!-- Step 1 - Level of support (content swapped per domain via JS) -->
         <div class="bg-white border border-kapture-fog rounded-2xl p-5 lg:p-6">
           <div class="flex items-center justify-between mb-4">
             <div class="flex items-center gap-3">
               <span class="step-num">1</span>
               <div>
-                <div class="font-display font-semibold text-base">Level of support</div>
-                <div class="text-xs text-kapture-smoke">How much help did Edward need this morning?</div>
+                <div id="step1Heading" class="font-display font-semibold text-base">Level of support</div>
+                <div id="step1Sub" class="text-xs text-kapture-smoke">How much help did Edward need this morning?</div>
               </div>
             </div>
             <span class="chip chip-warn text-[0.6875rem]">Required</span>
           </div>
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div id="step1Tiles" class="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <button class="icon-tile" data-step="1" data-value="independent" onclick="selectTile(this, 1)">
               <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="6" r="3"/><path d="M12 9v6"/><path d="M9 21l3-6 3 6"/><path d="M9 12h6"/></svg>
               <span class="text-xs font-medium">Independent</span>
@@ -199,7 +199,7 @@
               <span class="text-xs font-medium">Full hands-on</span>
             </button>
           </div>
-          <div class="mt-3 flex items-center gap-2 text-xs text-kapture-smoke">
+          <div id="step1Baseline" class="mt-3 flex items-center gap-2 text-xs text-kapture-smoke">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
             Care plan baseline: <strong class="text-kapture-coal mx-1">Assisted</strong> · Today's tap matches plan ✓
           </div>
@@ -521,7 +521,10 @@ const STATE = {
   step2a: 'verbal',         // verbal | non-verbal | implied | refused
   step2b: 'maintained',     // maintained | compromised
   step3: 'routine',         // routine | near-miss | incident | abc
+  domainKey: 'personal',
   domain: 'Personal care',
+  careType: 'personal care',
+  task: 'the wash, shave and oral care',
   startedAt: '07:42',
   endedAt: '08:04',
   durationMin: 22,
@@ -537,6 +540,186 @@ const CONSENT_PHRASE = { verbal:'gave verbal consent before the wash', 'non-verb
 const DIGNITY_PHRASE = { maintained:'Dignity was maintained throughout — privacy curtain drawn, room temperature checked.', compromised:'Dignity was briefly compromised during the transfer; carer apologised, repositioned, and continued.' };
 const OUTCOME_TAG = { routine:{label:'Routine', cls:'chip-ok', saf:'Caring'}, 'near-miss':{label:'Near miss', cls:'chip-warn', saf:'Safe'}, incident:{label:'Incident', cls:'chip-crit', saf:'Safe · Responsive'}, abc:{label:'ABC behaviour', cls:'chip-warn', saf:'Responsive'} };
 const OUTCOME_PHRASE = { routine:'Skin observed: no new redness on sacrum or heels. Mood was bright; he asked after Sister Anne.', 'near-miss':'A near miss was logged — Edward steadied himself on the rail before any fall. No injury. Falls protocol triggered automatically.', incident:'An incident occurred during the transfer. First-aid steps followed; manager notified within 5 minutes; family contact opened. Bradford Falls update queued.', abc:'Behaviour event captured to ABC chart. Antecedent, behaviour, consequence noted. De-escalation worked within 10 minutes.' };
+
+// ============================================================
+// DOMAIN_CONFIG — recording context for each of the 9 domains.
+// switchDomain() swaps step 1's question + tile set + baseline,
+// and rerender() uses .task / .careType to adapt the prose.
+// ============================================================
+const DOMAIN_CONFIG = {
+  personal: {
+    label: 'Personal care',
+    heading: 'Level of support',
+    sub: 'How much help did Edward need this morning?',
+    careType: 'personal care',
+    task: 'the wash, shave and oral care',
+    baseline: 'Assisted',
+    baselineNote: 'Today\'s tap matches plan ✓',
+    tiles: [
+      { value:'independent', label:'Independent', svg:'<circle cx="12" cy="6" r="3"/><path d="M12 9v6"/><path d="M9 21l3-6 3 6"/><path d="M9 12h6"/>' },
+      { value:'prompted',    label:'Prompted',    svg:'<circle cx="9" cy="6" r="3"/><path d="M9 9v12"/><path d="M16 12l-7 0"/><path d="M14 9l3 3-3 3"/>' },
+      { value:'assisted',    label:'Assisted',    svg:'<circle cx="8" cy="6" r="3"/><circle cx="16" cy="6" r="3"/><path d="M8 9v12"/><path d="M16 9v12"/><path d="M11 13h2"/>', defaultSelected:true },
+      { value:'full',        label:'Full hands-on', svg:'<circle cx="12" cy="6" r="3"/><path d="M5 14a7 7 0 0 1 14 0v2H5z"/><path d="M9 20h6"/>' }
+    ]
+  },
+  continence: {
+    label: 'Continence',
+    heading: 'Continence event',
+    sub: 'What happened with Edward\'s continence care?',
+    careType: 'continence care',
+    task: 'a pad change and continence observation',
+    baseline: 'Pad change × 4/day',
+    baselineNote: 'Logged on plan',
+    tiles: [
+      { value:'continent',  label:'Continent',  svg:'<circle cx="12" cy="12" r="9"/><polyline points="9 12 11 14 15 10"/>', defaultSelected:true },
+      { value:'pad-change', label:'Pad change', svg:'<rect x="5" y="7" width="14" height="11" rx="2"/><line x1="9" y1="11" x2="15" y2="11"/><line x1="9" y1="14" x2="13" y2="14"/>' },
+      { value:'incontinent',label:'Incontinent',svg:'<path d="M12 3v6"/><circle cx="12" cy="14" r="6"/><path d="M9 14h6"/>' },
+      { value:'refused',    label:'Refused care', svg:'<circle cx="12" cy="12" r="9"/><line x1="9" y1="9" x2="15" y2="15"/><line x1="15" y1="9" x2="9" y2="15"/>' }
+    ]
+  },
+  nutrition: {
+    label: 'Nutrition',
+    heading: 'Meal intake',
+    sub: 'How much of his meal did Edward eat?',
+    careType: 'nutritional support',
+    task: 'his breakfast and morning hydration',
+    baseline: 'Soft diet · 1.5L fluid target',
+    baselineNote: 'MUAC tracked',
+    tiles: [
+      { value:'all',     label:'All',     svg:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5" fill="currentColor"/>' },
+      { value:'most',    label:'Most',    svg:'<circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"/>', defaultSelected:true },
+      { value:'half',    label:'Half',    svg:'<circle cx="12" cy="12" r="9"/><path d="M12 12V3a9 9 0 0 1 0 18z" fill="currentColor"/>' },
+      { value:'refused', label:'Refused', svg:'<circle cx="12" cy="12" r="9"/><line x1="9" y1="9" x2="15" y2="15"/><line x1="15" y1="9" x2="9" y2="15"/>' }
+    ]
+  },
+  mobility: {
+    label: 'Mobility',
+    heading: 'Mobility today',
+    sub: 'How was Edward moved or supported?',
+    careType: 'mobility support',
+    task: 'his transfer from bed to chair',
+    baseline: 'Frame + 1 carer',
+    baselineNote: 'Plan reviewed 12 Mar',
+    tiles: [
+      { value:'walking',  label:'Walking',  svg:'<circle cx="13" cy="4" r="2"/><path d="M13 7v6"/><path d="M9 21l4-8 4 8"/><path d="M9 13h8"/>' },
+      { value:'frame',    label:'Frame',    svg:'<circle cx="12" cy="4" r="2"/><path d="M12 7v10"/><path d="M7 21l5-4 5 4"/><line x1="6" y1="13" x2="18" y2="13"/>', defaultSelected:true },
+      { value:'wheelchair', label:'Wheelchair', svg:'<circle cx="9" cy="6" r="2"/><path d="M9 8l-2 6h7"/><circle cx="9" cy="17" r="3"/><path d="M16 14l3 3"/>' },
+      { value:'hoist',    label:'Hoist',    svg:'<rect x="6" y="3" width="12" height="2"/><path d="M12 5v6"/><path d="M9 11h6l-1 6h-4z"/>' }
+    ]
+  },
+  medication: {
+    label: 'Medication',
+    heading: 'Medication outcome',
+    sub: 'What happened with Edward\'s medication round?',
+    careType: 'medication administration',
+    task: 'his morning medication round',
+    baseline: '8 regulars + PRN paracetamol',
+    baselineNote: '99% adherence this month',
+    tiles: [
+      { value:'taken',    label:'Taken',    svg:'<circle cx="12" cy="12" r="9"/><polyline points="8 12 11 15 16 9"/>', defaultSelected:true },
+      { value:'refused',  label:'Refused',  svg:'<circle cx="12" cy="12" r="9"/><line x1="9" y1="9" x2="15" y2="15"/><line x1="15" y1="9" x2="9" y2="15"/>' },
+      { value:'withheld', label:'Withheld', svg:'<rect x="6" y="9" width="12" height="6" rx="3"/><line x1="9" y1="12" x2="15" y2="12"/>' },
+      { value:'prn',      label:'PRN given',svg:'<circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/>' }
+    ]
+  },
+  mental: {
+    label: 'Mental state',
+    heading: 'Mood & mental state',
+    sub: 'How is Edward presenting today?',
+    careType: 'a mental state observation',
+    task: 'a mental state observation',
+    baseline: 'Bright most days',
+    baselineNote: 'No active concerns',
+    tiles: [
+      { value:'bright',   label:'Bright',    svg:'<circle cx="12" cy="12" r="9"/><circle cx="9" cy="10" r="1" fill="currentColor"/><circle cx="15" cy="10" r="1" fill="currentColor"/><path d="M8 14c1 2 3 3 4 3s3-1 4-3"/>', defaultSelected:true },
+      { value:'settled',  label:'Settled',   svg:'<circle cx="12" cy="12" r="9"/><circle cx="9" cy="10" r="1" fill="currentColor"/><circle cx="15" cy="10" r="1" fill="currentColor"/><line x1="8" y1="15" x2="16" y2="15"/>' },
+      { value:'anxious',  label:'Anxious',   svg:'<circle cx="12" cy="12" r="9"/><circle cx="9" cy="10" r="1" fill="currentColor"/><circle cx="15" cy="10" r="1" fill="currentColor"/><path d="M8 16c1-1 3-1.5 4-1.5s3 .5 4 1.5"/>' },
+      { value:'distressed', label:'Distressed', svg:'<circle cx="12" cy="12" r="9"/><circle cx="9" cy="10" r="1" fill="currentColor"/><circle cx="15" cy="10" r="1" fill="currentColor"/><path d="M8 17c1-2 3-3 4-3s3 1 4 3"/>' }
+    ]
+  },
+  behaviour: {
+    label: 'Behaviour',
+    heading: 'Behaviour observation',
+    sub: 'How would you describe Edward\'s behaviour just now?',
+    careType: 'behaviour monitoring',
+    task: 'an ABC observation period',
+    baseline: 'Sundowning 16:00–19:00 noted',
+    baselineNote: 'Music + tea = good intervention',
+    tiles: [
+      { value:'calm',       label:'Calm',       svg:'<circle cx="12" cy="12" r="9"/><line x1="8" y1="13" x2="16" y2="13"/>', defaultSelected:true },
+      { value:'agitated',   label:'Agitated',   svg:'<circle cx="12" cy="12" r="9"/><path d="M7 10l2-1 2 1 2-1 2 1 2-1"/><path d="M9 16l3-2 3 2"/>' },
+      { value:'aggressive', label:'Aggressive', svg:'<circle cx="12" cy="12" r="9"/><line x1="8" y1="9" x2="11" y2="11"/><line x1="11" y1="9" x2="8" y2="11"/><line x1="13" y1="9" x2="16" y2="11"/><line x1="16" y1="9" x2="13" y2="11"/>' },
+      { value:'withdrawn',  label:'Withdrawn',  svg:'<circle cx="12" cy="12" r="9"/><circle cx="9" cy="11" r="0.6" fill="currentColor"/><circle cx="15" cy="11" r="0.6" fill="currentColor"/><line x1="9" y1="15" x2="15" y2="15"/>' }
+    ]
+  },
+  vitals: {
+    label: 'Vitals',
+    heading: 'Reading captured',
+    sub: 'Which vital sign did you take just now?',
+    careType: 'vital sign monitoring',
+    task: 'vital sign observations',
+    baseline: 'NEWS2 weekly',
+    baselineNote: 'Last NEWS2 = 2',
+    tiles: [
+      { value:'news2', label:'NEWS2', svg:'<rect x="4" y="6" width="16" height="12" rx="2"/><line x1="8" y1="14" x2="10" y2="11"/><line x1="10" y1="11" x2="12" y2="14"/><line x1="12" y1="14" x2="14" y2="9"/><line x1="14" y1="9" x2="16" y2="13"/>', defaultSelected:true },
+      { value:'bp',    label:'BP',    svg:'<rect x="6" y="6" width="12" height="10" rx="2"/><line x1="9" y1="10" x2="15" y2="10"/><line x1="9" y1="13" x2="13" y2="13"/>' },
+      { value:'temp',  label:'Temp',  svg:'<rect x="10" y="3" width="4" height="13" rx="2"/><circle cx="12" cy="18" r="3"/>' },
+      { value:'spo2',  label:'SpO2',  svg:'<path d="M12 4c4 4 6 7 6 10a6 6 0 0 1-12 0c0-3 2-6 6-10z"/>' }
+    ]
+  },
+  wound: {
+    label: 'Wound care',
+    heading: 'Wound state',
+    sub: 'How is Edward\'s wound looking today?',
+    careType: 'wound care',
+    task: 'a sacral wound dressing change',
+    baseline: 'Stage 2 sacrum',
+    baselineNote: 'Dressed × 2/day',
+    tiles: [
+      { value:'healing',    label:'Healing',    svg:'<circle cx="12" cy="12" r="9"/><polyline points="8 12 11 15 16 9"/><path d="M3 12a9 9 0 0 1 4-7"/>', defaultSelected:true },
+      { value:'stable',     label:'Stable',     svg:'<circle cx="12" cy="12" r="9"/><line x1="7" y1="12" x2="17" y2="12"/>' },
+      { value:'worsening',  label:'Worsening',  svg:'<circle cx="12" cy="12" r="9"/><polyline points="8 9 11 12 16 7"/><path d="M3 12a9 9 0 0 0 4 7"/>' },
+      { value:'new',        label:'New wound',  svg:'<circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/>' }
+    ]
+  }
+};
+
+function switchDomain(pillEl, key) {
+  const cfg = DOMAIN_CONFIG[key];
+  if (!cfg) return;
+
+  // Pill state
+  document.querySelectorAll('.domain-pill').forEach(p => p.classList.remove('active'));
+  pillEl.classList.add('active');
+
+  // Step 1 panel content
+  document.getElementById('step1Heading').textContent = cfg.heading;
+  document.getElementById('step1Sub').textContent = cfg.sub;
+  document.getElementById('step1Baseline').innerHTML =
+    '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>' +
+    'Care plan baseline: <strong class="text-kapture-coal mx-1">' + cfg.baseline + '</strong> · ' + cfg.baselineNote;
+
+  // Rebuild tiles
+  const tilesHost = document.getElementById('step1Tiles');
+  tilesHost.innerHTML = cfg.tiles.map(function(t){
+    return '<button class="icon-tile' + (t.defaultSelected ? ' selected' : '') + '" data-step="1" data-value="' + t.value + '" onclick="selectTile(this, 1)">' +
+           '<svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">' + t.svg + '</svg>' +
+           '<span class="text-xs font-medium">' + t.label + '</span>' +
+           '</button>';
+  }).join('');
+
+  // Update STATE
+  const defaultTile = cfg.tiles.find(t => t.defaultSelected) || cfg.tiles[0];
+  STATE.domainKey = key;
+  STATE.domain = cfg.label;
+  STATE.careType = cfg.careType;
+  STATE.task = cfg.task;
+  STATE.step1 = defaultTile.value;
+
+  // Re-render the AI prose to reflect the new domain
+  rerender();
+  kooperToast(cfg.label + ' · recording context loaded');
+}
 
 // ============================================================
 function kooperToast(msg){const t=document.getElementById('toast');t.textContent=msg||'Saved';t.classList.add('on');clearTimeout(window.__t);window.__t=setTimeout(()=>t.classList.remove('on'),1600);}
@@ -560,9 +743,11 @@ function rerender(){
   const dignity = DIGNITY_PHRASE[STATE.step2b] || '';
   const outcome = OUTCOME_PHRASE[STATE.step3] || '';
   const voiceLine = STATE.voice ? ' Carer added: "' + STATE.voice + '"' : '';
-  const supportTone = STATE.step1 === 'full' ? 'full hands-on personal care' : (STATE.step1 === 'assisted' ? 'assisted personal care' : (STATE.step1 === 'prompted' ? 'prompted personal care' : 'independent personal care with light supervision'));
+  const careType = STATE.careType || 'personal care';
+  const task = STATE.task || 'the wash, shave and oral care';
+  const supportTone = STATE.step1 === 'full' ? 'full hands-on ' + careType : (STATE.step1 === 'assisted' ? 'assisted ' + careType : (STATE.step1 === 'prompted' ? 'prompted ' + careType : 'independent ' + careType + ' with light supervision'));
 
-  const prose = 'At ' + STATE.startedAt + ' on 6 May 2026, <strong>Mr Banda</strong> received <strong>' + supportTone + '</strong> from carer <strong>' + STATE.carer + '</strong>. He ' + consent + '. Edward ' + support + ' with the wash, shave and oral care. ' + dignity + ' His preferred talc and body wash were used. ' + outcome + voiceLine + ' Care concluded at ' + STATE.endedAt + ' (<strong>' + STATE.durationMin + ' minutes</strong>) with Edward dressed, comfortable and seated for breakfast.';
+  const prose = 'At ' + STATE.startedAt + ' on 6 May 2026, <strong>Mr Banda</strong> received <strong>' + supportTone + '</strong> from carer <strong>' + STATE.carer + '</strong>. He ' + consent + '. Edward ' + support + ' with ' + task + '. ' + dignity + ' His preferred talc and body wash were used. ' + outcome + voiceLine + ' Care concluded at ' + STATE.endedAt + ' (<strong>' + STATE.durationMin + ' minutes</strong>) with Edward dressed, comfortable and seated for breakfast.';
   const proseEl = document.getElementById('aiProse');
   proseEl.innerHTML = prose;
 
