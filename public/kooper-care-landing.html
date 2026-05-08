@@ -97,9 +97,33 @@
   .layer-card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.12); border-radius: 18px; padding: 2rem; }
   .layer-card.spotlight { background: linear-gradient(180deg, rgba(255,212,0,0.1) 0%, rgba(255,212,0,0.02) 100%); border-color: rgba(255,212,0,0.3); }
 
-  .persona-row { display: grid; grid-template-columns: 1.5fr 2.5fr 1fr; gap: 1rem; align-items: center; padding: 1rem 1.25rem; border-radius: 12px; transition: background 0.15s ease; cursor: pointer; }
-  .persona-row:hover { background: #F5F5F5; }
-  @media (max-width: 640px) { .persona-row { grid-template-columns: 1fr; gap: 0.5rem; } }
+  /* Persona row — improved layout */
+  .persona-row { display: grid; grid-template-columns: minmax(11rem, 0.9fr) minmax(0, 2.4fr) minmax(8rem, 0.9fr) 1.5rem; column-gap: 1.25rem; row-gap: 0.5rem; align-items: center; padding: 1rem 1.25rem; border-radius: 0; transition: background 0.15s ease; cursor: pointer; }
+  .persona-row:hover { background: #FAFAF7; }
+  .persona-row .pr-name { display: flex; align-items: center; gap: 0.5rem; }
+  .persona-row .pr-avatar { width: 26px; height: 26px; border-radius: 50%; background: #0A0A0A; color: #FFD400; display: flex; align-items: center; justify-content: center; font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 0.6875rem; flex-shrink: 0; }
+  .persona-row .pr-title { font-weight: 600; color: #0A0A0A; font-size: 0.9375rem; line-height: 1.15; }
+  .persona-row .pr-stack { display: flex; flex-wrap: wrap; gap: 0.3125rem; align-items: center; }
+  .persona-row .pr-wants { font-family: 'Source Serif 4', serif; font-style: italic; color: #3A3A3A; font-size: 0.8125rem; line-height: 1.3; text-align: right; }
+  .persona-row .pr-arrow { color: #9A9A9A; transition: transform 0.15s ease, color 0.15s ease; text-align: right; font-size: 1rem; }
+  .persona-row:hover .pr-arrow { color: #0A0A0A; transform: translateX(3px); }
+  .persona-row.is-stakeholder { background: rgba(255,212,0,0.06); }
+  .persona-row.is-stakeholder:hover { background: rgba(255,212,0,0.12); }
+
+  /* Module chip inside persona-row stack */
+  .persona-chip { display: inline-flex; align-items: center; padding: 0.1875rem 0.5rem; border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-size: 0.6875rem; font-weight: 500; color: #2A2A2A; background: #F5F5F5; border: 1px solid #ECEAE3; transition: all 0.12s ease; cursor: pointer; white-space: nowrap; }
+  .persona-chip:hover { background: #0A0A0A; color: #FFFFFF; border-color: #0A0A0A; }
+  .persona-chip.is-required { background: #FFD400; color: #0A0A0A; border-color: #FFD400; font-weight: 600; }
+  .persona-chip.is-required:hover { background: #F5B400; border-color: #F5B400; color: #0A0A0A; }
+  .persona-chip.is-stakeholder { background: #0A0A0A; color: #FFD400; border-color: #0A0A0A; }
+  .persona-chip.is-stakeholder:hover { background: #FFD400; color: #0A0A0A; border-color: #FFD400; }
+
+  /* Mobile — stack the row into rows on its own */
+  @media (max-width: 768px) {
+    .persona-row { grid-template-columns: 1fr; padding: 1rem 1.125rem; }
+    .persona-row .pr-arrow { display: none; }
+    .persona-row .pr-wants { text-align: left; padding-top: 0.125rem; border-top: 1px dashed #ECEAE3; margin-top: 0.25rem; padding-top: 0.5rem; font-size: 0.75rem; }
+  }
 </style>
 </head>
 <body class="antialiased" id="top">
@@ -458,31 +482,95 @@
       <p class="lede mt-4">PCS, Nourish, CareDocs build for the operator. kooper · care builds for everyone in the loop — staff, residents, families, partners, inspectors. Each persona gets a curated app stack and a permission profile.</p>
     </div>
 
-    <div class="surface bg-kapture-paper border border-kapture-fog rounded-2xl overflow-hidden">
+    <!-- Persona table — every row is a tap, every chip is a tap -->
+    <div class="surface bg-white border border-kapture-fog rounded-2xl overflow-hidden">
 
-      <div class="px-6 py-3 border-b border-kapture-fog text-xs uppercase tracking-widest font-mono text-kapture-mist bg-kapture-paper grid grid-cols-1 sm:grid-cols-[1.5fr_2.5fr_1fr] gap-4">
+      <div class="px-6 py-3 border-b border-kapture-fog text-[0.6875rem] uppercase tracking-[0.18em] font-mono text-kapture-mist bg-kapture-paper grid grid-cols-1 md:grid-cols-[minmax(11rem,0.9fr)_minmax(0,2.4fr)_minmax(8rem,0.9fr)_1.5rem] gap-4 items-center">
         <div>Persona</div>
-        <div class="hidden sm:block">Default app stack</div>
-        <div class="hidden sm:block text-right">Wants</div>
+        <div class="hidden md:block">Default app stack — tap any chip</div>
+        <div class="hidden md:block text-right">Wants</div>
+        <div></div>
       </div>
 
-      <div class="divide-y divide-kapture-fog bg-white">
-        <div class="persona-row"><div class="font-medium">Owner / Director</div><div class="text-sm text-kapture-smoke font-mono lowercase">hr · multi-site · estate · reports · ai · compliance</div><div class="text-xs text-kapture-mist text-right">CQC pass + cost control</div></div>
-        <div class="persona-row"><div class="font-medium">Registered Manager</div><div class="text-sm text-kapture-smoke font-mono lowercase">hr · care plans · recording · mar · charts · reports · audit · compliance · operations · ai</div><div class="text-xs text-kapture-mist text-right">Zero compliance gaps</div></div>
-        <div class="persona-row"><div class="font-medium">Clinical Lead</div><div class="text-sm text-kapture-smoke font-mono lowercase">hr · clinical · care plans · mar · charts · risk · reports · audit · gp-connect</div><div class="text-xs text-kapture-mist text-right">Hospital admissions ↓</div></div>
-        <div class="persona-row"><div class="font-medium">Senior Carer</div><div class="text-sm text-kapture-smoke font-mono lowercase">hr · recording · charts · risk · mar (assist) · operations</div><div class="text-xs text-kapture-mist text-right">Clean handovers</div></div>
-        <div class="persona-row"><div class="font-medium">Nurse (RGN)</div><div class="text-sm text-kapture-smoke font-mono lowercase">hr · clinical · care plans · recording · mar · charts · risk</div><div class="text-xs text-kapture-mist text-right">Speed during med rounds</div></div>
-        <div class="persona-row"><div class="font-medium">Carer</div><div class="text-sm text-kapture-smoke font-mono lowercase">hr · recording · charts</div><div class="text-xs text-kapture-mist text-right">3-tap notes · AI narrative</div></div>
-        <div class="persona-row"><div class="font-medium">Activities Coord</div><div class="text-sm text-kapture-smoke font-mono lowercase">hr · activities · communication · recording</div><div class="text-xs text-kapture-mist text-right">Engagement metrics</div></div>
-        <div class="persona-row"><div class="font-medium">Cook / Catering</div><div class="text-sm text-kapture-smoke font-mono lowercase">hr · charts · estate</div><div class="text-xs text-kapture-mist text-right">Auto-reorder + dietary clarity</div></div>
-        <div class="persona-row"><div class="font-medium">Maintenance</div><div class="text-sm text-kapture-smoke font-mono lowercase">hr · estate · operations</div><div class="text-xs text-kapture-mist text-right">Tickets + compliance dates</div></div>
-        <div class="persona-row bg-kapture-yellow/10"><div class="font-medium">Resident</div><div class="text-sm text-kapture-smoke font-mono lowercase">resident</div><div class="text-xs text-kapture-mist text-right">Agency over their own life</div></div>
-        <div class="persona-row bg-kapture-yellow/10"><div class="font-medium">Family</div><div class="text-sm text-kapture-smoke font-mono lowercase">family</div><div class="text-xs text-kapture-mist text-right">Daily summary · peace of mind</div></div>
-        <div class="persona-row bg-kapture-yellow/10"><div class="font-medium">Inspector (CQC)</div><div class="text-sm text-kapture-smoke font-mono lowercase">inspector</div><div class="text-xs text-kapture-mist text-right">Audit pack downloadable</div></div>
+      <div class="divide-y divide-kapture-fog" id="personaTable">
+        <!-- Operator side -->
+        <div class="persona-row" data-persona="owner" data-route="kooper-care-dashboards.html?as=owner">
+          <div class="pr-name"><span class="pr-avatar">LO</span><span class="pr-title">Owner / Director</span></div>
+          <div class="pr-stack" data-stack="hr|required,multi-site,estate,reports,ai,compliance"></div>
+          <div class="pr-wants">CQC pass + cost control</div>
+          <div class="pr-arrow" aria-hidden="true">→</div>
+        </div>
+        <div class="persona-row" data-persona="manager" data-route="kooper-care-dashboards.html?as=manager">
+          <div class="pr-name"><span class="pr-avatar">LO</span><span class="pr-title">Registered Manager</span></div>
+          <div class="pr-stack" data-stack="hr|required,care plans,recording,mar,charts,reports,audit,compliance,operations,ai"></div>
+          <div class="pr-wants">Zero compliance gaps</div>
+          <div class="pr-arrow" aria-hidden="true">→</div>
+        </div>
+        <div class="persona-row" data-persona="clinical-lead" data-route="kooper-clinical.html">
+          <div class="pr-name"><span class="pr-avatar">SA</span><span class="pr-title">Clinical Lead</span></div>
+          <div class="pr-stack" data-stack="hr|required,clinical,care plans,mar,charts,risk,reports,audit,gp-connect"></div>
+          <div class="pr-wants">Hospital admissions ↓</div>
+          <div class="pr-arrow" aria-hidden="true">→</div>
+        </div>
+        <div class="persona-row" data-persona="senior-carer" data-route="kooper-recording-demo.html">
+          <div class="pr-name"><span class="pr-avatar">RA</span><span class="pr-title">Senior Carer</span></div>
+          <div class="pr-stack" data-stack="hr|required,recording,charts,risk,mar,operations"></div>
+          <div class="pr-wants">Clean handovers</div>
+          <div class="pr-arrow" aria-hidden="true">→</div>
+        </div>
+        <div class="persona-row" data-persona="nurse" data-route="kooper-clinical.html">
+          <div class="pr-name"><span class="pr-avatar">SA</span><span class="pr-title">Nurse (RGN)</span></div>
+          <div class="pr-stack" data-stack="hr|required,clinical,care plans,recording,mar,charts,risk"></div>
+          <div class="pr-wants">Speed during med rounds</div>
+          <div class="pr-arrow" aria-hidden="true">→</div>
+        </div>
+        <div class="persona-row" data-persona="carer" data-route="kooper-recording-demo.html">
+          <div class="pr-name"><span class="pr-avatar">CT</span><span class="pr-title">Carer</span></div>
+          <div class="pr-stack" data-stack="hr|required,recording,charts"></div>
+          <div class="pr-wants">3-tap notes · AI narrative</div>
+          <div class="pr-arrow" aria-hidden="true">→</div>
+        </div>
+        <div class="persona-row" data-persona="activities" data-route="kooper-care-dashboards.html?as=activities">
+          <div class="pr-name"><span class="pr-avatar">DM</span><span class="pr-title">Activities Coord</span></div>
+          <div class="pr-stack" data-stack="hr|required,activities,communication,recording"></div>
+          <div class="pr-wants">Engagement metrics</div>
+          <div class="pr-arrow" aria-hidden="true">→</div>
+        </div>
+        <div class="persona-row" data-persona="cook" data-route="kooper-care-dashboards.html?as=cook">
+          <div class="pr-name"><span class="pr-avatar">MA</span><span class="pr-title">Cook / Catering</span></div>
+          <div class="pr-stack" data-stack="hr|required,charts,estate"></div>
+          <div class="pr-wants">Auto-reorder + dietary clarity</div>
+          <div class="pr-arrow" aria-hidden="true">→</div>
+        </div>
+        <div class="persona-row" data-persona="maintenance" data-route="kooper-care-dashboards.html?as=maintenance">
+          <div class="pr-name"><span class="pr-avatar">TJ</span><span class="pr-title">Maintenance</span></div>
+          <div class="pr-stack" data-stack="hr|required,estate,operations"></div>
+          <div class="pr-wants">Tickets + compliance dates</div>
+          <div class="pr-arrow" aria-hidden="true">→</div>
+        </div>
+        <!-- Stakeholder side — yellow tinted -->
+        <div class="persona-row is-stakeholder" data-persona="resident" data-route="kooper-resident.html">
+          <div class="pr-name"><span class="pr-avatar">EO</span><span class="pr-title">Resident</span></div>
+          <div class="pr-stack" data-stack="resident|stakeholder"></div>
+          <div class="pr-wants">Agency over their own life</div>
+          <div class="pr-arrow" aria-hidden="true">→</div>
+        </div>
+        <div class="persona-row is-stakeholder" data-persona="family" data-route="kooper-family.html">
+          <div class="pr-name"><span class="pr-avatar">SO</span><span class="pr-title">Family</span></div>
+          <div class="pr-stack" data-stack="family|stakeholder"></div>
+          <div class="pr-wants">Daily summary · peace of mind</div>
+          <div class="pr-arrow" aria-hidden="true">→</div>
+        </div>
+        <div class="persona-row is-stakeholder" data-persona="inspector" data-route="kooper-care-dashboards.html?as=inspector">
+          <div class="pr-name"><span class="pr-avatar">TJ</span><span class="pr-title">Inspector (CQC)</span></div>
+          <div class="pr-stack" data-stack="inspector|stakeholder"></div>
+          <div class="pr-wants">Audit pack downloadable</div>
+          <div class="pr-arrow" aria-hidden="true">→</div>
+        </div>
       </div>
     </div>
 
-    <p class="text-xs text-kapture-smoke mt-6">Stacks above are defaults. Operators tune per role; managers tune per worker. Field-level RBAC controls what each persona sees inside the apps they have.</p>
+    <p class="text-xs text-kapture-smoke mt-6">Stacks above are defaults — tap any persona to enter their dashboard, or tap any chip to jump straight to that app. Operators tune per role; managers tune per worker. Field-level RBAC controls what each persona sees inside the apps they have.</p>
   </div>
 </section>
 
@@ -896,6 +984,76 @@
       if (!dest) return;
       span.style.cursor = 'pointer';
       span.addEventListener('click', function () { window.location.href = dest; });
+    });
+
+    // ============================================================
+    // PERSONA TABLE — render chips, wire row + each chip
+    // ============================================================
+    // Map module label (as written in the data-stack) → kooper · app URL.
+    // Used to build href on each .persona-chip. Falls back gracefully.
+    var STACK_URLS = {
+      'hr':              'kooper-hr.html',
+      'care plans':      'kooper-care-plans.html',
+      'clinical':        'kooper-clinical.html',
+      'charts':          'kooper-reports.html',
+      'mar':             'kooper-recording-demo.html',
+      'recording':       'kooper-recording-demo.html',
+      'risk':            'kooper-clinical.html',
+      'activities':      'kooper-care-dashboards.html?as=activities',
+      'operations':      'kooper-care-dashboards.html?as=manager',
+      'estate':          'kooper-care-dashboards.html?as=maintenance',
+      'multi-site':      'kooper-care-dashboards.html?as=owner',
+      'reports':         'kooper-reports.html',
+      'audit':           'kooper-reports.html',
+      'compliance':      'kooper-reports.html',
+      'ai':              'kooper-reports.html',
+      'gp-connect':      'kooper-clinical.html',
+      'communication':   'kooper-family.html',
+      'resident':        'kooper-resident.html',
+      'family':          'kooper-family.html',
+      'inspector':       'kooper-care-dashboards.html?as=inspector'
+    };
+
+    document.querySelectorAll('#personaTable .persona-row').forEach(function (row) {
+      // Build the chips inside .pr-stack from the data-stack csv
+      var stackHost = row.querySelector('.pr-stack');
+      var data = (stackHost.getAttribute('data-stack') || '').trim();
+      if (!data) return;
+      stackHost.innerHTML = '';
+      data.split(',').forEach(function (entry) {
+        var parts = entry.split('|');
+        var label = (parts[0] || '').trim();
+        var flag = (parts[1] || '').trim(); // 'required' | 'stakeholder' | ''
+        if (!label) return;
+        var a = document.createElement('a');
+        a.className = 'persona-chip' + (flag === 'required' ? ' is-required' : '') + (flag === 'stakeholder' ? ' is-stakeholder' : '');
+        a.href = STACK_URLS[label] || row.getAttribute('data-route') || '#';
+        a.textContent = label;
+        a.title = 'Open kooper · ' + label;
+        a.addEventListener('click', function (e) {
+          // Stop the row click from also firing
+          e.stopPropagation();
+        });
+        stackHost.appendChild(a);
+      });
+
+      // Whole row click → persona's dashboard route
+      var routeUrl = row.getAttribute('data-route');
+      if (routeUrl) {
+        row.setAttribute('tabindex', '0');
+        row.setAttribute('role', 'button');
+        row.setAttribute('aria-label', 'Sign in as ' + (row.querySelector('.pr-title') || {}).textContent);
+        row.addEventListener('click', function (e) {
+          if (e.target.closest('a, button')) return;
+          window.location.href = routeUrl;
+        });
+        row.addEventListener('keydown', function (e) {
+          if ((e.key === 'Enter' || e.key === ' ') && document.activeElement === row) {
+            e.preventDefault();
+            window.location.href = routeUrl;
+          }
+        });
+      }
     });
   });
 </script>
