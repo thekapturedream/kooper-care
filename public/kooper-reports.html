@@ -73,8 +73,24 @@
   .toast { position: fixed; bottom: 5.5rem; left: 50%; transform: translateX(-50%); background: #0A0A0A; color: #FFD400; padding: 0.75rem 1.25rem; border-radius: 10px; font-size: 0.875rem; font-weight: 500; box-shadow: 0 12px 30px -8px rgba(0,0,0,0.3); z-index: 100; opacity: 0; transition: opacity 0.2s ease; }
   .toast.on { opacity: 1; }
 
-  .ai-input { width: 100%; padding: 0.875rem 1rem 0.875rem 2.75rem; background: #FFFFFF; border: 1px solid #D4D4D4; border-radius: 14px; font-size: 0.9375rem; color: #1A1A1A; transition: all 0.15s ease; }
+  .ai-input { width: 100%; padding: 0.875rem 7.5rem 0.875rem 2.75rem; background: #FFFFFF; border: 1px solid #D4D4D4; border-radius: 14px; font-size: 0.9375rem; color: #1A1A1A; transition: all 0.15s ease; text-overflow: ellipsis; }
   .ai-input:focus { outline: none; border-color: #0A0A0A; box-shadow: 0 0 0 4px rgba(255,212,0,0.15); }
+  @media (max-width: 480px) {
+    .ai-input { padding-right: 1rem; }
+    .ai-chip-overlay { display: none !important; }
+  }
+  /* AI search results */
+  .ai-results { background: #FFFFFF; border: 1px solid #D4D4D4; border-radius: 14px; margin-top: 0.75rem; overflow: hidden; }
+  .ai-result-row { display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.875rem 1rem; border-bottom: 1px solid #ECEAE3; cursor: pointer; transition: background 0.12s ease; }
+  .ai-result-row:last-child { border-bottom: 0; }
+  .ai-result-row:hover { background: #FAFAF7; }
+  .ai-result-row .ai-result-icon { width: 28px; height: 28px; border-radius: 8px; background: #FFD400; color: #0A0A0A; display: flex; align-items: center; justify-content: center; font-family: 'JetBrains Mono', monospace; font-size: 0.625rem; font-weight: 700; flex-shrink: 0; }
+  .ai-result-row .ai-result-title { font-weight: 600; font-size: 0.875rem; color: #0A0A0A; }
+  .ai-result-row .ai-result-meta { font-size: 0.75rem; color: #6B7280; margin-top: 0.125rem; }
+  .ai-result-row .ai-result-arrow { color: #9A9A9A; font-size: 1rem; align-self: center; transition: transform 0.12s ease; }
+  .ai-result-row:hover .ai-result-arrow { color: #0A0A0A; transform: translateX(3px); }
+  .ai-result-empty { padding: 1.5rem 1rem; text-align: center; font-size: 0.8125rem; color: #6B7280; font-style: italic; }
+  .ai-result-summary { padding: 0.75rem 1rem; background: #FFFBEB; border-bottom: 1px solid #FFE39A; font-size: 0.8125rem; color: #876300; display: flex; align-items: center; gap: 0.5rem; }
 
   .pulse-dot { position: relative; width: 8px; height: 8px; border-radius: 999px; background: #10B981; flex-shrink: 0; }
   .pulse-dot::after { content: ''; position: absolute; inset: -4px; border-radius: 999px; background: #10B981; opacity: 0.4; animation: pulse-out 1.6s ease-out infinite; }
@@ -111,8 +127,8 @@
         <a href="kooper-reports.html" class="nav-link nav-link-active">Reports</a>
       </div>
       <div class="flex items-center gap-2">
-        <span class="hidden md:inline-flex chip chip-outline-light text-[0.6875rem]"><span class="pulse-dot"></span> Live · 28 Apr → 6 May</span>
-        <button onclick="kooperToast('Export — PDF / XLSX / API · pick a destination')" class="btn-yellow text-xs">Export</button>
+        <span class="hidden xl:inline-flex chip chip-outline-light text-[0.6875rem] whitespace-nowrap"><span class="pulse-dot"></span> Live · 9d window</span>
+        <button onclick="kooperToast('Export — PDF / XLSX / API · pick a destination')" class="btn-yellow text-xs whitespace-nowrap">Export</button>
         <a href="kooper-sign-in.html" class="hidden md:inline-flex p-1.5 rounded text-white/60 hover:text-white hover:bg-kapture-coal transition" title="Sign out" aria-label="Sign out">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
         </a>
@@ -157,16 +173,18 @@
 <section class="bg-white border-b border-kapture-fog py-5">
   <div class="container-r">
     <div class="relative max-w-3xl mx-auto">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" class="absolute top-1/2 left-3 -translate-y-1/2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-      <input id="aiSearch" class="ai-input" placeholder='Ask in plain English — "Show me every fall in the last 30 days" · "Why is Edward’s mood lower?"' />
-      <span class="absolute top-1/2 right-3 -translate-y-1/2 chip chip-yellow text-[0.6875rem] font-mono">AI · CLAUDE</span>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2" class="absolute top-1/2 left-3 -translate-y-1/2 pointer-events-none"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+      <input id="aiSearch" class="ai-input" placeholder='Ask in plain English — try "every fall in the last 30 days"' />
+      <span class="ai-chip-overlay absolute top-1/2 right-3 -translate-y-1/2 chip chip-yellow text-[0.6875rem] font-mono pointer-events-none whitespace-nowrap">AI · CLAUDE</span>
     </div>
+    <!-- AI search results — hidden by default, populated on submit -->
+    <div id="aiResults" class="max-w-3xl mx-auto ai-results" style="display:none"></div>
     <div class="mt-3 flex flex-wrap items-center gap-2 justify-center">
       <span class="text-xs text-kapture-smoke">Try:</span>
-      <button onclick="askQ('Show me every fall in the last 30 days')" class="chip text-[0.6875rem]">every fall · 30 days</button>
-      <button onclick="askQ('Which residents have a NEWS2 above 3 today?')" class="chip text-[0.6875rem]">NEWS2 &gt; 3 today</button>
-      <button onclick="askQ('Where are we behind on care plan reviews?')" class="chip text-[0.6875rem]">overdue plan reviews</button>
-      <button onclick="askQ('Send Sarah a daily summary for Edward')" class="chip text-[0.6875rem]">family summary · Edward</button>
+      <button onclick="askQ('every fall in the last 30 days')" class="chip text-[0.6875rem]">every fall · 30 days</button>
+      <button onclick="askQ('NEWS2 above 3 today')" class="chip text-[0.6875rem]">NEWS2 &gt; 3 today</button>
+      <button onclick="askQ('overdue plan reviews')" class="chip text-[0.6875rem]">overdue plan reviews</button>
+      <button onclick="askQ('family summary for Edward')" class="chip text-[0.6875rem]">family summary · Edward</button>
     </div>
   </div>
 </section>
@@ -401,15 +419,117 @@ function pickAudience(el, key){
   kooperToast(m.label + ' loaded · ' + m.deck);
 }
 
+// ============================================================
+// AI search — pattern-matches the query against report tiles
+// and renders matched tiles with a Claude-style summary line.
+// Keywords map to the report tile titles + categories.
+// ============================================================
+const AI_KEYWORDS = {
+  'fall':       { match: ['fall','falls'],            domain:'safe',       summary:'3 falls in 30 days. 1 incident on 2 May (Mr H, sundowning), 2 near-misses on 28 Apr and 4 May. No injuries.' },
+  'news2':      { match: ['news2','news 2'],          domain:'responsive', summary:'Highest current NEWS2 is 5 (Mr H, Room 7) — escalation triggered, GP review pending. 2 residents on weekly NEWS2 watch.' },
+  'overdue':    { match: ['overdue','plan review','behind'], domain:'well-led', summary:'5 care plan reviews overdue · Edward (mental state, 17 May), Catherine (nutrition, 12 May), 3 others approaching deadline.' },
+  'family':     { match: ['family summary','edward','daily summary'], domain:'caring', summary:'Daily summary drafted for Edward — bright mood, joined Music & Memory, all meds taken. Ready to send to Sarah.' },
+  'med':        { match: ['med','mar','medication','drug'], domain:'effective', summary:'Med adherence 99.2% over 30 days. 3 PRN events flagged, all within protocol. 1 refusal (Mr R, antihypertensive) — escalated to GP.' },
+  'wound':      { match: ['wound','pressure','dressing','sskin'], domain:'safe', summary:'2 active wounds — Mrs Cross sacrum (Stage 2, healing), Mr Rossi heel (Stage 1). SSKIN scores trending up. No new pressure damage.' },
+  'mood':       { match: ['mood','wellbeing','depression'], domain:'caring', summary:'Mood patterns stable across 28 residents. 2 on watch (Mr R sundowning, Mrs C anxiety). Music interventions reducing distress events by 38%.' },
+  'incident':   { match: ['incident','near miss','accident'], domain:'safe', summary:'4 incidents in 30 days · 1 fall, 2 near-misses, 1 medication refusal. All signed off. Bradford Falls update queued.' },
+  'training':   { match: ['training','currency','dbs','rtw'], domain:'well-led', summary:'15/15 staff currently compliant. Fire alarm test due in 4 days. PAT testing scheduled 23 Jul. All RTW + DBS up to date.' },
+  'compliance': { match: ['compliance','cqc','saf'], domain:'well-led', summary:'CQC SAF readiness 99% · Safe 98 · Effective 100 · Caring 100 · Responsive 96 · Well-led 100. Inspector pack ready to compile.' }
+};
+
+function findAIMatches(rawQuery) {
+  const q = (rawQuery || '').toLowerCase().trim();
+  if (!q) return null;
+
+  // Match keywords against the query
+  let matchedKey = null;
+  for (const [key, cfg] of Object.entries(AI_KEYWORDS)) {
+    if (cfg.match.some(term => q.includes(term))) { matchedKey = key; break; }
+  }
+
+  // Filter visible report tiles by domain (or fall through to text match)
+  const tiles = Array.from(document.querySelectorAll('.report-tile'));
+  let matched = [];
+  if (matchedKey) {
+    const cfg = AI_KEYWORDS[matchedKey];
+    matched = tiles.filter(t => {
+      const k = (t.querySelector('.ed-kicker')?.textContent || '').trim().toLowerCase();
+      return k === cfg.domain;
+    });
+  }
+  // Fall back to substring text match
+  if (!matched.length) {
+    matched = tiles.filter(t => (t.textContent || '').toLowerCase().includes(q));
+  }
+  return {
+    summary: matchedKey ? AI_KEYWORDS[matchedKey].summary : null,
+    tiles: matched.slice(0, 5),
+    queryText: rawQuery.trim()
+  };
+}
+
+function renderAIResults(rawQuery) {
+  const host = document.getElementById('aiResults');
+  if (!rawQuery || !rawQuery.trim()) {
+    host.style.display = 'none';
+    host.innerHTML = '';
+    return;
+  }
+  const result = findAIMatches(rawQuery);
+  host.style.display = 'block';
+  let html = '';
+  if (result.summary) {
+    html += '<div class="ai-result-summary">' +
+            '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12"/><circle cx="12" cy="16" r="0.8" fill="currentColor"/></svg>' +
+            '<span><strong>Claude says:</strong> ' + result.summary + '</span>' +
+            '</div>';
+  }
+  if (result.tiles.length) {
+    result.tiles.forEach(tile => {
+      const kicker = (tile.querySelector('.ed-kicker')?.textContent || '').trim();
+      const title = (tile.querySelector('.stat-big, .font-display, h3')?.textContent || '').trim().slice(0, 60);
+      const meta = (tile.querySelector('.font-serif')?.textContent || tile.querySelector('p')?.textContent || '').trim().slice(0, 80);
+      html += '<div class="ai-result-row" data-target="' + (tile.id || '') + '" onclick="scrollToReport(this)">' +
+              '<span class="ai-result-icon">' + (kicker ? kicker.slice(0,1).toUpperCase() : '⊕') + '</span>' +
+              '<div style="flex:1;min-width:0">' +
+                '<div class="ai-result-title">' + (title || kicker || 'Report') + '</div>' +
+                '<div class="ai-result-meta">' + (kicker ? kicker + ' · ' : '') + meta + '</div>' +
+              '</div>' +
+              '<span class="ai-result-arrow">→</span>' +
+              '</div>';
+    });
+  } else if (!result.summary) {
+    html += '<div class="ai-result-empty">No matching reports for "' + rawQuery + '". Try a keyword like falls, news2, meds, or compliance.</div>';
+  }
+  host.innerHTML = html;
+  // Wire each row by walking back up to the actual tile DOM ref
+  Array.from(host.querySelectorAll('.ai-result-row')).forEach((row, i) => {
+    const tile = result.tiles[i];
+    if (!tile) return;
+    row.addEventListener('click', function () {
+      tile.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      tile.style.transition = 'box-shadow 0.4s ease';
+      tile.style.boxShadow = '0 0 0 3px rgba(255,212,0,0.6)';
+      setTimeout(() => { tile.style.boxShadow = ''; }, 1400);
+    });
+  });
+}
+
 function askQ(q){
-  document.getElementById('aiSearch').value = q;
-  kooperToast('Claude is generating: ' + q);
+  const input = document.getElementById('aiSearch');
+  input.value = q;
+  renderAIResults(q);
 }
 document.getElementById('aiSearch').addEventListener('keydown', function(e){
   if (e.key === 'Enter' && this.value.trim()) {
-    kooperToast('Claude is generating: ' + this.value.trim());
+    e.preventDefault();
+    renderAIResults(this.value.trim());
+  } else if (e.key === 'Escape') {
+    this.value = '';
+    renderAIResults('');
   }
 });
+function scrollToReport(){ /* handled inline by the listener bound after render */ }
 
 // ============================================================
 // Activate every .report-tile (the 15 individual report cards)
