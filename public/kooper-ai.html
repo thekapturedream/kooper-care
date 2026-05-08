@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>kooper · ai — the second brain for every shift</title>
+<meta name="description" content="kooper · ai turns voice into narrative, spots patterns before they become incidents, drafts CQC-ready summaries, and gives families plain-English digests. Powered by Claude. Audit-logged. Privacy-first." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = { theme: { extend: { colors: { kapture: { black:'#0A0A0A',ink:'#111111',coal:'#1A1A1A',ash:'#2A2A2A',smoke:'#3A3A3A',mist:'#9A9A9A',fog:'#D4D4D4',paper:'#F5F5F5',white:'#FFFFFF',yellow:'#FFD400',amber:'#F5B400'}, status:{critical:'#E5484D',warning:'#FFD400',ok:'#10B981',neutral:'#D4D4D4'}}, fontFamily:{display:['Space Grotesk','sans-serif'],sans:['Inter','sans-serif'],mono:['JetBrains Mono','monospace'],serif:['Source Serif 4','serif']}}}};
+</script>
+<style>
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Inter', sans-serif; background: #FAFAF7; color: #0A0A0A; -webkit-font-smoothing: antialiased; }
+  .font-display { font-family: 'Space Grotesk', sans-serif; }
+  .font-mono { font-family: 'JetBrains Mono', monospace; }
+  .font-serif { font-family: 'Source Serif 4', serif; }
+
+  .container-r { max-width: 1280px; margin: 0 auto; padding: 0 1rem; }
+  @media (min-width: 640px) { .container-r { padding: 0 1.5rem; } }
+  @media (min-width: 1024px) { .container-r { padding: 0 2rem; } }
+
+  /* Buttons */
+  .btn-primary { background: #0A0A0A; color: #FFFFFF; border: 1px solid #0A0A0A; padding: 0.625rem 1.125rem; border-radius: 10px; font-weight: 500; transition: all 0.15s ease; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; white-space: nowrap; }
+  .btn-primary:hover { background: transparent; color: #0A0A0A; }
+  .btn-yellow { background: #FFD400; color: #0A0A0A; border: 1px solid #FFD400; padding: 0.625rem 1.125rem; border-radius: 10px; font-weight: 600; transition: all 0.15s ease; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; white-space: nowrap; }
+  .btn-yellow:hover { background: #F5B400; }
+  .btn-secondary-on-dark { background: transparent; color: #FFFFFF; border: 1px solid #FFFFFF; padding: 0.625rem 1.125rem; border-radius: 10px; font-weight: 500; transition: all 0.15s ease; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; white-space: nowrap; }
+  .btn-secondary-on-dark:hover { background: #FFFFFF; color: #0A0A0A; }
+
+  /* Chips */
+  .chip { display: inline-flex; align-items: center; gap: 0.375rem; padding: 0.25rem 0.625rem; border-radius: 999px; font-size: 0.75rem; font-weight: 500; line-height: 1; background: #F5F5F5; color: #2A2A2A; border: 1px solid #D4D4D4; }
+  .chip-yellow { background: #FFD400; color: #0A0A0A; border-color: #FFD400; }
+  .chip-dark { background: #0A0A0A; color: #FFFFFF; border-color: #0A0A0A; }
+  .chip-outline-light { background: transparent; color: #FFFFFF; border-color: rgba(255,255,255,0.25); }
+  .chip-ok { background: rgba(16,185,129,0.1); color: #047857; border-color: rgba(16,185,129,0.25); }
+
+  /* Nav */
+  .nav-link { padding: 0.5rem 0.75rem; font-size: 0.875rem; font-weight: 500; color: rgba(255,255,255,0.75); border-radius: 8px; transition: all 0.15s ease; text-decoration: none; }
+  .nav-link:hover { color: #FFFFFF; background: #1A1A1A; }
+  .nav-link-active { background: #1A1A1A; color: #FFD400; }
+
+  /* Editorial type */
+  .ed-kicker { font-family: 'JetBrains Mono', monospace; font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #876300; display: inline-flex; align-items: center; gap: 0.5rem; }
+  .ed-kicker::before { content: ''; width: 18px; height: 2px; background: #FFD400; display: inline-block; }
+  .ed-kicker.on-dark { color: #FFD400; }
+  .h-section { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: clamp(1.5rem, 2.4vw, 2rem); line-height: 1.1; letter-spacing: -0.015em; }
+  .h-hero { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: clamp(2.25rem, 4.5vw, 3.5rem); line-height: 1.05; letter-spacing: -0.02em; }
+  .lede-serif { font-family: 'Source Serif 4', serif; line-height: 1.55; }
+  .lede { font-family: 'Source Serif 4', serif; color: #3A3A3A; font-size: clamp(1.0625rem, 1.4vw, 1.1875rem); line-height: 1.6; }
+
+  /* Hero pulse + ticker */
+  .pulse-dot { position: relative; width: 8px; height: 8px; border-radius: 999px; background: #10B981; flex-shrink: 0; }
+  .pulse-dot::after { content: ''; position: absolute; inset: -4px; border-radius: 999px; background: #10B981; opacity: 0.4; animation: pulse-out 1.6s ease-out infinite; }
+  @keyframes pulse-out { 0% { transform: scale(0.6); opacity: 0.6; } 100% { transform: scale(1.8); opacity: 0; } }
+
+  /* Conversation card */
+  .conv-card { background: #FFFFFF; border: 1px solid #ECEAE3; border-radius: 18px; overflow: hidden; box-shadow: 0 18px 40px -20px rgba(0,0,0,0.12); }
+  .conv-head { padding: 1rem 1.25rem; border-bottom: 1px solid #ECEAE3; background: #FAFAF7; display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; }
+  .conv-stream { padding: 1rem 1.25rem; min-height: 320px; max-height: 460px; overflow-y: auto; }
+  .conv-msg { display: flex; gap: 0.75rem; margin-bottom: 1rem; }
+  .conv-msg.me { flex-direction: row-reverse; }
+  .conv-avatar { width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-family: 'Space Grotesk'; font-weight: 600; font-size: 0.75rem; }
+  .conv-avatar.ai { background: #FFD400; color: #0A0A0A; }
+  .conv-avatar.me { background: #0A0A0A; color: #FFFFFF; }
+  .conv-bubble { background: #F5F5F5; border-radius: 14px; padding: 0.75rem 0.9375rem; max-width: 80%; font-size: 0.875rem; line-height: 1.5; color: #1A1A1A; }
+  .conv-msg.me .conv-bubble { background: #0A0A0A; color: #FFFFFF; }
+  .conv-bubble strong { color: #0A0A0A; font-weight: 600; }
+  .conv-msg.me .conv-bubble strong { color: #FFD400; }
+  .conv-cite { display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.0625rem 0.375rem; border-radius: 4px; background: rgba(255,212,0,0.18); color: #876300; font-family: 'JetBrains Mono', monospace; font-size: 0.625rem; font-weight: 600; margin: 0 0.125rem; vertical-align: middle; cursor: pointer; }
+  .conv-cite:hover { background: #FFD400; color: #0A0A0A; }
+  .conv-foot { padding: 0.75rem 1rem; border-top: 1px solid #ECEAE3; background: #FFFFFF; }
+  .conv-input-row { display: flex; gap: 0.5rem; align-items: center; }
+  .conv-input { flex: 1; border: 1px solid #D4D4D4; border-radius: 12px; padding: 0.625rem 0.875rem; font-size: 0.875rem; min-width: 0; }
+  .conv-input:focus { outline: none; border-color: #0A0A0A; box-shadow: 0 0 0 3px rgba(255,212,0,0.18); }
+  .conv-suggestions { display: flex; flex-wrap: wrap; gap: 0.375rem; padding: 0.625rem 1rem 0; background: #FFFFFF; }
+  .conv-suggestion { padding: 0.3125rem 0.625rem; border-radius: 8px; background: #F5F5F5; color: #2A2A2A; font-size: 0.6875rem; font-weight: 500; cursor: pointer; transition: all 0.12s ease; border: 0; font-family: 'Inter', sans-serif; }
+  .conv-suggestion:hover { background: #FFD400; color: #0A0A0A; }
+  .typing-dots { display: inline-flex; gap: 3px; padding: 0.5rem 0.75rem; }
+  .typing-dots span { width: 6px; height: 6px; border-radius: 50%; background: #9A9A9A; animation: typing 1.2s ease-in-out infinite; }
+  .typing-dots span:nth-child(2) { animation-delay: 0.18s; }
+  .typing-dots span:nth-child(3) { animation-delay: 0.36s; }
+  @keyframes typing { 0%, 60%, 100% { opacity: 0.3; transform: translateY(0); } 30% { opacity: 1; transform: translateY(-3px); } }
+
+  /* Activity feed */
+  .activity-row { display: flex; gap: 0.75rem; padding: 0.875rem 1rem; border-bottom: 1px solid #ECEAE3; cursor: pointer; transition: background 0.12s ease; }
+  .activity-row:last-child { border-bottom: 0; }
+  .activity-row:hover { background: #FAFAF7; }
+  .activity-row .a-time { font-family: 'JetBrains Mono', monospace; font-size: 0.6875rem; color: #6B7280; flex-shrink: 0; min-width: 56px; padding-top: 0.125rem; }
+  .activity-row .a-icon { width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-family: 'JetBrains Mono', monospace; font-size: 0.625rem; font-weight: 700; }
+  .activity-row .a-icon.draft { background: #FFD400; color: #0A0A0A; }
+  .activity-row .a-icon.flag { background: #E5484D; color: #FFFFFF; }
+  .activity-row .a-icon.spot { background: #A5B4FC; color: #0A0A0A; }
+  .activity-row .a-icon.send { background: #10B981; color: #FFFFFF; }
+  .activity-row .a-icon.audit { background: #0A0A0A; color: #FFD400; }
+  .activity-row .a-text { flex: 1; min-width: 0; font-size: 0.8125rem; line-height: 1.4; color: #1A1A1A; }
+  .activity-row .a-text strong { color: #0A0A0A; font-weight: 600; }
+  .activity-row .a-meta { font-size: 0.6875rem; color: #6B7280; margin-top: 0.125rem; font-style: italic; }
+
+  /* Capability cards */
+  .cap-card { background: #FFFFFF; border: 1px solid #ECEAE3; border-radius: 16px; padding: 1.25rem; transition: all 0.18s ease; cursor: pointer; }
+  .cap-card:hover { border-color: #0A0A0A; transform: translateY(-2px); box-shadow: 0 14px 32px -16px rgba(0,0,0,0.16); }
+  .cap-icon { width: 38px; height: 38px; border-radius: 10px; background: #FFD400; color: #0A0A0A; display: flex; align-items: center; justify-content: center; margin-bottom: 0.875rem; }
+  .cap-card.dark { background: #0A0A0A; color: #FFFFFF; border-color: #0A0A0A; }
+  .cap-card.dark .cap-icon { background: #FFD400; }
+  .cap-card.dark p { color: rgba(212,212,212,0.85); }
+
+  /* Trust panel */
+  .trust-toggle { display: flex; align-items: center; justify-content: space-between; padding: 0.875rem 0; border-bottom: 1px solid #ECEAE3; gap: 1rem; }
+  .trust-toggle:last-child { border-bottom: 0; }
+  .trust-toggle .t-label { font-size: 0.875rem; font-weight: 500; color: #0A0A0A; }
+  .trust-toggle .t-sub { font-size: 0.75rem; color: #6B7280; margin-top: 0.125rem; }
+  .switch { width: 38px; height: 22px; background: #D4D4D4; border-radius: 999px; position: relative; cursor: pointer; transition: background 0.15s ease; flex-shrink: 0; }
+  .switch::after { content: ''; position: absolute; top: 2px; left: 2px; width: 18px; height: 18px; background: #FFFFFF; border-radius: 50%; transition: transform 0.18s ease; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+  .switch.on { background: #0A0A0A; }
+  .switch.on::after { transform: translateX(16px); background: #FFD400; }
+
+  /* Stat cards */
+  .stat-card { background: #FFFFFF; border: 1px solid #ECEAE3; border-radius: 14px; padding: 1.125rem; }
+  .stat-num { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 2.25rem; line-height: 1.05; letter-spacing: -0.015em; color: #0A0A0A; }
+  .stat-card.dark { background: #0A0A0A; color: #FFFFFF; border-color: #0A0A0A; }
+  .stat-card.dark .stat-num { color: #FFD400; }
+
+  /* Toast */
+  .toast { position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%); background: #0A0A0A; color: #FFD400; padding: 0.75rem 1.25rem; border-radius: 10px; font-size: 0.875rem; font-weight: 500; box-shadow: 0 12px 30px -8px rgba(0,0,0,0.3); z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.2s ease; max-width: 90vw; text-align: center; }
+  .toast.on { opacity: 1; }
+
+  /* Cmd palette */
+  .cmd-key { font-family: 'JetBrains Mono', monospace; font-size: 0.6875rem; padding: 0.0625rem 0.375rem; border-radius: 4px; background: rgba(255,255,255,0.1); color: #FFFFFF; border: 1px solid rgba(255,255,255,0.18); }
+</style>
+</head>
+<body>
+
+<!-- ============================================== -->
+<!-- TOP NAV                                          -->
+<!-- ============================================== -->
+<nav class="bg-kapture-black text-white sticky top-0 z-40">
+  <div class="container-r">
+    <div class="flex items-center justify-between h-16 gap-4">
+      <a href="kooper-care-landing.html" class="flex items-center gap-3" title="Back to landing">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="28" height="28" fill="none" aria-label="kooper" role="img" class="text-white"><path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" d="M255.75 133.125c67.679 0 122.625 54.946 122.625 122.625S323.429 378.375 255.75 378.375 133.125 323.429 133.125 255.75s54.946-122.625 122.625-122.625m0-132.75c18.832 0 34.121 15.289 34.121 34.121s-15.289 34.121-34.121 34.121-34.121-15.289-34.121-34.121S236.918.375 255.75.375M75.173 75.173c13.316-13.316 34.938-13.316 48.254 0s13.316 34.938 0 48.254-34.938 13.316-48.254 0-13.316-34.938 0-48.254M511.125 255.75c0 18.832-15.289 34.121-34.121 34.121s-34.121-15.289-34.121-34.121 15.289-34.121 34.121-34.121 34.121 15.289 34.121 34.121M255.75 442.883c18.832 0 34.121 15.289 34.121 34.121s-15.289 34.121-34.121 34.121-34.121-15.289-34.121-34.121 15.289-34.121 34.121-34.121m132.323-54.81c13.316-13.316 34.938-13.316 48.254 0s13.316 34.938 0 48.254-34.938 13.316-48.254 0-13.316-34.938 0-48.254M68.617 255.75c0 18.832-15.289 34.121-34.121 34.121S.375 274.582.375 255.75s15.289-34.121 34.121-34.121 34.121 15.289 34.121 34.121m54.81 132.323c13.316 13.316 13.316 34.938 0 48.254s-34.938 13.316-48.254 0-13.316-34.938 0-48.254 34.938-13.316 48.254 0"/><path fill="#FFD400" fill-rule="evenodd" clip-rule="evenodd" d="M436.327 75.173c13.316 13.316 13.316 34.938 0 48.254s-34.938 13.316-48.254 0-13.316-34.938 0-48.254 34.938-13.316 48.254 0"/></svg>
+        <span class="hidden sm:flex items-center gap-2 font-display lowercase tracking-wide text-base">
+          <span class="font-semibold">kooper</span><span class="text-white/40">·</span><span class="font-medium">ai</span>
+        </span>
+      </a>
+      <div class="hidden lg:flex items-center gap-1">
+        <a href="kooper-care-landing.html" class="nav-link">Home</a>
+        <a href="kooper-care-dashboards.html" class="nav-link">Dashboard</a>
+        <a href="kooper-care-plans.html" class="nav-link">Care plans</a>
+        <a href="kooper-clinical.html" class="nav-link">Clinical</a>
+        <a href="kooper-recording-demo.html" class="nav-link">Recording</a>
+        <a href="kooper-reports.html" class="nav-link">Reports</a>
+        <a href="kooper-ai.html" class="nav-link nav-link-active">ai</a>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="hidden xl:inline-flex chip chip-outline-light text-[0.6875rem] whitespace-nowrap"><span class="pulse-dot"></span> Claude · Sonnet 4.6</span>
+        <button onclick="kooperToast('Cmd+K opens AI everywhere')" class="hidden md:inline-flex items-center gap-1 px-2.5 py-1.5 bg-kapture-coal text-white/80 rounded-md text-xs hover:bg-kapture-ash">
+          <span>Ask</span><span class="cmd-key">⌘K</span>
+        </button>
+        <a href="kooper-sign-in.html" class="hidden md:inline-flex p-1.5 rounded text-white/60 hover:text-white hover:bg-kapture-coal" title="Sign out" aria-label="Sign out">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ============================================== -->
+<!-- HERO                                             -->
+<!-- ============================================== -->
+<section class="bg-kapture-black text-white relative overflow-hidden">
+  <div class="absolute -right-40 -top-40 w-[500px] h-[500px] rounded-full bg-kapture-yellow/15 blur-3xl pointer-events-none"></div>
+  <div class="absolute -left-32 bottom-0 w-[420px] h-[420px] rounded-full bg-kapture-yellow/8 blur-3xl pointer-events-none"></div>
+  <div class="container-r relative py-12 lg:py-16">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+
+      <div class="lg:col-span-7">
+        <div class="ed-kicker on-dark mb-3">KOOPER · AI</div>
+        <h1 class="h-hero text-white mb-4">
+          The second brain for every shift.
+        </h1>
+        <p class="lede-serif text-white/75 text-lg lg:text-xl italic max-w-2xl mb-7">
+          Voice becomes narrative in 14 seconds. Patterns surface before they become incidents. Family digests draft themselves. Audit trails write themselves. Every other kooper app gets smarter when this one's on.
+        </p>
+        <div class="flex flex-wrap gap-3 items-center mb-7">
+          <button onclick="document.getElementById('aiInput').focus()" class="btn-yellow">
+            Ask kooper · ai
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+          </button>
+          <a href="#activity" class="btn-secondary-on-dark">See what AI just did</a>
+        </div>
+        <!-- Live ticker -->
+        <div class="flex flex-wrap gap-3 lg:gap-5 text-xs text-white/65">
+          <span class="flex items-center gap-2"><span class="pulse-dot"></span><span class="font-mono text-white" id="tk-drafts">42</span> drafts in flight</span>
+          <span class="flex items-center gap-2"><span class="font-mono text-white" id="tk-classifications">218</span> classifications today</span>
+          <span class="flex items-center gap-2"><span class="font-mono text-white" id="tk-patterns">3</span> patterns flagged this shift</span>
+          <span class="flex items-center gap-2"><span class="font-mono text-white">14s</span> avg confirm time</span>
+        </div>
+      </div>
+
+      <div class="lg:col-span-5">
+        <!-- Why kooper · ai is different — proof card -->
+        <div class="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-5">
+          <div class="flex items-center justify-between mb-3">
+            <div class="text-[0.6875rem] uppercase tracking-widest text-kapture-yellow font-mono">CONTEXT WINDOW</div>
+            <div class="text-[0.6875rem] text-white/50 font-mono">UPDATED · LIVE</div>
+          </div>
+          <div class="space-y-2.5 text-sm">
+            <div class="flex items-start gap-2"><span class="text-kapture-yellow mt-0.5">→</span><span class="text-white/85">Reads <strong class="text-white">every recording event</strong> across hr, recording, mar, charts, clinical, care plans</span></div>
+            <div class="flex items-start gap-2"><span class="text-kapture-yellow mt-0.5">→</span><span class="text-white/85">Knows the <strong class="text-white">care plan baseline</strong> for every resident — flags deviations live</span></div>
+            <div class="flex items-start gap-2"><span class="text-kapture-yellow mt-0.5">→</span><span class="text-white/85">Sees <strong class="text-white">redacted history</strong> only when explicitly granted — every expansion is audit-logged</span></div>
+            <div class="flex items-start gap-2"><span class="text-kapture-yellow mt-0.5">→</span><span class="text-white/85">Generates evidence <strong class="text-white">tagged to the right SAF quality statement</strong>, ready for inspector pack</span></div>
+          </div>
+          <div class="mt-4 pt-4 border-t border-white/10 grid grid-cols-3 gap-2 text-xs">
+            <div><div class="text-white/45 font-mono">Model</div><div class="font-mono font-semibold text-white">Sonnet 4.6</div></div>
+            <div><div class="text-white/45 font-mono">Hosting</div><div class="font-mono font-semibold text-white">UK · Govt</div></div>
+            <div><div class="text-white/45 font-mono">DSPT</div><div class="font-mono font-semibold text-white">Certified</div></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================== -->
+<!-- LIVE CONVERSATION                                -->
+<!-- ============================================== -->
+<section class="bg-kapture-paper py-16 lg:py-20 border-b border-kapture-fog">
+  <div class="container-r">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+
+      <div class="lg:col-span-4">
+        <div class="ed-kicker mb-3">CONVERSATION</div>
+        <h2 class="h-section">Ask anything across the house.</h2>
+        <p class="lede mt-4 max-w-md">Plain English in. Cited evidence out. Every answer traces back to source events you can verify. No hallucination. No fabrication. If kooper · ai doesn't know, it says so.</p>
+        <div class="mt-5 space-y-2 text-sm text-kapture-smoke">
+          <div class="flex items-start gap-2"><span class="text-kapture-coal font-bold mt-0.5">·</span>Cross-resident queries (who, when, what)</div>
+          <div class="flex items-start gap-2"><span class="text-kapture-coal font-bold mt-0.5">·</span>Pattern questions (why, how often, since when)</div>
+          <div class="flex items-start gap-2"><span class="text-kapture-coal font-bold mt-0.5">·</span>Predictive (who's at risk tonight, what to watch)</div>
+          <div class="flex items-start gap-2"><span class="text-kapture-coal font-bold mt-0.5">·</span>Drafting (incident report, family digest, handover note)</div>
+        </div>
+      </div>
+
+      <div class="lg:col-span-8">
+        <div class="conv-card">
+          <div class="conv-head">
+            <div class="flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-full bg-kapture-yellow flex items-center justify-center">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0A0A0A" stroke-width="2.5"><path d="M12 2 L14 8 L20 8 L15 12 L17 18 L12 14 L7 18 L9 12 L4 8 L10 8 Z"/></svg>
+              </div>
+              <div>
+                <div class="font-semibold text-sm">kooper · ai</div>
+                <div class="text-[0.6875rem] text-kapture-smoke font-mono flex items-center gap-1.5"><span class="pulse-dot"></span> reading 847 events from this 9-day window</div>
+              </div>
+            </div>
+            <button onclick="resetConversation()" class="text-[0.6875rem] text-kapture-smoke hover:text-kapture-black font-mono uppercase tracking-wider">Reset</button>
+          </div>
+
+          <div id="convStream" class="conv-stream"></div>
+
+          <div class="conv-suggestions" id="convSuggestions"></div>
+
+          <div class="conv-foot">
+            <form onsubmit="submitConv(event)" class="conv-input-row">
+              <input id="aiInput" class="conv-input" placeholder="Ask anything — try 'who's at risk tonight'" autocomplete="off" />
+              <button type="submit" class="btn-yellow text-xs">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                Send
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================== -->
+<!-- ACTIVITY FEED                                    -->
+<!-- ============================================== -->
+<section id="activity" class="py-16 lg:py-20 border-b border-kapture-fog">
+  <div class="container-r">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+
+      <div class="lg:col-span-5">
+        <div class="ed-kicker mb-3">LIVE ACTIVITY</div>
+        <h2 class="h-section">Every move kooper · ai makes is on the record.</h2>
+        <p class="lede mt-4 max-w-md">No black box. Every draft, every classification, every pattern flagged appears in this feed. Tap any row to see the source events, the prompt, and the confidence score.</p>
+        <div class="mt-6 grid grid-cols-2 gap-3">
+          <div class="stat-card">
+            <div class="text-xs uppercase tracking-wider text-kapture-mist font-medium">Drafts today</div>
+            <div class="stat-num mt-1">142</div>
+            <div class="text-xs text-status-ok mt-1">+12% vs yesterday</div>
+          </div>
+          <div class="stat-card">
+            <div class="text-xs uppercase tracking-wider text-kapture-mist font-medium">Confirmed</div>
+            <div class="stat-num mt-1">98%</div>
+            <div class="text-xs text-kapture-smoke mt-1">14s avg confirm</div>
+          </div>
+          <div class="stat-card dark">
+            <div class="text-xs uppercase tracking-wider text-kapture-yellow font-medium">Patterns flagged</div>
+            <div class="stat-num mt-1">3</div>
+            <div class="text-xs text-white/60 mt-1">Mr R · sundowning · 4d streak</div>
+          </div>
+          <div class="stat-card">
+            <div class="text-xs uppercase tracking-wider text-kapture-mist font-medium">Edits requested</div>
+            <div class="stat-num mt-1">3</div>
+            <div class="text-xs text-kapture-smoke mt-1">2% of drafts · low rate</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lg:col-span-7">
+        <div class="rounded-2xl border border-[#ECEAE3] bg-white overflow-hidden">
+          <div class="px-4 py-3 border-b border-[#ECEAE3] flex items-center justify-between bg-kapture-paper">
+            <div class="flex items-center gap-2">
+              <span class="font-mono text-[0.6875rem] uppercase tracking-widest text-kapture-smoke">Recent · last 60 minutes</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <button class="chip text-[0.6875rem]" data-feed-filter="all" onclick="filterFeed(this,'all')">All</button>
+              <button class="chip text-[0.6875rem]" data-feed-filter="draft" onclick="filterFeed(this,'draft')">Drafts</button>
+              <button class="chip text-[0.6875rem]" data-feed-filter="flag" onclick="filterFeed(this,'flag')">Flags</button>
+              <button class="chip text-[0.6875rem]" data-feed-filter="spot" onclick="filterFeed(this,'spot')">Patterns</button>
+            </div>
+          </div>
+          <div id="activityFeed">
+            <div class="activity-row" data-type="draft" onclick="kooperToast('Welfare check draft · Edward · 14:32 · 0.96 confidence')">
+              <span class="a-time">16:48</span>
+              <span class="a-icon draft">DRAFT</span>
+              <div class="flex-1">
+                <div class="a-text">Drafted welfare check for <strong>Edward Banda</strong> from carer Craig's voice note. Linked to mental state plan v4.</div>
+                <div class="a-meta">confidence 0.96 · awaiting carer confirm · <span class="font-mono">14s</span> draft time</div>
+              </div>
+            </div>
+            <div class="activity-row" data-type="spot" onclick="kooperToast('Pattern · Mr R sundowning · 4-day streak · suggested intervention')">
+              <span class="a-time">16:32</span>
+              <span class="a-icon spot">SPOT</span>
+              <div class="flex-1">
+                <div class="a-text">Pattern detected · <strong>Mr R</strong> agitation cluster 16:30–18:00, 4 days in a row. Music + tea intervention working — recommend extending afternoon activity slot.</div>
+                <div class="a-meta">cross-app synthesis · behaviour + activities + recording · flagged to clinical lead</div>
+              </div>
+            </div>
+            <div class="activity-row" data-type="flag" onclick="kooperToast('Critical flag · Mrs Cross NEWS2 5 · escalated to GP at 16:05')">
+              <span class="a-time">16:05</span>
+              <span class="a-icon flag">FLAG</span>
+              <div class="flex-1">
+                <div class="a-text">Escalation triggered · <strong>Mrs Cross</strong> NEWS2 reading 5. Auto-paged GP, on-call notified, family contact queued.</div>
+                <div class="a-meta">policy match · NEWS2 ≥ 5 · response time 12s</div>
+              </div>
+            </div>
+            <div class="activity-row" data-type="send" onclick="kooperToast('22 family digests sent · 6 awaiting carer confirm')">
+              <span class="a-time">15:00</span>
+              <span class="a-icon send">SEND</span>
+              <div class="flex-1">
+                <div class="a-text">Sent <strong>22 family daily digests</strong> · plain English, mood, meals, activities, no clinical detail. 6 still awaiting carer confirm before send.</div>
+                <div class="a-meta">privacy boundary respected · zero clinical leakage</div>
+              </div>
+            </div>
+            <div class="activity-row" data-type="draft" onclick="kooperToast('SAF evidence pack drafted · 18 pages · ready for review')">
+              <span class="a-time">14:48</span>
+              <span class="a-icon draft">DRAFT</span>
+              <div class="flex-1">
+                <div class="a-text">Drafted CQC inspector evidence pack — 18 pages, every event mapped to a SAF quality statement, watermarked, audit-hashed.</div>
+                <div class="a-meta">requested by Lola Okonkwo · ready for review</div>
+              </div>
+            </div>
+            <div class="activity-row" data-type="audit" onclick="kooperToast('Audit · expansion · Sister Anne · clinical_summary/Yanir')">
+              <span class="a-time">14:32</span>
+              <span class="a-icon audit">LOG</span>
+              <div class="flex-1">
+                <div class="a-text">Audit log · <strong>Sister Anne</strong> expanded redacted clinical_summary for Yanir Ashkenazi. Reason captured. Permanent record.</div>
+                <div class="a-meta">RBAC verified · expansion requires clinical role + reason</div>
+              </div>
+            </div>
+            <div class="activity-row" data-type="spot" onclick="kooperToast('Stock prediction · pads running low · auto-reorder Friday')">
+              <span class="a-time">14:18</span>
+              <span class="a-icon spot">SPOT</span>
+              <div class="flex-1">
+                <div class="a-text">Forecast · incontinence pad supply trending toward shortage at <strong>Draycott</strong>. Auto-reorder triggers in 2 days · £840 forecast cost.</div>
+                <div class="a-meta">cross-app · stock + recording · supply chain learns from usage</div>
+              </div>
+            </div>
+            <div class="activity-row" data-type="flag" onclick="kooperToast('Care plan deviation · Mr R mobility · reason captured')">
+              <span class="a-time">14:02</span>
+              <span class="a-icon flag">FLAG</span>
+              <div class="flex-1">
+                <div class="a-text">Care plan deviation noted · <strong>Mr R</strong> mobility recording diverged from baseline. Reason captured live by carer.</div>
+                <div class="a-meta">94% adherence this week · 6% deviations all logged with reason</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================== -->
+<!-- CAPABILITIES GRID                                -->
+<!-- ============================================== -->
+<section class="py-16 lg:py-20 bg-kapture-paper border-b border-kapture-fog">
+  <div class="container-r">
+    <div class="mb-10 max-w-3xl">
+      <div class="ed-kicker mb-3">CAPABILITIES</div>
+      <h2 class="h-section">What kooper · ai actually does on the floor.</h2>
+      <p class="lede mt-4">Six core capabilities, all running on the same context window. Tap a card to see it in action across the kooper app stack.</p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+
+      <a href="kooper-recording-demo.html" class="cap-card dark block">
+        <div class="cap-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/></svg></div>
+        <h3 class="font-display text-lg font-semibold mb-1">Voice → narrative</h3>
+        <p class="text-sm">Tap-tap-tap and speak. kooper · ai writes the CQC-ready narrative in 14 seconds with consent, dignity, support level, and outcome. Carer confirms in one tap.</p>
+        <div class="mt-4 text-[0.6875rem] font-mono text-kapture-yellow">→ in: kooper · recording</div>
+      </a>
+
+      <a href="kooper-care-plans.html" class="cap-card block">
+        <div class="cap-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><path d="M21 12c-1 0-3-1-3-3s2-3 3-3 3 1 3 3-2 3-3 3"/><circle cx="12" cy="12" r="9"/></svg></div>
+        <h3 class="font-display text-lg font-semibold mb-1">Pattern detection</h3>
+        <p class="text-sm text-kapture-smoke">Spots clusters before they become incidents. Sundowning windows, fall risk timing, mood drift, weight loss trends — surfaced with confidence and source events.</p>
+        <div class="mt-4 text-[0.6875rem] font-mono text-kapture-coal">→ in: kooper · clinical</div>
+      </a>
+
+      <a href="kooper-clinical.html" class="cap-card block">
+        <div class="cap-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l3-9 3 9 3-6 3 6"/><path d="M3 12h18"/></svg></div>
+        <h3 class="font-display text-lg font-semibold mb-1">Risk prediction</h3>
+        <p class="text-sm text-kapture-smoke">"Who's at risk tonight" returns names, reasons, and the recommended watch level. Predictions traced to source signals — never opaque.</p>
+        <div class="mt-4 text-[0.6875rem] font-mono text-kapture-coal">→ in: kooper · clinical, NEWS2</div>
+      </a>
+
+      <a href="kooper-reports.html" class="cap-card block">
+        <div class="cap-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg></div>
+        <h3 class="font-display text-lg font-semibold mb-1">Audit-ready summarization</h3>
+        <p class="text-sm text-kapture-smoke">Inspector pack drafted in seconds. Every event mapped to the right SAF quality statement, watermarked with audit hash, signed and ready for export.</p>
+        <div class="mt-4 text-[0.6875rem] font-mono text-kapture-coal">→ in: kooper · reports</div>
+      </a>
+
+      <a href="kooper-family.html" class="cap-card block">
+        <div class="cap-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></div>
+        <h3 class="font-display text-lg font-semibold mb-1">Family digests</h3>
+        <p class="text-sm text-kapture-smoke">Plain-English daily summaries the family can open in seconds. Mood, meals, activities, family contact — never clinical detail. Privacy boundary respected.</p>
+        <div class="mt-4 text-[0.6875rem] font-mono text-kapture-coal">→ in: kooper · family</div>
+      </a>
+
+      <a href="kooper-care-dashboards.html" class="cap-card block">
+        <div class="cap-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
+        <h3 class="font-display text-lg font-semibold mb-1">Cross-app synthesis</h3>
+        <p class="text-sm text-kapture-smoke">Reads the whole stack at once. "Three things to know this week" pulls from hr, recording, mar, clinical, charts, and reports — surfaced for owners and managers.</p>
+        <div class="mt-4 text-[0.6875rem] font-mono text-kapture-coal">→ in: every dashboard</div>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================== -->
+<!-- TRUST + CONTROLS                                 -->
+<!-- ============================================== -->
+<section class="py-16 lg:py-20 border-b border-kapture-fog">
+  <div class="container-r">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+
+      <div class="lg:col-span-5">
+        <div class="ed-kicker mb-3">TRUST · CONTROLS</div>
+        <h2 class="h-section">No black box. Every setting in your hands.</h2>
+        <p class="lede mt-4 max-w-md">kooper · ai is a tool, not an authority. The team controls what it sees, when it speaks, and what it can decide on its own. Every action is reversible. Every decision is logged.</p>
+
+        <div class="mt-6 rounded-xl bg-kapture-black text-white p-5">
+          <div class="text-[0.6875rem] uppercase tracking-widest text-kapture-yellow font-mono mb-2">MODEL CARD</div>
+          <div class="grid grid-cols-2 gap-3 text-sm">
+            <div><div class="text-white/50 text-xs">Model</div><div class="font-mono">Claude Sonnet 4.6</div></div>
+            <div><div class="text-white/50 text-xs">Hosting</div><div class="font-mono">UK Govt-cleared</div></div>
+            <div><div class="text-white/50 text-xs">Training cutoff</div><div class="font-mono">May 2025</div></div>
+            <div><div class="text-white/50 text-xs">DSPT</div><div class="font-mono">Standards Met</div></div>
+            <div><div class="text-white/50 text-xs">Data retention</div><div class="font-mono">Workspace only</div></div>
+            <div><div class="text-white/50 text-xs">On-prem</div><div class="font-mono">Available</div></div>
+          </div>
+          <a href="#" onclick="event.preventDefault(); kooperToast('Full model card opens · technical spec + risk register')" class="mt-4 inline-flex items-center gap-1 text-xs text-kapture-yellow underline-offset-4 hover:underline font-mono">Read the full model card →</a>
+        </div>
+      </div>
+
+      <div class="lg:col-span-7">
+        <div class="rounded-2xl border border-[#ECEAE3] bg-white p-6">
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h3 class="font-display font-semibold">Workspace controls</h3>
+              <p class="text-xs text-kapture-smoke mt-0.5">Changes apply across every kooper app · audit-logged</p>
+            </div>
+            <span class="chip chip-ok text-[0.6875rem]"><span class="pulse-dot"></span>Live</span>
+          </div>
+
+          <div class="trust-toggle">
+            <div class="flex-1">
+              <div class="t-label">Voice → AI drafts</div>
+              <div class="t-sub">Lets kooper · ai draft a structured note from a carer's voice. Carer always confirms before save.</div>
+            </div>
+            <div class="switch on" onclick="toggleSwitch(this, 'Voice → AI drafts')"></div>
+          </div>
+          <div class="trust-toggle">
+            <div class="flex-1">
+              <div class="t-label">Pattern detection</div>
+              <div class="t-sub">Surface clusters and trends across the team. Flagged to clinical lead, never auto-actioned.</div>
+            </div>
+            <div class="switch on" onclick="toggleSwitch(this, 'Pattern detection')"></div>
+          </div>
+          <div class="trust-toggle">
+            <div class="flex-1">
+              <div class="t-label">Family digests</div>
+              <div class="t-sub">Plain-English daily summaries. Privacy boundary enforced — no clinical detail leaks. Carer signs off before send.</div>
+            </div>
+            <div class="switch on" onclick="toggleSwitch(this, 'Family digests')"></div>
+          </div>
+          <div class="trust-toggle">
+            <div class="flex-1">
+              <div class="t-label">Auto-escalation on NEWS2 ≥ 5</div>
+              <div class="t-sub">Auto-pages GP and on-call when an escalation threshold is crossed. Manager always notified.</div>
+            </div>
+            <div class="switch on" onclick="toggleSwitch(this, 'Auto-escalation')"></div>
+          </div>
+          <div class="trust-toggle">
+            <div class="flex-1">
+              <div class="t-label">Predictive risk scoring</div>
+              <div class="t-sub">Surfaces residents at elevated risk for the next shift. Recommendations only — never decisions.</div>
+            </div>
+            <div class="switch" onclick="toggleSwitch(this, 'Predictive risk')"></div>
+          </div>
+          <div class="trust-toggle">
+            <div class="flex-1">
+              <div class="t-label">Resident opt-out (per resident)</div>
+              <div class="t-sub">Per-resident toggle inside their profile. When off, kooper · ai still aids carers but never auto-drafts about that resident.</div>
+            </div>
+            <a href="kooper-care-plans.html" class="text-xs text-kapture-coal underline-offset-4 hover:underline">Manage per resident →</a>
+          </div>
+
+          <div class="mt-5 pt-5 border-t border-[#ECEAE3] flex items-center justify-between flex-wrap gap-3">
+            <div class="text-xs text-kapture-smoke">Last change · 3 May · Lola Okonkwo enabled Family digests</div>
+            <a href="kooper-reports.html" class="text-xs text-kapture-coal font-mono uppercase tracking-wider underline-offset-4 hover:underline">View AI audit log →</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================== -->
+<!-- IMPACT METRICS                                   -->
+<!-- ============================================== -->
+<section class="bg-kapture-black text-white py-16 lg:py-20">
+  <div class="container-r">
+    <div class="mb-10 max-w-3xl">
+      <div class="ed-kicker on-dark mb-3">IMPACT · 30 DAYS</div>
+      <h2 class="h-section text-white">What the AI gives back to the team.</h2>
+      <p class="lede-serif text-white/75 italic text-lg mt-4 max-w-2xl">Time, not magic. Every minute saved on paperwork is a minute returned to people. Here's what kooper · ai gave back to Draycott House last month.</p>
+    </div>
+
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div class="rounded-xl bg-white/5 border border-white/10 p-5">
+        <div class="text-[0.6875rem] uppercase tracking-widest text-kapture-yellow font-mono mb-2">Time saved</div>
+        <div class="font-display text-4xl font-semibold text-white">312<span class="text-kapture-yellow">h</span></div>
+        <div class="text-xs text-white/60 mt-1">across 15 staff · 30 days</div>
+      </div>
+      <div class="rounded-xl bg-white/5 border border-white/10 p-5">
+        <div class="text-[0.6875rem] uppercase tracking-widest text-kapture-yellow font-mono mb-2">Notes drafted</div>
+        <div class="font-display text-4xl font-semibold text-white">4,287</div>
+        <div class="text-xs text-white/60 mt-1">98% confirmed without edit</div>
+      </div>
+      <div class="rounded-xl bg-white/5 border border-white/10 p-5">
+        <div class="text-[0.6875rem] uppercase tracking-widest text-kapture-yellow font-mono mb-2">Patterns surfaced</div>
+        <div class="font-display text-4xl font-semibold text-white">28</div>
+        <div class="text-xs text-white/60 mt-1">19 acted on · 9 dismissed</div>
+      </div>
+      <div class="rounded-xl bg-white/5 border border-white/10 p-5">
+        <div class="text-[0.6875rem] uppercase tracking-widest text-kapture-yellow font-mono mb-2">Inspector packs</div>
+        <div class="font-display text-4xl font-semibold text-white">3</div>
+        <div class="text-xs text-white/60 mt-1">all completed in &lt; 5 min</div>
+      </div>
+    </div>
+
+    <div class="mt-10 rounded-2xl bg-white/5 border border-white/10 p-6">
+      <div class="flex items-start justify-between flex-wrap gap-4">
+        <div class="max-w-xl">
+          <div class="text-[0.6875rem] uppercase tracking-widest text-kapture-yellow font-mono mb-2">CARER QUOTE</div>
+          <p class="font-serif italic text-lg text-white leading-relaxed">"I used to spend the last 90 minutes of every shift writing notes. Now I spend 10. I get to actually finish my shift, and the notes are better than I'd have written tired at 22:00."</p>
+          <div class="mt-3 text-sm text-white/70">Craig Musara · Carer · Draycott House</div>
+        </div>
+        <a href="kooper-recording-demo.html" class="btn-yellow">Try the 14-second flow →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================== -->
+<!-- BOTTOM CTA                                       -->
+<!-- ============================================== -->
+<section class="bg-kapture-yellow py-14">
+  <div class="container-r">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+      <div class="lg:col-span-7">
+        <h2 class="font-display text-3xl lg:text-4xl text-black font-semibold tracking-tight">Bundled with every kooper app.</h2>
+        <p class="text-black/80 mt-3 max-w-xl text-base">No separate AI fee. No per-call pricing. kooper · ai is the connective tissue — turn it on for the whole house in one tap, audit-logged from the first prompt.</p>
+      </div>
+      <div class="lg:col-span-5 flex flex-wrap gap-3 lg:justify-end">
+        <a href="kooper-sign-in.html" class="btn-primary">Try the demo accounts</a>
+        <a href="kooper-care-landing.html#cta" class="bg-black text-white border border-black rounded-[10px] px-3.5 py-2.5 text-sm font-semibold hover:bg-transparent hover:text-black inline-flex items-center gap-2">Book a demo</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================== -->
+<!-- FOOTER                                           -->
+<!-- ============================================== -->
+<footer class="bg-kapture-paper border-t border-kapture-fog py-8">
+  <div class="container-r flex flex-col md:flex-row md:items-center md:justify-between gap-3 text-xs text-kapture-smoke">
+    <div class="flex items-center gap-3">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="22" height="22" fill="none" aria-label="kooper" role="img" class="text-kapture-black"><path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" d="M255.75 133.125c67.679 0 122.625 54.946 122.625 122.625S323.429 378.375 255.75 378.375 133.125 323.429 133.125 255.75s54.946-122.625 122.625-122.625m0-132.75c18.832 0 34.121 15.289 34.121 34.121s-15.289 34.121-34.121 34.121-34.121-15.289-34.121-34.121S236.918.375 255.75.375M75.173 75.173c13.316-13.316 34.938-13.316 48.254 0s13.316 34.938 0 48.254-34.938 13.316-48.254 0-13.316-34.938 0-48.254M511.125 255.75c0 18.832-15.289 34.121-34.121 34.121s-34.121-15.289-34.121-34.121 15.289-34.121 34.121-34.121 34.121 15.289 34.121 34.121M255.75 442.883c18.832 0 34.121 15.289 34.121 34.121s-15.289 34.121-34.121 34.121-34.121-15.289-34.121-34.121 15.289-34.121 34.121-34.121m132.323-54.81c13.316-13.316 34.938-13.316 48.254 0s13.316 34.938 0 48.254-34.938 13.316-48.254 0-13.316-34.938 0-48.254M68.617 255.75c0 18.832-15.289 34.121-34.121 34.121S.375 274.582.375 255.75s15.289-34.121 34.121-34.121 34.121 15.289 34.121 34.121m54.81 132.323c13.316 13.316 13.316 34.938 0 48.254s-34.938 13.316-48.254 0-13.316-34.938 0-48.254 34.938-13.316 48.254 0"/><path fill="#FFD400" fill-rule="evenodd" clip-rule="evenodd" d="M436.327 75.173c13.316 13.316 13.316 34.938 0 48.254s-34.938 13.316-48.254 0-13.316-34.938 0-48.254 34.938-13.316 48.254 0"/></svg>
+      <div class="flex items-center gap-1.5 font-display lowercase tracking-wide text-sm text-kapture-black"><span class="font-semibold">kooper</span><span class="text-kapture-mist">·</span><span class="font-medium">ai</span></div>
+    </div>
+    <div class="flex items-center gap-3 flex-wrap">
+      <span class="font-mono">v0.1 · Claude Sonnet 4.6</span>
+      <span aria-hidden>·</span>
+      <span>Mock data · no PII</span>
+      <span aria-hidden>·</span>
+      <a href="kooper-reports.html" class="hover:text-kapture-black underline-offset-4 hover:underline">AI audit log</a>
+    </div>
+  </div>
+</footer>
+
+<div id="toast" class="toast">Saved</div>
+
+<script>
+function kooperToast(msg){
+  var t = document.getElementById('toast');
+  t.textContent = msg || 'Saved';
+  t.classList.add('on');
+  clearTimeout(window.__t);
+  window.__t = setTimeout(()=> t.classList.remove('on'), 1700);
+}
+
+// ============================================================
+// CONVERSATION — pattern-matched Claude-style replies
+// ============================================================
+const CONV_REPLIES = {
+  fall: { match:['fall','falls'], reply:'<strong>3 falls in 30 days</strong> across the house. 1 incident on 2 May (Mr H, sundowning, no injury), 2 near-misses (Mrs Cross slipped on damp floor 28 Apr, Mr Banda steadied on rail 4 May). Pattern: Mr H falls cluster between 16:30–18:00. <span class="conv-cite">recording</span> <span class="conv-cite">risk</span>' },
+  edward: { match:['edward','eddie','mr banda'], reply:'<strong>Edward Banda</strong>, Room 12, age 78. <strong>Bright mood today</strong> — joined Music & Memory at 11:00, sang along to Sinatra. All meds taken. Daughter Sarah visiting 18:00, message exchange logged 13:42. No clinical concerns. NEWS2 = 2, stable. Care plan v4 reviewed 12 Mar by Sister Anne. <span class="conv-cite">care plans</span> <span class="conv-cite">recording</span> <span class="conv-cite">family</span>' },
+  risk: { match:['risk tonight','at risk','tonight','watch tonight'], reply:'For tonight\'s shift, three residents to watch:<br><br>1. <strong>Mr H</strong> · falls cluster 16:30–18:00, NEWS2 5, post-incident. Hourly welfare checks until end of shift.<br>2. <strong>Mr R</strong> · sundowning pattern, agitation 16:00–19:00. Music + tea intervention prepped.<br>3. <strong>Mrs Cross</strong> · wound dressing due 19:30, sacrum Stage 2, NEWS2 reading 5 earlier today.<br><br>Recommend night nurse handover at 21:30. <span class="conv-cite">clinical</span> <span class="conv-cite">recording</span>' },
+  pattern: { match:['pattern','sundowning','why is','behaviour'], reply:'<strong>Sundowning pattern detected</strong> · Mr R, 4-day streak. Agitation cluster 16:30–18:00, all settled within 10 min using music + tea. Recommend extending afternoon activity slot to bridge 16:00–18:00. Pattern surfaced from cross-app synthesis (behaviour + activities + recording). Confidence 0.94. <span class="conv-cite">behaviour</span> <span class="conv-cite">activities</span>' },
+  draft: { match:['draft','write','generate','compile'], reply:'I can draft for you right now. Pick one:<br><br>· <strong>Family digest</strong> for Edward — plain English, mood, meals, activities (no clinical detail)<br>· <strong>Incident report</strong> #418 — Mr H fall, 2 May<br>· <strong>CQC inspector pack</strong> — 22 reports, 18 pages, audit-hashed<br>· <strong>Shift handover</strong> — for the 22:00 nurse coming on<br><br>Or paste your own brief and I\'ll structure it. <span class="conv-cite">reports</span>' },
+  med: { match:['med','medication','mar','adherence'], reply:'<strong>Med adherence 99.2%</strong> over 30 days. 3 PRN events flagged (all within protocol), 1 refusal escalated to GP (Mr R, antihypertensive). Next round 17:00 · 12 residents · Nurse Sister Anne. 2 PRN flagged for review. <span class="conv-cite">mar</span> <span class="conv-cite">clinical</span>' },
+  staff: { match:['staff','rota','shift','on shift','team'], reply:'<strong>4 staff on shift right now</strong> · Sister Anne (Nurse, until 22:00), Craig Musara (Carer, until 22:00), Rebecca Adesina (Senior Carer, until 22:00), Daniel Kowalski (Activities, ending 17:00). Night cover confirmed. 1 planned absence (Mary Chen, leave Mon–Wed) · bank carer arranged. <span class="conv-cite">hr</span>' },
+  cqc: { match:['cqc','inspector','saf','readiness'], reply:'<strong>CQC SAF readiness 99%</strong> · Safe 98 · Effective 100 · Caring 100 · Responsive 96 · Well-led 100. Inspector pack ready to compile. Last drill 14 Apr. 2 minor gaps in Responsive (resident voice in care plan reviews — work in progress). <span class="conv-cite">reports</span> <span class="conv-cite">audit</span>' },
+  unknown: { reply:'I don\'t have a confident answer for that. Try a more specific query — a resident name, a clinical domain (falls, NEWS2, wounds, mood), an audience (CQC, family, ops), or a time marker (today, this week). Or pick from the suggestions below.' }
+};
+
+const STARTER_SUGGESTIONS = [
+  { label:'Who\'s at risk tonight', q:'who is at risk tonight' },
+  { label:'How is Edward today', q:'how is Edward today' },
+  { label:'Falls in last 30 days', q:'falls in last 30 days' },
+  { label:'Why is Mr R agitated', q:'pattern Mr R sundowning' },
+  { label:'Draft tonight\'s handover', q:'draft a shift handover' },
+  { label:'CQC readiness', q:'CQC SAF readiness' }
+];
+
+function findReply(q){
+  const lower = (q || '').toLowerCase().trim();
+  if (!lower) return null;
+  for (const key in CONV_REPLIES) {
+    if (key === 'unknown') continue;
+    const cfg = CONV_REPLIES[key];
+    if (cfg.match.some(t => lower.includes(t))) return cfg.reply;
+  }
+  return CONV_REPLIES.unknown.reply;
+}
+
+function renderSuggestions(items){
+  const host = document.getElementById('convSuggestions');
+  host.innerHTML = '';
+  items.forEach(s => {
+    const btn = document.createElement('button');
+    btn.className = 'conv-suggestion';
+    btn.textContent = s.label;
+    btn.onclick = () => askConv(s.q);
+    host.appendChild(btn);
+  });
+}
+
+function appendMsg(role, html){
+  const stream = document.getElementById('convStream');
+  const wrap = document.createElement('div');
+  wrap.className = 'conv-msg' + (role === 'me' ? ' me' : '');
+  wrap.innerHTML =
+    '<div class="conv-avatar ' + role + '">' + (role === 'me' ? 'U' : 'AI') + '</div>' +
+    '<div class="conv-bubble">' + html + '</div>';
+  stream.appendChild(wrap);
+  stream.scrollTop = stream.scrollHeight;
+}
+
+function appendTyping(){
+  const stream = document.getElementById('convStream');
+  const wrap = document.createElement('div');
+  wrap.className = 'conv-msg typing-wrap';
+  wrap.innerHTML =
+    '<div class="conv-avatar ai">AI</div>' +
+    '<div class="conv-bubble" style="padding:0;background:transparent"><div class="typing-dots"><span></span><span></span><span></span></div></div>';
+  stream.appendChild(wrap);
+  stream.scrollTop = stream.scrollHeight;
+  return wrap;
+}
+
+function askConv(q){
+  document.getElementById('aiInput').value = q;
+  submitConvText(q);
+}
+
+function submitConv(e){
+  e.preventDefault();
+  const input = document.getElementById('aiInput');
+  const q = input.value.trim();
+  if (!q) return;
+  submitConvText(q);
+  input.value = '';
+}
+
+function submitConvText(q){
+  appendMsg('me', q.replace(/</g,'&lt;'));
+  const typing = appendTyping();
+  setTimeout(() => {
+    typing.remove();
+    const reply = findReply(q);
+    appendMsg('ai', reply || CONV_REPLIES.unknown.reply);
+    // Refresh suggestions to follow-up queries
+    renderSuggestions([
+      { label:'Show me the source events', q:'show me source events for ' + q },
+      { label:'Draft a summary of this', q:'draft a summary of ' + q },
+      { label:'Notify the manager', q:'notify the manager about ' + q }
+    ]);
+  }, 700);
+}
+
+function resetConversation(){
+  document.getElementById('convStream').innerHTML = '';
+  appendMsg('ai', 'Hi Lola. I\'ve got the last 9 days · 847 events across 28 residents loaded in context. <br><br>Try a question or pick one below — I\'ll cite the source events so you can verify every answer.');
+  renderSuggestions(STARTER_SUGGESTIONS);
+}
+
+// ============================================================
+// ACTIVITY FEED — filter by type
+// ============================================================
+function filterFeed(btn, type){
+  document.querySelectorAll('[data-feed-filter]').forEach(b => b.classList.remove('chip-yellow'));
+  btn.classList.add('chip-yellow');
+  document.querySelectorAll('#activityFeed .activity-row').forEach(row => {
+    if (type === 'all') row.style.display = '';
+    else row.style.display = (row.dataset.type === type ? '' : 'none');
+  });
+}
+
+// ============================================================
+// TRUST TOGGLES
+// ============================================================
+function toggleSwitch(el, label){
+  el.classList.toggle('on');
+  const state = el.classList.contains('on') ? 'enabled' : 'disabled';
+  kooperToast(label + ' · ' + state + ' · audit-logged');
+}
+
+// ============================================================
+// AMBIENT TICKER — gently increment hero numbers
+// ============================================================
+const tkDrafts = document.getElementById('tk-drafts');
+const tkClass = document.getElementById('tk-classifications');
+setInterval(() => {
+  if (tkDrafts) tkDrafts.textContent = Math.min(58, parseInt(tkDrafts.textContent, 10) + (Math.random() < 0.6 ? 1 : 0));
+  if (tkClass) tkClass.textContent = parseInt(tkClass.textContent, 10) + Math.floor(1 + Math.random() * 3);
+}, 4200);
+
+// ============================================================
+// CMD+K opens the input
+// ============================================================
+document.addEventListener('keydown', (e) => {
+  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+    e.preventDefault();
+    const inp = document.getElementById('aiInput');
+    if (inp) { inp.focus(); inp.scrollIntoView({ behavior:'smooth', block:'center' }); }
+  }
+});
+
+// Init
+resetConversation();
+
+// Kick the activity-feed All chip into active state
+document.addEventListener('DOMContentLoaded', () => {
+  const allBtn = document.querySelector('[data-feed-filter="all"]');
+  if (allBtn) allBtn.classList.add('chip-yellow');
+});
+</script>
+</body>
+</html>
