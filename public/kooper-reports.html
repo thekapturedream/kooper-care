@@ -185,6 +185,30 @@
       <button onclick="askQ('NEWS2 above 3 today')" class="chip text-[0.6875rem]">NEWS2 &gt; 3 today</button>
       <button onclick="askQ('overdue plan reviews')" class="chip text-[0.6875rem]">overdue plan reviews</button>
       <button onclick="askQ('family summary for Edward')" class="chip text-[0.6875rem]">family summary · Edward</button>
+      <button id="moreExamplesBtn" onclick="toggleMoreExamples()" class="chip text-[0.6875rem] font-mono">+ more</button>
+    </div>
+    <div id="moreExamplesPanel" class="mt-2 max-w-3xl mx-auto flex flex-wrap items-center gap-2 justify-center" style="display:none">
+      <span class="text-[0.6875rem] text-kapture-mist font-mono uppercase tracking-wider">Residents:</span>
+      <button onclick="askQ('how is Edward today')" class="chip text-[0.6875rem]">Edward today</button>
+      <button onclick="askQ('Mrs Cross wound')" class="chip text-[0.6875rem]">Mrs Cross wound</button>
+      <button onclick="askQ('Mr H NEWS2')" class="chip text-[0.6875rem]">Mr H · NEWS2</button>
+      <button onclick="askQ('Yanir medication')" class="chip text-[0.6875rem]">Yanir meds</button>
+      <span class="text-[0.6875rem] text-kapture-mist font-mono uppercase tracking-wider ml-3">Clinical:</span>
+      <button onclick="askQ('DoLS active')" class="chip text-[0.6875rem]">DoLS active</button>
+      <button onclick="askQ('MHA section')" class="chip text-[0.6875rem]">MHA sections</button>
+      <button onclick="askQ('sundowning')" class="chip text-[0.6875rem]">sundowning</button>
+      <button onclick="askQ('fluid intake')" class="chip text-[0.6875rem]">fluid intake</button>
+      <button onclick="askQ('weight loss')" class="chip text-[0.6875rem]">weight</button>
+      <span class="text-[0.6875rem] text-kapture-mist font-mono uppercase tracking-wider ml-3">Ops:</span>
+      <button onclick="askQ('staff on shift')" class="chip text-[0.6875rem]">staff on shift</button>
+      <button onclick="askQ('absences today')" class="chip text-[0.6875rem]">absences</button>
+      <button onclick="askQ('occupancy')" class="chip text-[0.6875rem]">occupancy</button>
+      <button onclick="askQ('what needs my sign-off')" class="chip text-[0.6875rem]">my sign-off queue</button>
+      <button onclick="askQ('shift handover')" class="chip text-[0.6875rem]">handover</button>
+      <span class="text-[0.6875rem] text-kapture-mist font-mono uppercase tracking-wider ml-3">Time:</span>
+      <button onclick="askQ('today')" class="chip text-[0.6875rem]">today</button>
+      <button onclick="askQ('yesterday')" class="chip text-[0.6875rem]">yesterday</button>
+      <button onclick="askQ('this week')" class="chip text-[0.6875rem]">this week</button>
     </div>
   </div>
 </section>
@@ -423,18 +447,64 @@ function pickAudience(el, key){
 // AI search — pattern-matches the query against report tiles
 // and renders matched tiles with a Claude-style summary line.
 // Keywords map to the report tile titles + categories.
+// Order matters — resident-name and time-marker matches run
+// before generic keywords so e.g. "edward fall" → Edward profile
+// rather than the generic falls report.
 // ============================================================
 const AI_KEYWORDS = {
-  'fall':       { match: ['fall','falls'],            domain:'safe',       summary:'3 falls in 30 days. 1 incident on 2 May (Mr H, sundowning), 2 near-misses on 28 Apr and 4 May. No injuries.' },
-  'news2':      { match: ['news2','news 2'],          domain:'responsive', summary:'Highest current NEWS2 is 5 (Mr H, Room 7) — escalation triggered, GP review pending. 2 residents on weekly NEWS2 watch.' },
-  'overdue':    { match: ['overdue','plan review','behind'], domain:'well-led', summary:'5 care plan reviews overdue · Edward (mental state, 17 May), Catherine (nutrition, 12 May), 3 others approaching deadline.' },
-  'family':     { match: ['family summary','edward','daily summary'], domain:'caring', summary:'Daily summary drafted for Edward — bright mood, joined Music & Memory, all meds taken. Ready to send to Sarah.' },
-  'med':        { match: ['med','mar','medication','drug'], domain:'effective', summary:'Med adherence 99.2% over 30 days. 3 PRN events flagged, all within protocol. 1 refusal (Mr R, antihypertensive) — escalated to GP.' },
-  'wound':      { match: ['wound','pressure','dressing','sskin'], domain:'safe', summary:'2 active wounds — Mrs Cross sacrum (Stage 2, healing), Mr Rossi heel (Stage 1). SSKIN scores trending up. No new pressure damage.' },
-  'mood':       { match: ['mood','wellbeing','depression'], domain:'caring', summary:'Mood patterns stable across 28 residents. 2 on watch (Mr R sundowning, Mrs C anxiety). Music interventions reducing distress events by 38%.' },
-  'incident':   { match: ['incident','near miss','accident'], domain:'safe', summary:'4 incidents in 30 days · 1 fall, 2 near-misses, 1 medication refusal. All signed off. Bradford Falls update queued.' },
-  'training':   { match: ['training','currency','dbs','rtw'], domain:'well-led', summary:'15/15 staff currently compliant. Fire alarm test due in 4 days. PAT testing scheduled 23 Jul. All RTW + DBS up to date.' },
-  'compliance': { match: ['compliance','cqc','saf'], domain:'well-led', summary:'CQC SAF readiness 99% · Safe 98 · Effective 100 · Caring 100 · Responsive 96 · Well-led 100. Inspector pack ready to compile.' }
+  // ---- Resident-specific (run first; most specific wins) ----
+  'edward':     { match:['edward','eddie','mr banda'],          domain:'caring',     summary:'Edward Banda · 78 · Room 12. Bright mood, all meds taken, joined Music & Memory at 11:00. Daughter Sarah visiting 18:00. No clinical concerns. Last family message 13:42.' },
+  'mrs-cross':  { match:['mrs cross','mrs c','catherine cross'], domain:'safe',       summary:'Mrs Cross · sacral pressure injury Stage 2, healing. Last dressing 13:30, next due 19:30. SSKIN 4/5. Diabetic + soft-textured diet active. No new redness.' },
+  'mr-h':       { match:['mr h','mr hargreaves','room 7'],      domain:'responsive', summary:'Mr H · Falls × 2 in 48h, sundowning pattern 16:00–19:00. NEWS2 5 (escalation triggered). Pain 6/10, PRN paracetamol 13:00. GP review pending. Hourly welfare checks until end of shift.' },
+  'yanir':      { match:['yanir','mr ashkenazi'],               domain:'effective',  summary:'Yanir Ashkenazi · Olanzapine 10mg + Sodium Valproate 500mg, all on schedule. Mood stable. Settled in lounge. No PRN required this shift.' },
+  'mr-r':       { match:['mr r','mr rossi'],                    domain:'caring',     summary:'Mr R · Sundowning event logged 16:30. Music + tea intervention working — settled within 10 min. Heel wound Stage 1, healing. ABC chart updated × 4 this week.' },
+  'sarah':      { match:['sarah','daughter'],                   domain:'caring',     summary:'Sarah Banda · last message to Dad 13:42 ("bringing biscuits"). Daily AI summary drafted, ready to send. Visit booked 18:00 today. 3 photos shared this week.' },
+
+  // ---- Time-aware queries ----
+  'today':      { match:['today','this shift','right now'],     domain:'caring',     summary:'Today · 142 notes, 12 voice drafts pending review, 2 wound dressings due (Mrs Cross 19:30, Mr Rossi tomorrow), 4 staff on shift, 28/30 residents present. CQC ready 100%.' },
+  'yesterday':  { match:['yesterday','last 24','past day'],     domain:'safe',       summary:'Yesterday · 138 notes, 0 incidents, 1 near-miss (Mr H steadied himself on rail), 99% med adherence, all PRN events within protocol. Handover notes filed clean.' },
+  'this-week':  { match:['this week','past week','last 7'],     domain:'safe',       summary:'This week · 6 voice drafts, 3 falls (1 incident, 2 near-miss), 0 hospital admissions, 99.2% med adherence. Engagement +18% vs last week. SAF readiness 99%.' },
+
+  // ---- Clinical core ----
+  'fall':       { match:['fall','falls'],                       domain:'safe',       summary:'3 falls in 30 days · 1 incident on 2 May (Mr H, sundowning), 2 near-misses on 28 Apr and 4 May. No injuries. Bradford Falls protocol triggered automatically.' },
+  'news2':      { match:['news2','news 2','early warning'],     domain:'responsive', summary:'Highest current NEWS2 is 5 (Mr H, Room 7) — escalation triggered, GP review pending. 2 residents on weekly NEWS2 watch. Trends stable across the rest.' },
+  'wound':      { match:['wound','pressure','dressing','sskin','ulcer'], domain:'safe', summary:'2 active wounds · Mrs Cross sacrum (Stage 2, healing), Mr Rossi heel (Stage 1). SSKIN scores trending up. No new pressure damage in 30 days.' },
+  'pain':       { match:['pain','painchek','prn'],              domain:'safe',       summary:'3 residents on pain watch · Mr H (PainChek 6/10, PRN given), Mrs Cross (self-report 3/10, stable), Mrs Okafor (PRN paracetamol flagged). All within protocol.' },
+  'med':        { match:['med','mar','medication','drug round','prn'], domain:'effective', summary:'Med adherence 99.2% over 30 days. 3 PRN events flagged, all within protocol. 1 refusal (Mr R, antihypertensive) escalated to GP. Next round 17:00 · 12 residents.' },
+  'mha':        { match:['mha','mental health act','section','sectioning'], domain:'effective', summary:'1 active MHA Section · Yanir Ashkenazi, Section 2, expires 23 May 2026. Renewal review scheduled. Capacity assessments current. No new sections this quarter.' },
+  'dols':       { match:['dols','deprivation','lps','liberty'], domain:'effective',  summary:'2 active DoLS authorisations · Mr H (expires 8 Jul), Mrs Patel (expires 14 Sep). 0 expired, 0 awaiting renewal. Best-interest assessments on file for both.' },
+  'gp':         { match:['gp','doctor','referral','gp connect'],domain:'responsive', summary:'GP Connect status · synced 14:18. 1 review pending (Mr H, post-fall). 0 overdue referrals. Next routine review 12 May.' },
+
+  // ---- Behaviour + mental state ----
+  'mood':       { match:['mood','wellbeing','depression','low'],domain:'caring',     summary:'Mood patterns stable across 28 residents. 2 on watch (Mr R sundowning, Mrs C anxiety). Music interventions reducing distress events by 38%.' },
+  'sundowning': { match:['sundown','sundowning','agitation','restless evening'], domain:'caring', summary:'Sundowning pattern logged for Mr R · 16:00–19:00 window. Music + tea intervention working. ABC chart × 4 this week. Recommend extending afternoon activity slot.' },
+  'behaviour':  { match:['behaviour','behavior','abc','aggression'], domain:'caring', summary:'4 behaviour events logged this week · all sundowning pattern (Mr R). De-escalation worked within 10 min each time. Family informed. Antipsychotic review NOT recommended.' },
+
+  // ---- Nutrition + hydration ----
+  'nutrition':  { match:['nutrition','meal','food','eating','diet'], domain:'effective', summary:'Nutrition stable · 28 residents, 3 special diets (Edward penicillin medication-only, Mrs C diabetic + pureed, Mr H high-protein MUAC <22). 0 weight loss flags this week.' },
+  'fluid':      { match:['fluid','hydration','drink','water'],  domain:'effective',  summary:'Fluid intake on target · 27/28 residents above 1.5L target. 1 watch (Mrs C, 1.2L yesterday). Encourage drinks added to handover. Skimmed milk stock critical · auto-reorder Fri.' },
+  'weight':     { match:['weight','muac','bmi'],                domain:'effective',  summary:'Weight currency · 28/28 residents weighed in last 30 days. 0 unplanned weight loss >3%. 1 MUAC <22cm flag (Mr H, high-protein meals continuing).' },
+
+  // ---- Operations ----
+  'overdue':    { match:['overdue','plan review','behind','due'],domain:'well-led',  summary:'5 care plan reviews overdue · Edward (mental state, 17 May), Catherine (nutrition, 12 May), 3 others approaching deadline. Manager sign-off required on 1 (Mr H).' },
+  'incident':   { match:['incident','near miss','accident'],    domain:'safe',       summary:'4 incidents in 30 days · 1 fall, 2 near-misses, 1 medication refusal. All signed off. Bradford Falls update queued. RIDDOR not triggered.' },
+  'occupancy':  { match:['occupancy','beds','vacancy','admission'], domain:'well-led', summary:'Group occupancy 94% · Draycott 96% (29/30), Marylebone 92% (22/24), Camberwell 95% (23/24). 1 admission Mon, 0 discharges this week.' },
+  'rota':       { match:['rota','shift','staffing','staff on'], domain:'well-led',   summary:'4 staff on shift · Sister Anne (Nurse, until 22:00), Craig (Carer, until 22:00), Rebecca (Senior Carer, until 22:00), Daniel (Activities, ending 17:00). Cover for night shift confirmed.' },
+  'absence':    { match:['absence','sick','off','sickness'],    domain:'well-led',   summary:'0 unplanned absences today. 1 planned (Mary Chen, leave Mon-Wed). Cover arranged via bank carer. Sickness rate 1.8% YTD (target <3%).' },
+  'training':   { match:['training','currency','dbs','rtw','induction'], domain:'well-led', summary:'15/15 staff currently compliant. Fire alarm test due in 4 days. PAT testing scheduled 23 Jul. All RTW + DBS up to date. 0 expiring next 30 days.' },
+
+  // ---- Insights & evidence ----
+  'compliance': { match:['compliance','cqc','saf','readiness'], domain:'well-led',   summary:'CQC SAF readiness 99% · Safe 98 · Effective 100 · Caring 100 · Responsive 96 · Well-led 100. Inspector pack ready to compile. Last drill 14 Apr.' },
+  'audit':      { match:['audit','audit trail','evidence'],     domain:'well-led',   summary:'Audit trail · 847 events logged in 30-day window, 0 redactions. Every view, edit, and sign-off recorded. Inspector pack downloadable. Read-only access expires 17 May.' },
+  'family-summary': { match:['family summary','digest','daily summary'], domain:'caring', summary:'Daily AI summaries drafted for 28/28 residents. 22 sent, 6 awaiting carer confirm. Average draft-to-confirm time: 14 seconds.' },
+
+  // ---- Sign-off / management focus ----
+  'sign-off':   { match:['sign off','sign-off','my queue','approval'], domain:'safe', summary:'5 actions waiting on you · Sign off Incident #418 (Mr H fall, 2h ago), 2 care plan reviews due (Edward, Catherine), 3 hire applicants for night carer slot, 1 wound care variance.' },
+  'handover':   { match:['handover','handoff','shift change'],  domain:'caring',     summary:'Handover from Sister Anne · 14:00. Mr H hourly checks. Mrs C wound dressing 19:30. Mr R sundowning watch 16:30. Lounge cleaned. Fire alarm test scheduled tomorrow 10:00.' },
+
+  // ---- Stakeholder ----
+  'visit':      { match:['visit','visiting','visitor'],         domain:'caring',     summary:'1 visit booked today · Sarah Banda 18:00 (Edward). 0 walk-ins. Visitor log up to date. Next family open day 24 May.' },
+  'photo':      { match:['photo','photos','pictures'],          domain:'caring',     summary:'3 new photos shared with families today · Music & Memory session, garden tea, Mr R\'s birthday prep. Family-side feed updated automatically.' }
 };
 
 function findAIMatches(rawQuery) {
@@ -530,6 +600,15 @@ document.getElementById('aiSearch').addEventListener('keydown', function(e){
   }
 });
 function scrollToReport(){ /* handled inline by the listener bound after render */ }
+
+function toggleMoreExamples() {
+  var panel = document.getElementById('moreExamplesPanel');
+  var btn = document.getElementById('moreExamplesBtn');
+  if (!panel || !btn) return;
+  var open = panel.style.display !== 'none';
+  panel.style.display = open ? 'none' : 'flex';
+  btn.textContent = open ? '+ more' : '− less';
+}
 
 // ============================================================
 // Activate every .report-tile (the 15 individual report cards)
