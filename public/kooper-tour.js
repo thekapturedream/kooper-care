@@ -93,13 +93,21 @@
   .kt-menu-foot { padding: 0.4375rem 0.625rem 0.25rem; font-family: 'JetBrains Mono', monospace; font-size: 0.625rem; text-transform: uppercase; letter-spacing: 0.08em; color: #9A9A9A; }
 
   /* Tour launch button — for first-time visitors */
-  .kt-launch-strip { position: fixed; bottom: 1rem; left: 50%; transform: translateX(-50%); z-index: 70; background: #0A0A0A; color: #FFFFFF; padding: 0.625rem 1rem 0.625rem 0.75rem; border-radius: 999px; box-shadow: 0 14px 36px -12px rgba(0,0,0,0.45); display: inline-flex; align-items: center; gap: 0.625rem; font-size: 0.8125rem; font-weight: 500; opacity: 0; pointer-events: none; transition: opacity 0.2s ease, transform 0.2s ease; max-width: calc(100vw - 32px); }
+  .kt-launch-strip { position: fixed; bottom: 1rem; left: 50%; transform: translateX(-50%) translateY(8px); z-index: 70; background: #0A0A0A; color: #FFFFFF; padding: 0.625rem 0.875rem 0.625rem 0.75rem; border-radius: 999px; box-shadow: 0 14px 36px -12px rgba(0,0,0,0.45); display: flex; align-items: center; gap: 0.625rem; font-size: 0.8125rem; font-weight: 500; opacity: 0; pointer-events: none; transition: opacity 0.2s ease, transform 0.2s ease; max-width: calc(100vw - 24px); width: max-content; flex-wrap: nowrap; white-space: nowrap; }
   .kt-launch-strip.on { opacity: 1; pointer-events: auto; transform: translateX(-50%) translateY(0); }
-  .kt-launch-strip .kt-launch-icon { width: 26px; height: 26px; border-radius: 50%; background: #FFD400; color: #0A0A0A; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-weight: 700; font-size: 0.75rem; }
-  .kt-launch-cta { background: #FFD400; color: #0A0A0A; border: 0; padding: 0.3125rem 0.625rem; border-radius: 999px; font-size: 0.6875rem; font-weight: 700; cursor: pointer; font-family: inherit; }
+  .kt-launch-strip .kt-launch-icon { width: 24px; height: 24px; border-radius: 50%; background: #FFD400; color: #0A0A0A; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; font-weight: 700; font-size: 0.75rem; line-height: 1; }
+  .kt-launch-strip .kt-launch-text { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .kt-launch-cta { background: #FFD400; color: #0A0A0A; border: 0; padding: 0.3125rem 0.6875rem; border-radius: 999px; font-size: 0.6875rem; font-weight: 700; cursor: pointer; font-family: inherit; flex-shrink: 0; white-space: nowrap; line-height: 1.2; }
   .kt-launch-cta:hover { background: #F5B400; }
-  .kt-launch-x { background: transparent; border: 0; color: rgba(255,255,255,0.5); cursor: pointer; padding: 0.25rem; line-height: 0; }
+  .kt-launch-x { background: transparent; border: 0; color: rgba(255,255,255,0.5); cursor: pointer; padding: 0.25rem; line-height: 0; flex-shrink: 0; }
   .kt-launch-x:hover { color: #FFFFFF; }
+  /* Mobile · narrow viewports */
+  @media (max-width: 480px) {
+    .kt-launch-strip { left: 12px; right: 12px; transform: none; max-width: calc(100vw - 24px); width: auto; padding: 0.5rem 0.625rem; gap: 0.5rem; font-size: 0.75rem; }
+    .kt-launch-strip.on { transform: none; }
+    .kt-launch-strip .kt-launch-text { font-size: 0.75rem; }
+    .kt-launch-strip .kt-launch-text-long { display: none; }
+  }
   `;
 
   function injectStyles() {
@@ -369,7 +377,7 @@
     launchEl.className = 'kt-launch-strip';
     launchEl.innerHTML =
       '<span class="kt-launch-icon">★</span>' +
-      '<span>New here? Take a quick tour of <strong>kooper · ' + (state.config.page || 'this page') + '</strong></span>' +
+      '<span class="kt-launch-text"><span class="kt-launch-text-long">New here? </span>Quick tour of <strong>kooper · ' + (state.config.page || 'this page') + '</strong></span>' +
       '<button class="kt-launch-cta" data-kt-launch>Take tour</button>' +
       '<button class="kt-launch-x" data-kt-launch-x aria-label="Dismiss"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button>';
     document.body.appendChild(launchEl);
