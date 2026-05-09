@@ -495,55 +495,55 @@
 
       <div class="divide-y divide-kapture-fog" id="personaTable">
         <!-- Operator side -->
-        <div class="persona-row" data-persona="owner" data-route="kooper-care-dashboards.html?as=owner">
+        <div class="persona-row" data-persona="owner" data-route="kooper-hr.html">
           <div class="pr-name"><span class="pr-avatar">LO</span><span class="pr-title">Owner / Director</span></div>
           <div class="pr-stack" data-stack="hr|required,multi-site,estate,reports,ai,compliance"></div>
           <div class="pr-wants">CQC pass + cost control</div>
           <div class="pr-arrow" aria-hidden="true">→</div>
         </div>
-        <div class="persona-row" data-persona="manager" data-route="kooper-care-dashboards.html?as=manager">
+        <div class="persona-row" data-persona="manager" data-route="kooper-hr.html">
           <div class="pr-name"><span class="pr-avatar">LO</span><span class="pr-title">Registered Manager</span></div>
           <div class="pr-stack" data-stack="hr|required,care plans,recording,mar,charts,reports,audit,compliance,operations,ai"></div>
           <div class="pr-wants">Zero compliance gaps</div>
           <div class="pr-arrow" aria-hidden="true">→</div>
         </div>
-        <div class="persona-row" data-persona="clinical-lead" data-route="kooper-clinical.html">
+        <div class="persona-row" data-persona="clinical-lead" data-route="kooper-staff.html?as=sa">
           <div class="pr-name"><span class="pr-avatar">SA</span><span class="pr-title">Clinical Lead</span></div>
           <div class="pr-stack" data-stack="hr|required,clinical,care plans,mar,charts,risk,reports,audit,gp-connect"></div>
           <div class="pr-wants">Hospital admissions ↓</div>
           <div class="pr-arrow" aria-hidden="true">→</div>
         </div>
-        <div class="persona-row" data-persona="senior-carer" data-route="kooper-recording-demo.html">
+        <div class="persona-row" data-persona="senior-carer" data-route="kooper-staff.html?as=ra">
           <div class="pr-name"><span class="pr-avatar">RA</span><span class="pr-title">Senior Carer</span></div>
           <div class="pr-stack" data-stack="hr|required,recording,charts,risk,mar,operations"></div>
           <div class="pr-wants">Clean handovers</div>
           <div class="pr-arrow" aria-hidden="true">→</div>
         </div>
-        <div class="persona-row" data-persona="nurse" data-route="kooper-clinical.html">
+        <div class="persona-row" data-persona="nurse" data-route="kooper-staff.html?as=sa">
           <div class="pr-name"><span class="pr-avatar">SA</span><span class="pr-title">Nurse (RGN)</span></div>
           <div class="pr-stack" data-stack="hr|required,clinical,care plans,recording,mar,charts,risk"></div>
           <div class="pr-wants">Speed during med rounds</div>
           <div class="pr-arrow" aria-hidden="true">→</div>
         </div>
-        <div class="persona-row" data-persona="carer" data-route="kooper-recording-demo.html">
+        <div class="persona-row" data-persona="carer" data-route="kooper-staff.html?as=cm">
           <div class="pr-name"><span class="pr-avatar">CT</span><span class="pr-title">Carer</span></div>
           <div class="pr-stack" data-stack="hr|required,recording,charts"></div>
           <div class="pr-wants">3-tap notes · AI narrative</div>
           <div class="pr-arrow" aria-hidden="true">→</div>
         </div>
-        <div class="persona-row" data-persona="activities" data-route="kooper-care-dashboards.html?as=activities">
+        <div class="persona-row" data-persona="activities" data-route="kooper-staff.html?as=dk">
           <div class="pr-name"><span class="pr-avatar">DM</span><span class="pr-title">Activities Coord</span></div>
           <div class="pr-stack" data-stack="hr|required,activities,communication,recording"></div>
           <div class="pr-wants">Engagement metrics</div>
           <div class="pr-arrow" aria-hidden="true">→</div>
         </div>
-        <div class="persona-row" data-persona="cook" data-route="kooper-care-dashboards.html?as=cook">
+        <div class="persona-row" data-persona="cook" data-route="kooper-staff.html?as=mc">
           <div class="pr-name"><span class="pr-avatar">MA</span><span class="pr-title">Cook / Catering</span></div>
           <div class="pr-stack" data-stack="hr|required,charts,estate"></div>
           <div class="pr-wants">Auto-reorder + dietary clarity</div>
           <div class="pr-arrow" aria-hidden="true">→</div>
         </div>
-        <div class="persona-row" data-persona="maintenance" data-route="kooper-care-dashboards.html?as=maintenance">
+        <div class="persona-row" data-persona="maintenance" data-route="kooper-staff.html?as=tb">
           <div class="pr-name"><span class="pr-avatar">TJ</span><span class="pr-title">Maintenance</span></div>
           <div class="pr-stack" data-stack="hr|required,estate,operations"></div>
           <div class="pr-wants">Tickets + compliance dates</div>
@@ -796,18 +796,18 @@
 
     // ===== HERO PERSONA SWITCHER ============================================
     var PERSONAS = [
-      { id:'manager',       name:'Lola Banda',        first:'Lola',     role:'Manager',         init:'LB', stack:['hr','reports','operations','audit','compliance','recording'],         route:'kooper-care-dashboards.html', label:'/dashboards' },
-      { id:'owner',         name:'Lola Banda',        first:'Lola',     role:'Owner',           init:'LB', stack:['multi-site','reports','audit','compliance','operations'],              route:'kooper-care-dashboards.html', label:'/dashboards' },
-      { id:'clinical-lead', name:'Sister Anne',       first:'Sister Anne', role:'Clinical Lead', init:'SA', stack:['care plans','clinical','charts','mar','recording','risk'],            route:'kooper-clinical.html',         label:'/clinical' },
-      { id:'nurse',         name:'Sister Anne',       first:'Sister Anne', role:'Nurse',         init:'SA', stack:['clinical','charts','mar','recording','care plans'],                   route:'kooper-clinical.html',         label:'/clinical' },
-      { id:'senior-carer',  name:'Rebecca Owusu',     first:'Rebecca',  role:'Senior Carer',    init:'RO', stack:['recording','care plans','charts','mar','activities'],                 route:'kooper-recording-demo.html',   label:'/recording' },
-      { id:'carer',         name:'Craig Thompson',    first:'Craig',    role:'Carer',           init:'CT', stack:['recording','care plans','charts','mar'],                              route:'kooper-recording-demo.html',   label:'/recording' },
-      { id:'activities',    name:'Daniel Mensah',     first:'Daniel',   role:'Activities',      init:'DM', stack:['activities','recording','care plans'],                                route:'kooper-recording-demo.html',   label:'/recording' },
-      { id:'cook',          name:'Mary Achebe',       first:'Mary',     role:'Cook',            init:'MA', stack:['recording','operations'],                                              route:'kooper-recording-demo.html',   label:'/recording' },
-      { id:'maintenance',   name:'Tomas Jankowski',   first:'Tomas',    role:'Maintenance',     init:'TJ', stack:['estate','operations','recording'],                                     route:'kooper-care-dashboards.html', label:'/operations' },
-      { id:'resident',      name:'Edward Okonkwo',    first:'Edward',   role:'Resident',        init:'EO', stack:['resident','activities','family'],                                      route:'kooper-resident.html',         label:'/resident' },
-      { id:'family',        name:'Sarah Okonkwo',     first:'Sarah',    role:'Family',          init:'SO', stack:['family','resident','activities'],                                      route:'kooper-family.html',           label:'/family' },
-      { id:'inspector',     name:'Tomas Jankowski',   first:'Tomas',    role:'Inspector',       init:'TJ', stack:['audit','reports','compliance','care plans','recording'],              route:'kooper-care-dashboards.html', label:'/inspector' }
+      { id:'manager',       name:'Lola Okonkwo',      first:'Lola',     role:'Manager',         init:'LO', stack:['hr','reports','operations','audit','compliance','recording'],         route:'kooper-hr.html',                 label:'/hr launcher' },
+      { id:'owner',         name:'Lola Okonkwo',      first:'Lola',     role:'Owner',           init:'LO', stack:['multi-site','reports','audit','compliance','operations'],              route:'kooper-hr.html',                 label:'/hr launcher' },
+      { id:'clinical-lead', name:'Sister Anne',       first:'Sister Anne', role:'Clinical Lead', init:'SA', stack:['care plans','clinical','charts','mar','recording','risk'],            route:'kooper-staff.html?as=sa',        label:'/staff · sa' },
+      { id:'nurse',         name:'Sister Anne',       first:'Sister Anne', role:'Nurse',         init:'SA', stack:['clinical','charts','mar','recording','care plans'],                   route:'kooper-staff.html?as=sa',        label:'/staff · sa' },
+      { id:'senior-carer',  name:'Rebecca Adesina',   first:'Rebecca',  role:'Senior Carer',    init:'RA', stack:['recording','care plans','charts','mar','activities'],                 route:'kooper-staff.html?as=ra',        label:'/staff · ra' },
+      { id:'carer',         name:'Craig Musara',      first:'Craig',    role:'Carer',           init:'CM', stack:['recording','care plans','charts','mar'],                              route:'kooper-staff.html?as=cm',        label:'/staff · cm' },
+      { id:'activities',    name:'Daniel Kowalski',   first:'Daniel',   role:'Activities',      init:'DK', stack:['activities','recording','care plans'],                                route:'kooper-staff.html?as=dk',        label:'/staff · dk' },
+      { id:'cook',          name:'Mary Chen',         first:'Mary',     role:'Cook',            init:'MC', stack:['recording','operations'],                                              route:'kooper-staff.html?as=mc',        label:'/staff · mc' },
+      { id:'maintenance',   name:'Tomas Bauer',       first:'Tomas',    role:'Maintenance',     init:'TB', stack:['estate','operations','recording'],                                     route:'kooper-staff.html?as=tb',        label:'/staff · tb' },
+      { id:'resident',      name:'Edward Banda',      first:'Edward',   role:'Resident',        init:'EB', stack:['resident','activities','family'],                                      route:'kooper-resident.html',           label:'/resident' },
+      { id:'family',        name:'Sarah Banda',       first:'Sarah',    role:'Family',          init:'SB', stack:['family','resident','activities'],                                      route:'kooper-family.html',             label:'/family' },
+      { id:'inspector',     name:'Tomas Jankowski',   first:'Tomas',    role:'Inspector',       init:'TJ', stack:['audit','reports','compliance','care plans','recording'],              route:'kooper-care-dashboards.html?as=inspector', label:'/inspector' }
     ];
 
     var REQUIRED_APP = 'hr'; // every persona implicitly carries kooper · hr identity
