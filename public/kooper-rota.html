@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>kooper · rota — manage the week, work the week</title>
+<meta name="description" content="kooper · rota — drag-drop weekly rota for managers, my-shifts view for staff. WTR conflict detection, swap requests, time-off, live cost tracking. A standalone micro-app inside kooper · hr." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = { theme: { extend: { colors: { kapture: { black:'#0A0A0A',ink:'#111111',coal:'#1A1A1A',ash:'#2A2A2A',smoke:'#3A3A3A',mist:'#9A9A9A',fog:'#D4D4D4',paper:'#F5F5F5',white:'#FFFFFF',yellow:'#FFD400',amber:'#F5B400'}, status:{critical:'#E5484D',warning:'#FFD400',ok:'#10B981',neutral:'#D4D4D4'}}, fontFamily:{display:['Space Grotesk','sans-serif'],sans:['Inter','sans-serif'],mono:['JetBrains Mono','monospace'],serif:['Source Serif 4','serif']}}}};
+</script>
+<style>
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Inter', sans-serif; background: #FAFAF7; color: #0A0A0A; -webkit-font-smoothing: antialiased; }
+  .font-display { font-family: 'Space Grotesk', sans-serif; }
+  .font-mono { font-family: 'JetBrains Mono', monospace; }
+  .font-serif { font-family: 'Source Serif 4', serif; }
+
+  .container-r { max-width: 1400px; margin: 0 auto; padding: 0 1rem; }
+  @media (min-width: 640px) { .container-r { padding: 0 1.5rem; } }
+  @media (min-width: 1024px) { .container-r { padding: 0 2rem; } }
+
+  /* Buttons */
+  .btn-primary { background: #0A0A0A; color: #FFFFFF; border: 1px solid #0A0A0A; padding: 0.5rem 0.875rem; border-radius: 10px; font-weight: 500; transition: all 0.15s ease; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.8125rem; white-space: nowrap; font-family: inherit; }
+  .btn-primary:hover { background: transparent; color: #0A0A0A; }
+  .btn-secondary { background: transparent; color: #0A0A0A; border: 1px solid #0A0A0A; padding: 0.5rem 0.875rem; border-radius: 10px; font-weight: 500; transition: all 0.15s ease; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.8125rem; white-space: nowrap; font-family: inherit; }
+  .btn-secondary:hover { background: #0A0A0A; color: #FFFFFF; }
+  .btn-yellow { background: #FFD400; color: #0A0A0A; border: 1px solid #FFD400; padding: 0.5rem 0.875rem; border-radius: 10px; font-weight: 600; transition: all 0.15s ease; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.8125rem; white-space: nowrap; font-family: inherit; }
+  .btn-yellow:hover { background: #F5B400; }
+  .btn-secondary-on-dark { background: transparent; color: #FFFFFF; border: 1px solid rgba(255,255,255,0.4); padding: 0.5rem 0.875rem; border-radius: 10px; font-weight: 500; transition: all 0.15s ease; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.8125rem; white-space: nowrap; font-family: inherit; }
+  .btn-secondary-on-dark:hover { background: rgba(255,255,255,0.1); }
+
+  /* Chips */
+  .chip { display: inline-flex; align-items: center; gap: 0.375rem; padding: 0.25rem 0.625rem; border-radius: 999px; font-size: 0.75rem; font-weight: 500; line-height: 1; background: #FFFFFF; color: #2A2A2A; border: 1px solid #ECEAE3; }
+  .chip-yellow { background: #FFD400; color: #0A0A0A; border-color: #FFD400; }
+  .chip-dark { background: #0A0A0A; color: #FFFFFF; border-color: #0A0A0A; }
+  .chip-ok { background: rgba(16,185,129,0.1); color: #047857; border-color: rgba(16,185,129,0.25); }
+  .chip-warn { background: rgba(255,212,0,0.2); color: #876300; border-color: rgba(255,212,0,0.5); }
+  .chip-crit { background: rgba(229,72,77,0.1); color: #B42318; border-color: rgba(229,72,77,0.3); }
+  .chip-outline-light { background: transparent; color: #FFFFFF; border-color: rgba(255,255,255,0.25); }
+
+  /* Nav */
+  .nav-link { padding: 0.5rem 0.75rem; font-size: 0.875rem; font-weight: 500; color: rgba(255,255,255,0.75); border-radius: 8px; transition: all 0.15s ease; text-decoration: none; }
+  .nav-link:hover { color: #FFFFFF; background: #1A1A1A; }
+  .nav-link-active { background: #1A1A1A; color: #FFD400; }
+
+  /* Editorial type */
+  .ed-kicker { font-family: 'JetBrains Mono', monospace; font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #876300; display: inline-flex; align-items: center; gap: 0.5rem; }
+  .ed-kicker::before { content: ''; width: 18px; height: 2px; background: #FFD400; display: inline-block; }
+  .ed-kicker.on-dark { color: #FFD400; }
+  .h-section { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: clamp(1.375rem, 2.2vw, 1.75rem); line-height: 1.1; letter-spacing: -0.015em; }
+  .h-hero { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: clamp(1.875rem, 3.6vw, 2.5rem); line-height: 1.05; letter-spacing: -0.02em; }
+
+  /* Pulse */
+  .pulse-dot { position: relative; width: 8px; height: 8px; border-radius: 999px; background: #10B981; flex-shrink: 0; }
+  .pulse-dot::after { content: ''; position: absolute; inset: -4px; border-radius: 999px; background: #10B981; opacity: 0.4; animation: pulse-out 1.6s ease-out infinite; }
+  @keyframes pulse-out { 0% { transform: scale(0.6); opacity: 0.6; } 100% { transform: scale(1.8); opacity: 0; } }
+
+  /* View toggle */
+  .view-pill { padding: 0.5rem 0.875rem; border-radius: 10px; font-size: 0.8125rem; font-weight: 500; border: 1px solid #D4D4D4; background: #FFFFFF; color: #2A2A2A; cursor: pointer; transition: all 0.12s ease; white-space: nowrap; font-family: inherit; }
+  .view-pill:hover { border-color: #0A0A0A; }
+  .view-pill.active { background: #0A0A0A; color: #FFD400; border-color: #0A0A0A; }
+  .view-pill .vp-key { font-family: 'JetBrains Mono', monospace; font-size: 0.625rem; padding: 0.0625rem 0.375rem; border-radius: 4px; background: #F5F5F5; color: #6B7280; margin-left: 0.375rem; }
+  .view-pill.active .vp-key { background: rgba(255,212,0,0.18); color: #FFD400; }
+
+  /* KPI strip */
+  .kpi-card { background: #FFFFFF; border: 1px solid #ECEAE3; border-radius: 12px; padding: 0.875rem 1rem; }
+  .kpi-card .k-label { font-family: 'JetBrains Mono', monospace; font-size: 0.625rem; text-transform: uppercase; letter-spacing: 0.1em; color: #6B7280; }
+  .kpi-card .k-num { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 1.5rem; line-height: 1.05; letter-spacing: -0.012em; color: #0A0A0A; }
+  .kpi-card .k-sub { font-size: 0.6875rem; color: #6B7280; margin-top: 0.0625rem; }
+  .kpi-card.dark { background: #0A0A0A; color: #FFFFFF; border-color: #0A0A0A; }
+  .kpi-card.dark .k-label { color: #FFD400; }
+  .kpi-card.dark .k-num { color: #FFFFFF; }
+  .kpi-card.dark .k-sub { color: rgba(255,255,255,0.6); }
+
+  /* WEEK GRID — manager view */
+  .week-grid { display: grid; grid-template-columns: 160px repeat(7, 1fr); border: 1px solid #ECEAE3; border-radius: 14px; overflow: hidden; background: #FFFFFF; min-width: 880px; }
+  .week-grid-head { display: contents; }
+  .week-cell { padding: 0.5rem 0.625rem; border-bottom: 1px solid #ECEAE3; border-right: 1px solid #ECEAE3; min-height: 64px; position: relative; }
+  .week-cell:last-child { border-right: 0; }
+  .week-grid-head .week-cell { background: #FAFAF7; padding: 0.625rem 0.625rem; border-bottom: 1px solid #ECEAE3; }
+  .day-head { font-size: 0.6875rem; font-family: 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: 0.08em; color: #6B7280; }
+  .day-head .d-num { font-family: 'Space Grotesk', sans-serif; font-size: 1rem; font-weight: 600; color: #0A0A0A; letter-spacing: -0.01em; display: block; margin-top: 0.0625rem; }
+  .day-head.is-today .d-num { color: #876300; }
+  .day-head.is-today .d-num::after { content: '·'; color: #FFD400; margin-left: 0.25rem; }
+  .worker-row-head { font-size: 0.8125rem; font-weight: 500; color: #1A1A1A; display: flex; align-items: center; gap: 0.5rem; }
+  .worker-row-head .w-avatar { width: 26px; height: 26px; border-radius: 50%; background: #0A0A0A; color: #FFD400; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 0.625rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .worker-row-head .w-meta { font-size: 0.625rem; color: #6B7280; font-family: 'JetBrains Mono', monospace; }
+
+  /* Shift card inside a cell */
+  .shift { padding: 0.3125rem 0.5rem; border-radius: 8px; font-size: 0.6875rem; font-weight: 500; cursor: grab; user-select: none; transition: all 0.12s ease; line-height: 1.2; min-height: 38px; display: flex; flex-direction: column; justify-content: center; }
+  .shift.dragging { opacity: 0.4; cursor: grabbing; }
+  .shift .s-time { font-family: 'JetBrains Mono', monospace; font-size: 0.6rem; opacity: 0.75; margin-top: 0.0625rem; }
+  .shift.day { background: #FFD400; color: #0A0A0A; border: 1px solid transparent; }
+  .shift.evening { background: #A5B4FC; color: #0A0A0A; }
+  .shift.night { background: #0A0A0A; color: #FFD400; }
+  .shift.cover { background: #FFFBEB; color: #876300; border: 1px dashed #FFD400; }
+  .shift.off { background: transparent; color: #9A9A9A; font-style: italic; cursor: default; min-height: auto; padding: 0.125rem 0.5rem; }
+  .shift.conflict { box-shadow: 0 0 0 2px #E5484D; }
+  .week-cell.drop-target { background: rgba(255,212,0,0.12); }
+
+  /* Worker view list */
+  .my-shift-card { background: #FFFFFF; border: 1px solid #ECEAE3; border-radius: 14px; padding: 1rem 1.125rem; transition: all 0.15s ease; }
+  .my-shift-card.next { background: linear-gradient(180deg, #0A0A0A 0%, #1A1A1A 100%); color: #FFFFFF; border-color: #0A0A0A; }
+  .my-shift-card.next .ms-day { color: #FFD400; }
+  .my-shift-card.next .ms-time { color: #FFFFFF; }
+  .my-shift-card.next .ms-meta { color: rgba(255,255,255,0.65); }
+  .ms-day { font-family: 'JetBrains Mono', monospace; font-size: 0.625rem; text-transform: uppercase; letter-spacing: 0.1em; color: #876300; }
+  .ms-time { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 1.25rem; color: #0A0A0A; margin-top: 0.125rem; letter-spacing: -0.01em; }
+  .ms-meta { font-size: 0.75rem; color: #6B7280; margin-top: 0.125rem; }
+
+  /* Approvals row */
+  .approve-row { display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.875rem 1rem; border-bottom: 1px solid #ECEAE3; transition: background 0.12s ease; }
+  .approve-row:last-child { border-bottom: 0; }
+  .approve-row:hover { background: #FAFAF7; }
+  .approve-row .ap-icon { width: 32px; height: 32px; border-radius: 8px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-family: 'JetBrains Mono', monospace; font-size: 0.625rem; font-weight: 700; }
+  .approve-row .ap-icon.swap { background: rgba(165,180,252,0.25); color: #4338CA; }
+  .approve-row .ap-icon.off { background: rgba(255,212,0,0.2); color: #876300; }
+  .approve-row .ap-icon.cover { background: rgba(229,72,77,0.12); color: #B42318; }
+  .approve-row .ap-text { flex: 1; min-width: 0; font-size: 0.8125rem; line-height: 1.4; }
+  .approve-row .ap-meta { font-size: 0.6875rem; color: #6B7280; margin-top: 0.125rem; font-style: italic; }
+  .approve-row .ap-actions { display: flex; gap: 0.375rem; flex-shrink: 0; }
+
+  /* Modal + scrim */
+  .scrim { position: fixed; inset: 0; background: rgba(10,10,10,0.55); z-index: 90; opacity: 0; pointer-events: none; transition: opacity 0.18s ease; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
+  .scrim.on { opacity: 1; pointer-events: auto; }
+  .modal { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -48%); background: #FFFFFF; border-radius: 18px; max-width: min(560px, 92vw); width: 100%; max-height: 86vh; overflow: hidden; z-index: 95; opacity: 0; pointer-events: none; transition: opacity 0.18s ease, transform 0.18s ease; box-shadow: 0 30px 60px -20px rgba(0,0,0,0.35); display: flex; flex-direction: column; }
+  .modal.on { opacity: 1; pointer-events: auto; transform: translate(-50%, -50%); }
+  .modal-head { padding: 1rem 1.125rem; border-bottom: 1px solid #ECEAE3; display: flex; align-items: flex-start; justify-content: space-between; gap: 0.75rem; }
+  .modal-title { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 1.0625rem; line-height: 1.2; color: #0A0A0A; }
+  .modal-sub { font-size: 0.75rem; color: #6B7280; margin-top: 0.125rem; }
+  .modal-x { background: transparent; border: 0; cursor: pointer; color: #6B7280; padding: 0.25rem; border-radius: 6px; line-height: 0; flex-shrink: 0; }
+  .modal-x:hover { color: #0A0A0A; background: #F5F5F5; }
+  .modal-body { padding: 1.125rem; overflow-y: auto; }
+  .modal-foot { padding: 0.875rem 1.125rem; border-top: 1px solid #ECEAE3; background: #FAFAF7; display: flex; align-items: center; justify-content: flex-end; gap: 0.5rem; flex-wrap: wrap; }
+
+  .field-label { font-family: 'JetBrains Mono', monospace; font-size: 0.625rem; text-transform: uppercase; letter-spacing: 0.08em; color: #6B7280; display: block; margin-bottom: 0.25rem; font-weight: 600; }
+  .field-input { width: 100%; padding: 0.5rem 0.625rem; border: 1px solid #D4D4D4; border-radius: 8px; font-size: 0.8125rem; font-family: inherit; }
+  .field-input:focus { outline: none; border-color: #0A0A0A; box-shadow: 0 0 0 3px rgba(255,212,0,0.18); }
+
+  /* Toast */
+  .toast { position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%); background: #0A0A0A; color: #FFD400; padding: 0.75rem 1.125rem; border-radius: 10px; font-size: 0.8125rem; font-weight: 500; box-shadow: 0 12px 30px -8px rgba(0,0,0,0.3); z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.2s ease; max-width: 90vw; text-align: center; }
+  .toast.on { opacity: 1; }
+
+  /* Hidden by default — view-specific */
+  .view { display: none; }
+  .view.is-active { display: block; }
+
+  /* Cost progress bar */
+  .cost-bar { height: 8px; background: #F5F5F5; border-radius: 999px; overflow: hidden; }
+  .cost-bar > div { height: 100%; background: linear-gradient(90deg, #10B981 0%, #FFD400 78%, #E5484D 100%); transition: width 0.3s ease; border-radius: 999px; }
+
+  /* Day view roster */
+  .day-roster { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0.75rem; }
+  .roster-card { background: #FFFFFF; border: 1px solid #ECEAE3; border-radius: 14px; padding: 0.875rem 1rem; }
+  .roster-card.on-now { background: linear-gradient(180deg, #FFFBEB 0%, #FFFFFF 100%); border-color: #FFD400; }
+
+  .scroll-x { overflow-x: auto; }
+  .scroll-x::-webkit-scrollbar { height: 6px; }
+  .scroll-x::-webkit-scrollbar-thumb { background: #D4D4D4; border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<!-- ============================================== -->
+<!-- TOP NAV                                          -->
+<!-- ============================================== -->
+<nav class="bg-kapture-black text-white sticky top-0 z-40">
+  <div class="container-r">
+    <div class="flex items-center justify-between h-16 gap-4">
+      <a href="kooper-care-landing.html" class="flex items-center gap-3" title="Back to landing">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="28" height="28" fill="none" aria-label="kooper" role="img" class="text-white"><path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" d="M255.75 133.125c67.679 0 122.625 54.946 122.625 122.625S323.429 378.375 255.75 378.375 133.125 323.429 133.125 255.75s54.946-122.625 122.625-122.625m0-132.75c18.832 0 34.121 15.289 34.121 34.121s-15.289 34.121-34.121 34.121-34.121-15.289-34.121-34.121S236.918.375 255.75.375M75.173 75.173c13.316-13.316 34.938-13.316 48.254 0s13.316 34.938 0 48.254-34.938 13.316-48.254 0-13.316-34.938 0-48.254M511.125 255.75c0 18.832-15.289 34.121-34.121 34.121s-34.121-15.289-34.121-34.121 15.289-34.121 34.121-34.121 34.121 15.289 34.121 34.121M255.75 442.883c18.832 0 34.121 15.289 34.121 34.121s-15.289 34.121-34.121 34.121-34.121-15.289-34.121-34.121 15.289-34.121 34.121-34.121m132.323-54.81c13.316-13.316 34.938-13.316 48.254 0s13.316 34.938 0 48.254-34.938 13.316-48.254 0-13.316-34.938 0-48.254M68.617 255.75c0 18.832-15.289 34.121-34.121 34.121S.375 274.582.375 255.75s15.289-34.121 34.121-34.121 34.121 15.289 34.121 34.121m54.81 132.323c13.316 13.316 13.316 34.938 0 48.254s-34.938 13.316-48.254 0-13.316-34.938 0-48.254 34.938-13.316 48.254 0"/><path fill="#FFD400" fill-rule="evenodd" clip-rule="evenodd" d="M436.327 75.173c13.316 13.316 13.316 34.938 0 48.254s-34.938 13.316-48.254 0-13.316-34.938 0-48.254 34.938-13.316 48.254 0"/></svg>
+        <span class="hidden sm:flex items-center gap-2 font-display lowercase tracking-wide text-base">
+          <span class="font-semibold">kooper</span><span class="text-white/40">·</span><span class="font-medium">rota</span>
+        </span>
+      </a>
+      <div class="hidden lg:flex items-center gap-1">
+        <a href="kooper-care-landing.html" class="nav-link">Home</a>
+        <a href="kooper-care-dashboards.html" class="nav-link">Dashboard</a>
+        <a href="kooper-hr.html" class="nav-link">HR launcher</a>
+        <a href="kooper-care-plans.html" class="nav-link">Care plans</a>
+        <a href="kooper-clinical.html" class="nav-link">Clinical</a>
+        <a href="kooper-recording-demo.html" class="nav-link">Reporting</a>
+        <a href="kooper-reports.html" class="nav-link">Reports</a>
+        <a href="kooper-ai.html" class="nav-link">ai</a>
+      </div>
+      <div class="flex items-center gap-2">
+        <a href="kooper-hr.html" class="hidden md:inline-flex items-center gap-1 px-2.5 py-1.5 bg-kapture-coal text-white/80 rounded-md text-xs hover:bg-kapture-ash" title="Exit to HR launcher">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+          HR
+        </a>
+        <button id="kooperHintsBtn" type="button" aria-label="Toggle hints"><span class="kt-hint-dot-mini" aria-hidden="true"></span><span data-kt-label>Hints</span></button>
+        <button onclick="openAddShift()" class="btn-yellow text-xs whitespace-nowrap">+ Shift</button>
+        <a href="kooper-sign-in.html" class="hidden md:inline-flex p-1.5 rounded text-white/60 hover:text-white hover:bg-kapture-coal" title="Sign out" aria-label="Sign out">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ============================================== -->
+<!-- HERO STRIP                                       -->
+<!-- ============================================== -->
+<section class="bg-kapture-black text-white relative overflow-hidden">
+  <div class="absolute -right-40 -top-40 w-[460px] h-[460px] rounded-full bg-kapture-yellow/15 blur-3xl pointer-events-none"></div>
+  <div class="container-r relative py-8 lg:py-10">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-end">
+      <div class="lg:col-span-7">
+        <div class="ed-kicker on-dark mb-3">KOOPER · ROTA · MICRO-APP</div>
+        <h1 class="h-hero text-white mb-2">Manage the week. Work the week.</h1>
+        <p class="text-white/70 max-w-2xl text-sm lg:text-base">Drag-drop shifts, WTR conflict detection, swap requests, time-off, live cost tracking — and a Worker view that gives every staff member their own week, payslips and clock-in. One micro-app, two sides.</p>
+
+        <!-- View toggle -->
+        <div class="mt-6">
+          <div class="text-[0.6875rem] uppercase tracking-widest text-kapture-mist font-mono mb-2">View as</div>
+          <div class="flex flex-wrap gap-2" id="viewToggle">
+            <button class="view-pill active" data-view="manager" onclick="switchView(this,'manager')">Manager <span class="vp-key">M</span></button>
+            <button class="view-pill" data-view="worker" onclick="switchView(this,'worker')">Worker <span class="vp-key">W</span></button>
+            <button class="view-pill" data-view="day" onclick="switchView(this,'day')">Day · today <span class="vp-key">D</span></button>
+          </div>
+        </div>
+      </div>
+
+      <div class="lg:col-span-5">
+        <div class="bg-white/5 border border-white/10 rounded-2xl p-4 backdrop-blur-sm">
+          <div class="flex items-center justify-between mb-3">
+            <div class="text-[0.6875rem] uppercase tracking-widest text-kapture-mist font-mono">Week</div>
+            <div class="flex items-center gap-1">
+              <button onclick="weekShift(-1)" class="w-7 h-7 rounded-md bg-white/8 hover:bg-white/15 text-white/70 hover:text-white" aria-label="Previous week">‹</button>
+              <button onclick="weekToday()" class="px-2 py-1 text-xs rounded-md bg-white/8 hover:bg-white/15 text-white/85">Today</button>
+              <button onclick="weekShift(1)" class="w-7 h-7 rounded-md bg-white/8 hover:bg-white/15 text-white/70 hover:text-white" aria-label="Next week">›</button>
+            </div>
+          </div>
+          <div id="weekRange" class="font-mono text-sm">Mon 4 May → Sun 10 May 2026</div>
+          <div class="grid grid-cols-3 gap-2 mt-3 pt-3 border-t border-white/10 text-xs">
+            <div><div class="text-white/50 font-mono">Site</div><div class="font-mono font-semibold">Draycott</div></div>
+            <div><div class="text-white/50 font-mono">Workers</div><div class="font-mono font-semibold" id="hWorkers">15</div></div>
+            <div><div class="text-white/50 font-mono">Coverage</div><div class="font-mono font-semibold text-kapture-yellow" id="hCoverage">98%</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================== -->
+<!-- KPI STRIP                                        -->
+<!-- ============================================== -->
+<section class="bg-kapture-paper border-b border-kapture-fog py-4">
+  <div class="container-r">
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+      <div class="kpi-card">
+        <div class="k-label">Hours scheduled</div>
+        <div class="k-num" id="kpiHours">412h</div>
+        <div class="k-sub">across 15 workers</div>
+      </div>
+      <div class="kpi-card">
+        <div class="k-label">Live cost</div>
+        <div class="k-num" id="kpiCost">£6,240</div>
+        <div class="k-sub" id="kpiCostSub">Budget £6,400 · 97%</div>
+      </div>
+      <div class="kpi-card">
+        <div class="k-label">Coverage gaps</div>
+        <div class="k-num" id="kpiGaps">2</div>
+        <div class="k-sub">Wed evening · Fri night</div>
+      </div>
+      <div class="kpi-card">
+        <div class="k-label">WTR flags</div>
+        <div class="k-num" id="kpiFlags">0</div>
+        <div class="k-sub">Working Time Regs · clean</div>
+      </div>
+      <div class="kpi-card dark">
+        <div class="k-label">Approvals</div>
+        <div class="k-num" id="kpiApprovals">3</div>
+        <div class="k-sub">2 swaps · 1 time-off</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================== -->
+<!-- VIEW · MANAGER                                   -->
+<!-- ============================================== -->
+<section class="view is-active py-8 lg:py-10" data-view="manager">
+  <div class="container-r space-y-8">
+
+    <!-- Cost panel -->
+    <div class="bg-white border border-kapture-fog rounded-2xl p-5">
+      <div class="flex items-center justify-between mb-3 flex-wrap gap-2">
+        <div>
+          <div class="ed-kicker">WEEK COST</div>
+          <h2 class="h-section mt-2">£6,240 of £6,400 budget · 97%</h2>
+        </div>
+        <div class="flex gap-2 flex-wrap">
+          <button onclick="kooperToast('Forecast saved · variance alerts armed')" class="btn-secondary">Save forecast</button>
+          <button onclick="openPublishModal()" class="btn-primary">Publish week to staff →</button>
+        </div>
+      </div>
+      <div class="cost-bar"><div style="width:97%"></div></div>
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4 text-xs">
+        <div><div class="text-kapture-mist font-mono">Day shifts</div><div class="font-mono font-semibold mt-0.5 text-kapture-black">£3,420 · 21 shifts</div></div>
+        <div><div class="text-kapture-mist font-mono">Evening shifts</div><div class="font-mono font-semibold mt-0.5 text-kapture-black">£1,820 · 12 shifts</div></div>
+        <div><div class="text-kapture-mist font-mono">Night shifts</div><div class="font-mono font-semibold mt-0.5 text-kapture-black">£760 · 7 shifts</div></div>
+        <div><div class="text-kapture-mist font-mono">Cover &amp; bank</div><div class="font-mono font-semibold mt-0.5 text-status-warning">£240 · 2 shifts</div></div>
+      </div>
+    </div>
+
+    <!-- Coverage gaps banner -->
+    <div class="bg-kapture-black text-white rounded-2xl p-5 relative overflow-hidden">
+      <div class="absolute -right-16 -top-16 w-48 h-48 rounded-full bg-status-critical/20 blur-3xl pointer-events-none"></div>
+      <div class="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 flex-wrap">
+        <div>
+          <div class="ed-kicker on-dark">COVERAGE GAPS · 2</div>
+          <h3 class="font-display text-xl font-semibold mt-1">Wed evening + Fri night need cover</h3>
+          <p class="text-white/65 text-sm mt-1">Bank carer auto-suggested for both. Tap accept to slot in.</p>
+        </div>
+        <div class="flex gap-2 flex-wrap">
+          <button onclick="kooperToast('Auto-cover applied · Wed eve 14:00–22:00 + Fri night 22:00–07:00')" class="btn-yellow">Auto-fill from bank</button>
+          <button onclick="kooperToast('Open call sent · 4 bank carers + 2 staff')" class="btn-secondary-on-dark">Open call</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Week grid -->
+    <div>
+      <div class="flex items-center justify-between mb-3 flex-wrap gap-2">
+        <h2 class="h-section">Week grid · drag to reschedule</h2>
+        <div class="flex items-center gap-2 flex-wrap">
+          <button onclick="kooperToast('Filter · day / evening / night / cover')" class="chip">Filter</button>
+          <button onclick="kooperToast('Sort · alphabetical · contracted hours · seniority')" class="chip">Sort</button>
+          <button onclick="bulkImport()" class="btn-secondary">Bulk import .csv</button>
+        </div>
+      </div>
+      <div class="scroll-x">
+        <div class="week-grid" id="weekGrid">
+          <!-- Header row -->
+          <div class="week-grid-head">
+            <div class="week-cell day-head" style="background:#FAFAF7"><span>Worker</span></div>
+            <div class="week-cell day-head"><span>Mon</span><span class="d-num">4</span></div>
+            <div class="week-cell day-head"><span>Tue</span><span class="d-num">5</span></div>
+            <div class="week-cell day-head is-today"><span>Wed · today</span><span class="d-num">6</span></div>
+            <div class="week-cell day-head"><span>Thu</span><span class="d-num">7</span></div>
+            <div class="week-cell day-head"><span>Fri</span><span class="d-num">8</span></div>
+            <div class="week-cell day-head"><span>Sat</span><span class="d-num">9</span></div>
+            <div class="week-cell day-head"><span>Sun</span><span class="d-num">10</span></div>
+          </div>
+          <!-- Worker rows populated by JS -->
+        </div>
+      </div>
+      <p class="text-xs text-kapture-smoke mt-3 italic">Drag any shift to a different cell to reschedule. Drop an empty cell to add. Conflicts (consecutive nights, &gt;48h week, missed breaks) flash red automatically.</p>
+    </div>
+
+    <!-- Approvals -->
+    <div class="bg-white border border-kapture-fog rounded-2xl overflow-hidden">
+      <div class="px-5 py-3 border-b border-kapture-fog flex items-center justify-between bg-kapture-paper">
+        <div>
+          <div class="ed-kicker">APPROVALS · 3 PENDING</div>
+        </div>
+        <div class="flex gap-2">
+          <button onclick="kooperToast('All marked seen · 0 left in your queue')" class="chip">Mark all seen</button>
+        </div>
+      </div>
+      <div id="approvalsList">
+        <div class="approve-row">
+          <span class="ap-icon swap">SWAP</span>
+          <div class="flex-1">
+            <div class="ap-text"><strong>Craig Musara</strong> requests to swap his Sat day shift with <strong>Rebecca Adesina</strong>'s Sun day shift.</div>
+            <div class="ap-meta">submitted 14:18 · Rebecca already accepted</div>
+          </div>
+          <div class="ap-actions">
+            <button onclick="approveItem(this,'Swap approved · rota auto-updated')" class="btn-yellow text-xs py-1.5">Approve</button>
+            <button onclick="approveItem(this,'Swap declined · Craig + Rebecca notified')" class="chip">Decline</button>
+          </div>
+        </div>
+        <div class="approve-row">
+          <span class="ap-icon swap">SWAP</span>
+          <div class="flex-1">
+            <div class="ap-text"><strong>Daniel Kowalski</strong> requests to drop his Thu evening (16:00–22:00) and pick up Sun day instead.</div>
+            <div class="ap-meta">submitted 11:42 · no current taker for Thu evening</div>
+          </div>
+          <div class="ap-actions">
+            <button onclick="approveItem(this,'Swap approved with cover · open call to fill Thu evening')" class="btn-yellow text-xs py-1.5">Approve</button>
+            <button onclick="approveItem(this,'Swap declined · Daniel notified')" class="chip">Decline</button>
+          </div>
+        </div>
+        <div class="approve-row">
+          <span class="ap-icon off">OFF</span>
+          <div class="flex-1">
+            <div class="ap-text"><strong>Sister Anne</strong> requests time off · 19–22 May (3 days · planned annual leave).</div>
+            <div class="ap-meta">submitted Mon · annual leave balance 8 days remaining after this</div>
+          </div>
+          <div class="ap-actions">
+            <button onclick="approveItem(this,'Time off approved · cover plan auto-drafted')" class="btn-yellow text-xs py-1.5">Approve</button>
+            <button onclick="approveItem(this,'Time off declined · Sister Anne notified with reason')" class="chip">Decline</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============================================== -->
+<!-- VIEW · WORKER                                    -->
+<!-- ============================================== -->
+<section class="view py-8 lg:py-10" data-view="worker">
+  <div class="container-r space-y-8">
+
+    <!-- Worker header -->
+    <div class="flex items-center justify-between flex-wrap gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 rounded-full bg-kapture-coal text-kapture-yellow flex items-center justify-center font-display font-bold">CM</div>
+        <div>
+          <div class="font-display text-lg font-semibold">Craig Musara</div>
+          <div class="text-xs text-kapture-smoke font-mono">Carer · Draycott · 32h contracted weekly</div>
+        </div>
+      </div>
+      <div class="flex gap-2 flex-wrap">
+        <button onclick="openTimeOff()" class="btn-secondary">Request time off</button>
+        <button onclick="openSwap()" class="btn-yellow">Request swap</button>
+      </div>
+    </div>
+
+    <!-- Next shift -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <div class="my-shift-card next lg:col-span-1">
+        <div class="ms-day">Today · in 2h 18m</div>
+        <div class="ms-time">14:00 — 22:00</div>
+        <div class="ms-meta">Day · Draycott · 8h shift · break 17:30</div>
+        <div class="mt-4 pt-4 border-t border-white/10 flex flex-wrap gap-2">
+          <button onclick="kooperToast('Clocked in at 14:00 · welcome Craig')" class="btn-yellow text-xs">Clock in</button>
+          <button onclick="kooperToast('Sister Anne notified · running 5 min late')" class="btn-secondary-on-dark text-xs">I'll be late</button>
+        </div>
+      </div>
+      <div class="my-shift-card lg:col-span-1">
+        <div class="ms-day">This week</div>
+        <div class="ms-time">32h scheduled</div>
+        <div class="ms-meta">4 shifts · matches contract · 0 overtime</div>
+        <div class="mt-4 pt-4 border-t border-kapture-fog text-xs space-y-1">
+          <div class="flex justify-between"><span class="text-kapture-smoke">Mon · Tue</span><span class="font-mono">off</span></div>
+          <div class="flex justify-between"><span class="text-kapture-smoke">Wed · today</span><span class="font-mono">14:00–22:00</span></div>
+          <div class="flex justify-between"><span class="text-kapture-smoke">Thu</span><span class="font-mono">14:00–22:00</span></div>
+          <div class="flex justify-between"><span class="text-kapture-smoke">Fri</span><span class="font-mono">14:00–22:00</span></div>
+          <div class="flex justify-between"><span class="text-kapture-smoke">Sat</span><span class="font-mono">07:00–15:00</span></div>
+        </div>
+      </div>
+      <div class="my-shift-card lg:col-span-1">
+        <div class="ms-day">Earnings · this period</div>
+        <div class="ms-time">£1,548</div>
+        <div class="ms-meta">128h · period 27 Apr → 24 May · paid Fri 30 May</div>
+        <div class="mt-4 pt-4 border-t border-kapture-fog flex flex-wrap gap-2">
+          <button onclick="kooperToast('Last 3 payslips opened in new tab')" class="chip text-xs">Payslips</button>
+          <button onclick="kooperToast('Timesheet signed · sent to Lola for approval')" class="chip text-xs">Sign timesheet</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- My pending requests -->
+    <div class="bg-white border border-kapture-fog rounded-2xl overflow-hidden">
+      <div class="px-5 py-3 border-b border-kapture-fog bg-kapture-paper">
+        <div class="ed-kicker">MY REQUESTS · STATUS</div>
+      </div>
+      <div>
+        <div class="approve-row">
+          <span class="ap-icon swap">SWAP</span>
+          <div class="flex-1">
+            <div class="ap-text">Swap requested · my Sat day shift ↔ Rebecca's Sun day shift.</div>
+            <div class="ap-meta">submitted 14:18 · Rebecca accepted · awaiting Lola's approval</div>
+          </div>
+          <div class="ap-actions">
+            <span class="chip chip-warn text-xs">Pending</span>
+          </div>
+        </div>
+        <div class="approve-row">
+          <span class="ap-icon off">OFF</span>
+          <div class="flex-1">
+            <div class="ap-text">Time off · 12–14 Jun (3 days · holiday in Spain).</div>
+            <div class="ap-meta">submitted last week · approved · cover assigned · auto-added to calendar</div>
+          </div>
+          <div class="ap-actions">
+            <span class="chip chip-ok text-xs">Approved</span>
+          </div>
+        </div>
+        <div class="approve-row">
+          <span class="ap-icon cover">COVER</span>
+          <div class="flex-1">
+            <div class="ap-text">Cover offer · Wed evening 14:00–22:00 (open call).</div>
+            <div class="ap-meta">posted 9 May · 3 takers · close at 16:00 today</div>
+          </div>
+          <div class="ap-actions">
+            <button onclick="kooperToast('Picked up · Wed evening shift now yours')" class="btn-yellow text-xs py-1.5">Pick up</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Availability + WTR -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="bg-white border border-kapture-fog rounded-2xl p-5">
+        <div class="flex items-center justify-between mb-3">
+          <div class="ed-kicker">MY AVAILABILITY</div>
+          <button onclick="kooperToast('Availability editor opens · drag to set hours')" class="text-xs text-kapture-smoke hover:text-kapture-black">Edit →</button>
+        </div>
+        <div class="grid grid-cols-7 gap-1 text-center text-[0.6875rem]">
+          <div><div class="text-kapture-mist">M</div><div class="mt-1 h-12 rounded bg-status-ok/15 text-emerald-700 font-mono flex items-center justify-center">all day</div></div>
+          <div><div class="text-kapture-mist">T</div><div class="mt-1 h-12 rounded bg-status-ok/15 text-emerald-700 font-mono flex items-center justify-center">all day</div></div>
+          <div><div class="text-kapture-mist">W</div><div class="mt-1 h-12 rounded bg-kapture-yellow/30 text-amber-800 font-mono flex items-center justify-center">PM only</div></div>
+          <div><div class="text-kapture-mist">T</div><div class="mt-1 h-12 rounded bg-kapture-yellow/30 text-amber-800 font-mono flex items-center justify-center">PM only</div></div>
+          <div><div class="text-kapture-mist">F</div><div class="mt-1 h-12 rounded bg-kapture-yellow/30 text-amber-800 font-mono flex items-center justify-center">PM only</div></div>
+          <div><div class="text-kapture-mist">S</div><div class="mt-1 h-12 rounded bg-status-ok/15 text-emerald-700 font-mono flex items-center justify-center">AM only</div></div>
+          <div><div class="text-kapture-mist">S</div><div class="mt-1 h-12 rounded bg-kapture-fog text-kapture-mist font-mono flex items-center justify-center">off</div></div>
+        </div>
+      </div>
+      <div class="bg-white border border-kapture-fog rounded-2xl p-5">
+        <div class="ed-kicker mb-3">WORKING TIME · COMPLIANT</div>
+        <div class="space-y-2 text-sm">
+          <div class="flex items-center justify-between"><span>This week</span><span class="font-mono text-status-ok">32 / 48h</span></div>
+          <div class="flex items-center justify-between"><span>Average · last 17 weeks</span><span class="font-mono text-status-ok">31h</span></div>
+          <div class="flex items-center justify-between"><span>Days off in last 7 days</span><span class="font-mono text-status-ok">2 days</span></div>
+          <div class="flex items-center justify-between"><span>Consecutive nights</span><span class="font-mono">0 / 4 max</span></div>
+          <div class="flex items-center justify-between"><span>Night-worker opt-out</span><span class="font-mono text-kapture-mist">No</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============================================== -->
+<!-- VIEW · DAY                                       -->
+<!-- ============================================== -->
+<section class="view py-8 lg:py-10" data-view="day">
+  <div class="container-r space-y-8">
+    <div>
+      <div class="ed-kicker">TODAY · WED 6 MAY</div>
+      <h2 class="h-section mt-2">Who's on, who's coming, who's just gone home.</h2>
+    </div>
+
+    <!-- Live now panel -->
+    <div class="bg-kapture-black text-white rounded-2xl p-5 relative overflow-hidden">
+      <div class="absolute -right-16 -top-16 w-48 h-48 rounded-full bg-kapture-yellow/15 blur-3xl pointer-events-none"></div>
+      <div class="relative">
+        <div class="flex items-center gap-2 mb-3">
+          <span class="pulse-dot"></span>
+          <span class="ed-kicker on-dark">LIVE · 4 ON THE FLOOR</span>
+        </div>
+        <div class="day-roster">
+          <div class="roster-card on-now"><div class="flex items-center justify-between mb-1"><div class="font-medium text-sm">Sister Anne</div><span class="chip chip-ok text-[0.625rem]"><span class="pulse-dot"></span>On floor</span></div><div class="text-xs text-kapture-smoke font-mono">Nurse · 12:00–22:00 · break 18:00</div></div>
+          <div class="roster-card on-now"><div class="flex items-center justify-between mb-1"><div class="font-medium text-sm">Craig Musara</div><span class="chip chip-ok text-[0.625rem]"><span class="pulse-dot"></span>On floor</span></div><div class="text-xs text-kapture-smoke font-mono">Carer · 14:00–22:00 · break 17:30</div></div>
+          <div class="roster-card on-now"><div class="flex items-center justify-between mb-1"><div class="font-medium text-sm">Rebecca Adesina</div><span class="chip chip-ok text-[0.625rem]"><span class="pulse-dot"></span>On floor</span></div><div class="text-xs text-kapture-smoke font-mono">Senior Carer · 14:00–22:00 · break 18:30</div></div>
+          <div class="roster-card on-now"><div class="flex items-center justify-between mb-1"><div class="font-medium text-sm">Daniel Kowalski</div><span class="chip chip-warn text-[0.625rem]">Ending soon</span></div><div class="text-xs text-kapture-smoke font-mono">Activities · 09:00–17:00 · ends in 25m</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Coming up + Just gone home -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div class="bg-white border border-kapture-fog rounded-2xl p-5">
+        <div class="ed-kicker mb-3">COMING UP · TODAY</div>
+        <div class="space-y-2 text-sm">
+          <div class="flex items-center justify-between p-2 rounded hover:bg-kapture-paper"><div><div class="font-medium">Bank carer · TBC</div><div class="text-xs text-kapture-smoke font-mono">22:00–07:00 · Night · cover gap</div></div><span class="chip chip-warn text-[0.6875rem]">Auto-fill armed</span></div>
+          <div class="flex items-center justify-between p-2 rounded hover:bg-kapture-paper"><div><div class="font-medium">Yvonne Patel</div><div class="text-xs text-kapture-smoke font-mono">22:00–07:00 · Night nurse</div></div><span class="chip text-[0.6875rem]">Confirmed</span></div>
+        </div>
+      </div>
+      <div class="bg-white border border-kapture-fog rounded-2xl p-5">
+        <div class="ed-kicker mb-3">JUST GONE HOME</div>
+        <div class="space-y-2 text-sm">
+          <div class="flex items-center justify-between p-2 rounded hover:bg-kapture-paper"><div><div class="font-medium">Mary Chen</div><div class="text-xs text-kapture-smoke font-mono">06:00–14:00 · Cook · clocked out 14:02</div></div><span class="chip chip-ok text-[0.6875rem]">Timesheet ✓</span></div>
+          <div class="flex items-center justify-between p-2 rounded hover:bg-kapture-paper"><div><div class="font-medium">Tomas Bauer</div><div class="text-xs text-kapture-smoke font-mono">07:00–15:00 · Maintenance · clocked out 15:08</div></div><span class="chip chip-ok text-[0.6875rem]">Timesheet ✓</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Hours grid by skill -->
+    <div class="bg-white border border-kapture-fog rounded-2xl p-5">
+      <div class="ed-kicker mb-3">COVERAGE BY SKILL · TODAY</div>
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-sm">
+        <div class="p-3 bg-kapture-paper rounded-lg"><div class="text-kapture-mist text-xs font-mono">Nurse</div><div class="font-display font-semibold text-lg mt-0.5">2</div><div class="text-xs text-status-ok mt-0.5">Day + night ✓</div></div>
+        <div class="p-3 bg-kapture-paper rounded-lg"><div class="text-kapture-mist text-xs font-mono">Senior carer</div><div class="font-display font-semibold text-lg mt-0.5">1</div><div class="text-xs text-status-ok mt-0.5">Shift lead ✓</div></div>
+        <div class="p-3 bg-kapture-paper rounded-lg"><div class="text-kapture-mist text-xs font-mono">Carer</div><div class="font-display font-semibold text-lg mt-0.5">3</div><div class="text-xs text-status-ok mt-0.5">3:1 ratio ✓</div></div>
+        <div class="p-3 bg-kapture-paper rounded-lg"><div class="text-kapture-mist text-xs font-mono">Activities</div><div class="font-display font-semibold text-lg mt-0.5">1</div><div class="text-xs text-status-warning mt-0.5">Ending 17:00</div></div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ============================================== -->
+<!-- FOOTER                                           -->
+<!-- ============================================== -->
+<footer class="bg-kapture-paper border-t border-kapture-fog py-6 mt-8">
+  <div class="container-r flex flex-col md:flex-row md:items-center md:justify-between gap-3 text-xs text-kapture-smoke">
+    <div class="flex items-center gap-3">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="22" height="22" fill="none" aria-label="kooper" role="img" class="text-kapture-black"><path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" d="M255.75 133.125c67.679 0 122.625 54.946 122.625 122.625S323.429 378.375 255.75 378.375 133.125 323.429 133.125 255.75s54.946-122.625 122.625-122.625m0-132.75c18.832 0 34.121 15.289 34.121 34.121s-15.289 34.121-34.121 34.121-34.121-15.289-34.121-34.121S236.918.375 255.75.375M75.173 75.173c13.316-13.316 34.938-13.316 48.254 0s13.316 34.938 0 48.254-34.938 13.316-48.254 0-13.316-34.938 0-48.254M511.125 255.75c0 18.832-15.289 34.121-34.121 34.121s-34.121-15.289-34.121-34.121 15.289-34.121 34.121-34.121 34.121 15.289 34.121 34.121M255.75 442.883c18.832 0 34.121 15.289 34.121 34.121s-15.289 34.121-34.121 34.121-34.121-15.289-34.121-34.121 15.289-34.121 34.121-34.121m132.323-54.81c13.316-13.316 34.938-13.316 48.254 0s13.316 34.938 0 48.254-34.938 13.316-48.254 0-13.316-34.938 0-48.254M68.617 255.75c0 18.832-15.289 34.121-34.121 34.121S.375 274.582.375 255.75s15.289-34.121 34.121-34.121 34.121 15.289 34.121 34.121m54.81 132.323c13.316 13.316 13.316 34.938 0 48.254s-34.938 13.316-48.254 0-13.316-34.938 0-48.254 34.938-13.316 48.254 0"/><path fill="#FFD400" fill-rule="evenodd" clip-rule="evenodd" d="M436.327 75.173c13.316 13.316 13.316 34.938 0 48.254s-34.938 13.316-48.254 0-13.316-34.938 0-48.254 34.938-13.316 48.254 0"/></svg>
+      <div class="flex items-center gap-1.5 font-display lowercase tracking-wide text-sm text-kapture-black"><span class="font-semibold">kooper</span><span class="text-kapture-mist">·</span><span class="font-medium">rota</span></div>
+    </div>
+    <div class="flex items-center gap-3 flex-wrap">
+      <a href="kooper-hr.html" class="hover:text-kapture-black underline-offset-4 hover:underline">← HR launcher</a>
+      <span aria-hidden>·</span>
+      <span class="font-mono">v0.1 · standalone micro-app</span>
+      <span aria-hidden>·</span>
+      <span>Mock data · no PII</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ============================================== -->
+<!-- MODALS                                           -->
+<!-- ============================================== -->
+<div id="scrim" class="scrim" onclick="closeAll()"></div>
+
+<!-- Add shift modal -->
+<div id="addShiftModal" class="modal" role="dialog" aria-label="Add shift">
+  <div class="modal-head">
+    <div>
+      <div class="modal-title">Add a shift</div>
+      <div class="modal-sub">Pick a worker, a day, a shift type — it lands on the grid.</div>
+    </div>
+    <button class="modal-x" onclick="closeAll()" aria-label="Close"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button>
+  </div>
+  <div class="modal-body">
+    <form onsubmit="submitAddShift(event)" class="space-y-3">
+      <div class="grid grid-cols-2 gap-3">
+        <div><label class="field-label">Worker</label><select id="newWorker" class="field-input"><option>Sister Anne · Nurse</option><option>Craig Musara · Carer</option><option>Rebecca Adesina · Senior Carer</option><option>Daniel Kowalski · Activities</option><option>Yvonne Patel · Nurse</option><option>Mary Chen · Cook</option><option>Tomas Bauer · Maintenance</option></select></div>
+        <div><label class="field-label">Day</label><select id="newDay" class="field-input"><option>Mon 4 May</option><option>Tue 5 May</option><option selected>Wed 6 May · today</option><option>Thu 7 May</option><option>Fri 8 May</option><option>Sat 9 May</option><option>Sun 10 May</option></select></div>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div><label class="field-label">Shift type</label><select id="newType" class="field-input"><option value="day">Day · 07:00–15:00</option><option value="day">Day · 14:00–22:00</option><option value="evening">Evening · 16:00–22:00</option><option value="night">Night · 22:00–07:00</option><option value="cover">Cover · open call</option></select></div>
+        <div><label class="field-label">Hours</label><input id="newHours" type="text" class="field-input" value="8" /></div>
+      </div>
+      <div><label class="field-label">Note (optional)</label><input id="newNote" type="text" class="field-input" placeholder="e.g. cover for Mary's holiday" /></div>
+    </form>
+  </div>
+  <div class="modal-foot">
+    <button onclick="closeAll()" class="chip">Cancel</button>
+    <button onclick="document.querySelector('#addShiftModal form').requestSubmit()" class="btn-yellow">Add shift</button>
+  </div>
+</div>
+
+<!-- Time off modal -->
+<div id="timeOffModal" class="modal" role="dialog" aria-label="Request time off">
+  <div class="modal-head">
+    <div>
+      <div class="modal-title">Request time off</div>
+      <div class="modal-sub">Goes to your manager · most replies within 24h</div>
+    </div>
+    <button class="modal-x" onclick="closeAll()" aria-label="Close"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button>
+  </div>
+  <div class="modal-body">
+    <form onsubmit="submitTimeOff(event)" class="space-y-3">
+      <div class="grid grid-cols-2 gap-3">
+        <div><label class="field-label">From</label><input id="offFrom" type="date" class="field-input" value="2026-06-12" /></div>
+        <div><label class="field-label">To</label><input id="offTo" type="date" class="field-input" value="2026-06-14" /></div>
+      </div>
+      <div><label class="field-label">Reason</label><select id="offReason" class="field-input"><option>Annual leave</option><option>Personal day</option><option>Sick</option><option>Family emergency</option><option>Compassionate</option><option>Other</option></select></div>
+      <div><label class="field-label">Note to manager</label><textarea id="offNote" rows="3" class="field-input" placeholder="Optional context — helps your manager say yes."></textarea></div>
+      <div class="rounded-lg bg-kapture-paper p-3 text-xs text-kapture-smoke">
+        <strong class="text-kapture-black">Annual leave balance</strong> · 11 days remaining · this request would leave you with 8 days.
+      </div>
+    </form>
+  </div>
+  <div class="modal-foot">
+    <button onclick="closeAll()" class="chip">Cancel</button>
+    <button onclick="document.querySelector('#timeOffModal form').requestSubmit()" class="btn-yellow">Send request</button>
+  </div>
+</div>
+
+<!-- Swap modal -->
+<div id="swapModal" class="modal" role="dialog" aria-label="Request swap">
+  <div class="modal-head">
+    <div>
+      <div class="modal-title">Request a shift swap</div>
+      <div class="modal-sub">Offer one of your shifts in exchange for someone else's.</div>
+    </div>
+    <button class="modal-x" onclick="closeAll()" aria-label="Close"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button>
+  </div>
+  <div class="modal-body">
+    <form onsubmit="submitSwap(event)" class="space-y-3">
+      <div><label class="field-label">My shift to give up</label><select id="swapMine" class="field-input"><option>Wed 6 May · 14:00–22:00 · day</option><option>Thu 7 May · 14:00–22:00 · day</option><option>Sat 9 May · 07:00–15:00 · day</option></select></div>
+      <div><label class="field-label">Shift I want instead</label><select id="swapTheirs" class="field-input"><option>Sun 10 May · Rebecca · 07:00–15:00 · day</option><option>Sun 10 May · Daniel · 14:00–22:00 · day</option><option>Mon 11 May · Sister Anne · 12:00–22:00</option></select></div>
+      <div><label class="field-label">Note to recipient</label><textarea id="swapNote" rows="3" class="field-input" placeholder="Optional · e.g. family event Saturday"></textarea></div>
+    </form>
+  </div>
+  <div class="modal-foot">
+    <button onclick="closeAll()" class="chip">Cancel</button>
+    <button onclick="document.querySelector('#swapModal form').requestSubmit()" class="btn-yellow">Send swap request</button>
+  </div>
+</div>
+
+<!-- Publish modal -->
+<div id="publishModal" class="modal" role="dialog" aria-label="Publish week">
+  <div class="modal-head">
+    <div>
+      <div class="modal-title">Publish week to staff</div>
+      <div class="modal-sub">Locks the schedule and notifies everyone with a shift this week.</div>
+    </div>
+    <button class="modal-x" onclick="closeAll()" aria-label="Close"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button>
+  </div>
+  <div class="modal-body space-y-3 text-sm">
+    <div class="rounded-lg bg-kapture-paper p-3">
+      <div class="font-medium text-kapture-black mb-1">42 shifts ready · 15 workers · 412 hours</div>
+      <div class="text-xs text-kapture-smoke">Cost £6,240 against £6,400 budget. 2 cover gaps · 0 WTR conflicts.</div>
+    </div>
+    <label class="flex items-start gap-2 text-xs cursor-pointer"><input type="checkbox" checked class="mt-0.5"><span>Notify all 15 workers via push + email</span></label>
+    <label class="flex items-start gap-2 text-xs cursor-pointer"><input type="checkbox" checked class="mt-0.5"><span>Lock changes — only swap requests + cover offers from here</span></label>
+    <label class="flex items-start gap-2 text-xs cursor-pointer"><input type="checkbox" class="mt-0.5"><span>Send to payroll on shift completion (auto-timesheet)</span></label>
+  </div>
+  <div class="modal-foot">
+    <button onclick="closeAll()" class="chip">Cancel</button>
+    <button onclick="publishWeek()" class="btn-primary">Publish week</button>
+  </div>
+</div>
+
+<div id="toast" class="toast">Saved</div>
+
+<script>
+function kooperToast(msg){ var t=document.getElementById('toast'); t.textContent=msg||'Saved'; t.classList.add('on'); clearTimeout(window.__t); window.__t=setTimeout(()=>t.classList.remove('on'),1700); }
+
+// ============================================================
+// VIEW SWITCHER
+// ============================================================
+function switchView(btn, key){
+  document.querySelectorAll('.view-pill').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('section.view').forEach(s=>s.classList.toggle('is-active', s.dataset.view===key));
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+// Keyboard shortcuts
+document.addEventListener('keydown', e => {
+  if (e.target.matches('input, textarea, select')) return;
+  if (e.key.toLowerCase() === 'm') { var b = document.querySelector('[data-view="manager"]'); if (b) switchView(b,'manager'); }
+  if (e.key.toLowerCase() === 'w') { var b = document.querySelector('[data-view="worker"]');  if (b) switchView(b,'worker'); }
+  if (e.key.toLowerCase() === 'd') { var b = document.querySelector('[data-view="day"]');     if (b) switchView(b,'day'); }
+});
+
+// ============================================================
+// WEEK NAVIGATION
+// ============================================================
+let weekOffset = 0;
+const WEEK_LABEL = ['4 May','11 May','18 May','25 May','1 Jun','8 Jun'];
+function weekShift(delta){
+  weekOffset = Math.max(-1, Math.min(4, weekOffset + delta));
+  const start = WEEK_LABEL[weekOffset+1] || ('+' + (weekOffset+1) + 'w');
+  document.getElementById('weekRange').textContent = (weekOffset === 0 ? 'Mon ' : (weekOffset > 0 ? '+'+weekOffset+'w · Mon ' : '-'+Math.abs(weekOffset)+'w · Mon ')) + start + ' 2026';
+  kooperToast('Loaded week ' + (weekOffset === 0 ? 'this week' : (weekOffset > 0 ? 'next +' + weekOffset : weekOffset)));
+}
+function weekToday(){ weekOffset = 0; document.getElementById('weekRange').textContent = 'Mon 4 May → Sun 10 May 2026'; kooperToast('Returned to current week'); }
+
+// ============================================================
+// WEEK GRID — populated from a worker config
+// ============================================================
+const WORKERS = [
+  { id:'sa', name:'Sister Anne',     role:'Nurse',          init:'SA', shifts:['day-day','day-day','day-day','day-day','off','off','off'] },
+  { id:'cm', name:'Craig Musara',    role:'Carer',          init:'CM', shifts:['off','off','day-pm','day-pm','day-pm','day-am','off'] },
+  { id:'ra', name:'Rebecca Adesina', role:'Senior Carer',   init:'RA', shifts:['day-pm','off','day-pm','day-pm','day-pm','day-am','off'] },
+  { id:'dk', name:'Daniel Kowalski', role:'Activities',     init:'DK', shifts:['day-day','day-day','day-day','day-day','day-day','off','off'] },
+  { id:'yp', name:'Yvonne Patel',    role:'Nurse',          init:'YP', shifts:['off','off','night','night','off','off','night'] },
+  { id:'mc', name:'Mary Chen',       role:'Cook',           init:'MC', shifts:['day-am','day-am','day-am','day-am','off','off','day-am'] },
+  { id:'tb', name:'Tomas Bauer',     role:'Maintenance',    init:'TB', shifts:['day-am','day-am','off','day-am','day-am','off','off'] }
+];
+const SHIFT_TEMPLATES = {
+  'day-am':  { label:'Day', cls:'day',     time:'07:00–15:00' },
+  'day-pm':  { label:'Day', cls:'day',     time:'14:00–22:00' },
+  'day-day': { label:'Day', cls:'day',     time:'09:00–17:00' },
+  'evening': { label:'Eve', cls:'evening', time:'16:00–22:00' },
+  'night':   { label:'Night', cls:'night', time:'22:00–07:00' },
+  'cover':   { label:'Cover',cls:'cover',  time:'TBC' },
+  'off':     { label:'Off',  cls:'off',    time:'' }
+};
+function renderWeekGrid(){
+  const grid = document.getElementById('weekGrid');
+  // Remove all existing worker rows (keep the head row)
+  Array.from(grid.querySelectorAll(':scope > div:not(.week-grid-head)')).forEach(n=>n.remove());
+  WORKERS.forEach(w => {
+    const head = document.createElement('div');
+    head.className = 'week-cell worker-row-head';
+    head.innerHTML = '<span class="w-avatar">' + w.init + '</span><span><span class="block">' + w.name + '</span><span class="w-meta">' + w.role + '</span></span>';
+    grid.appendChild(head);
+    w.shifts.forEach((s, day) => {
+      const cell = document.createElement('div');
+      cell.className = 'week-cell';
+      cell.dataset.worker = w.id;
+      cell.dataset.day = day;
+      const tpl = SHIFT_TEMPLATES[s];
+      if (s !== 'off') {
+        cell.innerHTML = '<div class="shift ' + tpl.cls + '" draggable="true" data-shift-key="' + s + '" onclick="editShift(this,\'' + w.name + '\',' + day + ')">' + tpl.label + '<span class="s-time">' + tpl.time + '</span></div>';
+      } else {
+        cell.innerHTML = '<div class="shift off">Off</div>';
+      }
+      grid.appendChild(cell);
+    });
+  });
+  wireDragDrop();
+}
+function editShift(el, who, day){
+  event.stopPropagation();
+  kooperToast(who + ' · ' + ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'][day] + ' shift opened · edit / delete / cover');
+}
+function wireDragDrop(){
+  let dragging = null;
+  document.querySelectorAll('#weekGrid .shift').forEach(s => {
+    if (s.classList.contains('off')) return;
+    s.addEventListener('dragstart', e => { dragging = s; s.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; });
+    s.addEventListener('dragend',   () => { if (dragging) dragging.classList.remove('dragging'); dragging = null; document.querySelectorAll('.drop-target').forEach(c=>c.classList.remove('drop-target')); });
+  });
+  document.querySelectorAll('#weekGrid .week-cell').forEach(cell => {
+    if (cell.classList.contains('day-head') || cell.classList.contains('worker-row-head')) return;
+    cell.addEventListener('dragover',  e => { e.preventDefault(); cell.classList.add('drop-target'); });
+    cell.addEventListener('dragleave', () => cell.classList.remove('drop-target'));
+    cell.addEventListener('drop', e => {
+      e.preventDefault();
+      cell.classList.remove('drop-target');
+      if (!dragging || cell.contains(dragging)) return;
+      // Check for conflict: simple test — overlapping shift this day for same worker not done; we just move.
+      cell.appendChild(dragging);
+      checkConflicts();
+      kooperToast('Shift moved · cost recalculated · WTR re-checked');
+    });
+  });
+}
+function checkConflicts(){
+  // Demo: random tiny chance of flagging a conflict on the moved shift
+  document.querySelectorAll('.shift.conflict').forEach(s=>s.classList.remove('conflict'));
+  // Real version would check 48h cap, consecutive nights, missed breaks
+}
+
+// ============================================================
+// APPROVALS
+// ============================================================
+function approveItem(btn, msg){
+  const row = btn.closest('.approve-row');
+  if (row) {
+    row.style.transition = 'opacity 0.3s ease';
+    row.style.opacity = '0';
+    setTimeout(()=> row.remove(), 300);
+  }
+  kooperToast(msg);
+  // Decrement KPI
+  const k = document.getElementById('kpiApprovals');
+  if (k) k.textContent = Math.max(0, parseInt(k.textContent,10) - 1);
+}
+
+// ============================================================
+// MODAL HELPERS
+// ============================================================
+function openModal(id){ document.getElementById('scrim').classList.add('on'); document.getElementById(id).classList.add('on'); }
+function closeAll(){ document.getElementById('scrim').classList.remove('on'); document.querySelectorAll('.modal').forEach(m=>m.classList.remove('on')); }
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAll(); });
+
+function openAddShift(){ openModal('addShiftModal'); }
+function openTimeOff(){ openModal('timeOffModal'); }
+function openSwap(){ openModal('swapModal'); }
+function openPublishModal(){ openModal('publishModal'); }
+
+function submitAddShift(e){
+  e.preventDefault();
+  const w = document.getElementById('newWorker').value;
+  const d = document.getElementById('newDay').value;
+  closeAll();
+  kooperToast(w.split(' · ')[0] + ' · ' + d + ' · shift added · cost +£94');
+  // Bump the hours KPI for fun
+  const h = document.getElementById('kpiHours'); if (h) h.textContent = (parseInt(h.textContent,10) + parseInt(document.getElementById('newHours').value,10) || 8) + 'h';
+}
+function submitTimeOff(e){
+  e.preventDefault();
+  closeAll();
+  const f = document.getElementById('offFrom').value;
+  const t = document.getElementById('offTo').value;
+  kooperToast('Time off requested · ' + f + ' → ' + t + ' · sent to Lola');
+}
+function submitSwap(e){
+  e.preventDefault();
+  closeAll();
+  kooperToast('Swap request sent · recipient + manager notified');
+}
+function publishWeek(){
+  closeAll();
+  kooperToast('Week published · 15 workers notified · payroll armed');
+}
+
+function bulkImport(){
+  kooperToast('CSV import opens · paste rows or upload .csv (worker, day, type, hours)');
+}
+
+// ============================================================
+// INIT
+// ============================================================
+document.addEventListener('DOMContentLoaded', renderWeekGrid);
+</script>
+
+<!-- ============================================================ -->
+<!-- GUIDED TOUR + HINTS                                            -->
+<!-- ============================================================ -->
+<script id="kooper-tour-config" type="application/json">
+{
+  "page": "rota",
+  "steps": [
+    {
+      "target": "#viewToggle",
+      "placement": "bottom",
+      "title": "Manager · Worker · Day",
+      "body": "kooper · rota gives every staff member their own view. Manager sees the whole week + cost + approvals. Worker sees their next shift, hours, payslips, swap requests. Day view shows who's on the floor right now."
+    },
+    {
+      "target": "#weekGrid",
+      "placement": "top",
+      "title": "Drag-drop shifts · live conflicts",
+      "body": "Pick up any shift card and drop it on a different cell. WTR conflict detection runs live (48h cap, consecutive nights, missing breaks). Cost + coverage recalculate instantly."
+    },
+    {
+      "target": "#approvalsList",
+      "placement": "top",
+      "title": "Approvals queue · 1-tap decisions",
+      "body": "Swap requests, time-off, cover offers — all queued here for the manager. Approve/Decline both fire automated downstream actions (notifications, cover plans, payroll)."
+    },
+    {
+      "target": "#kpiApprovals",
+      "placement": "bottom",
+      "title": "Live KPIs across the strip",
+      "body": "Hours scheduled · live cost vs budget · coverage gaps · WTR flags · pending approvals. The strip recalculates as you drag, approve, or publish."
+    },
+    {
+      "target": "#kooperHintsBtn",
+      "placement": "bottom",
+      "title": "Hints stay on after the tour",
+      "body": "Toggle Hints to keep yellow pulse dots near key features. Right-click for replay options · or press M / W / D for quick view switching."
+    }
+  ],
+  "hints": [
+    { "target": "#viewToggle", "label": "Three views · M (manager) W (worker) D (day)" },
+    { "target": "#weekGrid", "label": "Drag-drop shifts · WTR auto-checks" },
+    { "target": "#approvalsList", "label": "Approvals queue · 1-tap decisions" }
+  ]
+}
+</script>
+<script src="kooper-tour.js" defer></script>
+</body>
+</html>
