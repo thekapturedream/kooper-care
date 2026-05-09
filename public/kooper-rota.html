@@ -99,8 +99,35 @@
   .shift.night { background: #0A0A0A; color: #FFD400; }
   .shift.cover { background: #FFFBEB; color: #876300; border: 1px dashed #FFD400; }
   .shift.off { background: transparent; color: #9A9A9A; font-style: italic; cursor: default; min-height: auto; padding: 0.125rem 0.5rem; }
-  .shift.conflict { box-shadow: 0 0 0 2px #E5484D; }
+  .shift.conflict { box-shadow: 0 0 0 2px #E5484D; animation: pulseRed 1.4s ease-in-out infinite; }
+  @keyframes pulseRed { 0%,100% { box-shadow: 0 0 0 2px #E5484D; } 50% { box-shadow: 0 0 0 3px rgba(229,72,77,0.6); } }
   .week-cell.drop-target { background: rgba(255,212,0,0.12); }
+  .week-cell.empty-clickable { cursor: pointer; transition: background 0.1s ease; }
+  .week-cell.empty-clickable:hover { background: rgba(255,212,0,0.08); }
+  .week-cell.empty-clickable:hover::after { content: '+'; position: absolute; right: 8px; top: 50%; transform: translateY(-50%); color: #876300; font-weight: 700; font-size: 0.875rem; }
+  .week-cell { position: relative; }
+
+  /* Shift quick-edit popover */
+  .shift-popover { position: fixed; z-index: 80; background: #FFFFFF; border: 1px solid #ECEAE3; border-radius: 14px; box-shadow: 0 20px 40px -10px rgba(0,0,0,0.25); padding: 0.875rem; width: 280px; opacity: 0; pointer-events: none; transform: translateY(4px); transition: opacity 0.14s ease, transform 0.14s ease; }
+  .shift-popover.on { opacity: 1; pointer-events: auto; transform: translateY(0); }
+  .shift-popover .sp-head { display: flex; align-items: center; justify-content: space-between; padding-bottom: 0.5rem; border-bottom: 1px solid #ECEAE3; margin-bottom: 0.625rem; }
+  .shift-popover .sp-title { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 0.8125rem; color: #0A0A0A; }
+  .shift-popover .sp-meta { font-family: 'JetBrains Mono', monospace; font-size: 0.625rem; color: #6B7280; text-transform: uppercase; letter-spacing: 0.06em; }
+  .shift-popover .sp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.375rem; margin-bottom: 0.5rem; }
+  .shift-popover .sp-btn { padding: 0.5rem 0.625rem; border-radius: 8px; font-family: 'Inter', sans-serif; font-weight: 500; font-size: 0.75rem; border: 1px solid #ECEAE3; background: #FFFFFF; color: #0A0A0A; cursor: pointer; text-align: left; line-height: 1.15; transition: all 0.12s ease; }
+  .shift-popover .sp-btn:hover { background: #FAFAF7; border-color: #0A0A0A; }
+  .shift-popover .sp-btn.active { background: #0A0A0A; color: #FFD400; border-color: #0A0A0A; }
+  .shift-popover .sp-btn .sp-time { display: block; font-family: 'JetBrains Mono', monospace; font-size: 0.625rem; opacity: 0.7; margin-top: 0.125rem; font-weight: 400; }
+  .shift-popover .sp-foot { display: flex; justify-content: space-between; align-items: center; gap: 0.375rem; padding-top: 0.5rem; border-top: 1px solid #ECEAE3; margin-top: 0.5rem; }
+  .shift-popover .sp-delete { color: #B42318; background: transparent; border: 0; font-size: 0.75rem; font-weight: 500; cursor: pointer; padding: 0.25rem 0.5rem; border-radius: 6px; }
+  .shift-popover .sp-delete:hover { background: rgba(229,72,77,0.08); }
+  .shift-popover .sp-conflict-line { font-size: 0.6875rem; color: #B42318; line-height: 1.3; padding: 0.5rem 0.625rem; background: rgba(229,72,77,0.06); border: 1px solid rgba(229,72,77,0.15); border-radius: 8px; margin-bottom: 0.5rem; display: none; }
+  .shift-popover .sp-conflict-line.on { display: block; }
+
+  /* Undo toast */
+  .undo-toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: 1.5rem; background: #0A0A0A; color: #FFFFFF; padding: 0.75rem 0.875rem; border-radius: 12px; font-size: 0.8125rem; display: flex; align-items: center; gap: 0.75rem; z-index: 90; opacity: 0; pointer-events: none; transition: opacity 0.16s ease, transform 0.16s ease; transform: translate(-50%, 8px); box-shadow: 0 12px 32px -8px rgba(0,0,0,0.4); }
+  .undo-toast.on { opacity: 1; pointer-events: auto; transform: translate(-50%, 0); }
+  .undo-toast .ut-btn { background: #FFD400; color: #0A0A0A; padding: 0.3125rem 0.625rem; border-radius: 6px; font-weight: 600; font-size: 0.75rem; border: 0; cursor: pointer; }
 
   /* Worker view list */
   .my-shift-card { background: #FFFFFF; border: 1px solid #ECEAE3; border-radius: 14px; padding: 1rem 1.125rem; transition: all 0.15s ease; }
@@ -832,62 +859,335 @@ const SHIFT_TEMPLATES = {
   'cover':   { label:'Cover',cls:'cover',  time:'TBC' },
   'off':     { label:'Off',  cls:'off',    time:'' }
 };
+// ============================================================
+// SHIFT-STATE — single source of truth for the week grid
+// ============================================================
+// We mirror the visible grid here so WTR checks + undo work cleanly.
+let SHIFT_STATE = {}; // workerId -> [day0..day6] of shift-key
+function rebuildShiftState(){
+  SHIFT_STATE = {};
+  WORKERS.forEach(w => { SHIFT_STATE[w.id] = w.shifts.slice(); });
+}
+rebuildShiftState();
+
+// Hours per shift type — drives WTR + cost calcs
+const SHIFT_HOURS = { 'day-am':8, 'day-pm':8, 'day-day':8, 'evening':6, 'night':9, 'cover':8, 'off':0 };
+const SHIFT_END   = { 'day-am':15, 'day-pm':22, 'day-day':17, 'evening':22, 'night':31 /* 07:00 next day */, 'cover':22 };
+const SHIFT_START = { 'day-am':7,  'day-pm':14, 'day-day':9,  'evening':16, 'night':22, 'cover':14 };
+
 function renderWeekGrid(){
   const grid = document.getElementById('weekGrid');
-  // Remove all existing worker rows (keep the head row)
   Array.from(grid.querySelectorAll(':scope > div:not(.week-grid-head)')).forEach(n=>n.remove());
   WORKERS.forEach(w => {
     const head = document.createElement('div');
     head.className = 'week-cell worker-row-head';
     head.innerHTML = '<span class="w-avatar">' + w.init + '</span><span><span class="block">' + w.name + '</span><span class="w-meta">' + w.role + '</span></span>';
     grid.appendChild(head);
-    w.shifts.forEach((s, day) => {
+    SHIFT_STATE[w.id].forEach((s, day) => {
       const cell = document.createElement('div');
       cell.className = 'week-cell';
       cell.dataset.worker = w.id;
       cell.dataset.day = day;
-      const tpl = SHIFT_TEMPLATES[s];
-      if (s !== 'off') {
-        cell.innerHTML = '<div class="shift ' + tpl.cls + '" draggable="true" data-shift-key="' + s + '" onclick="editShift(this,\'' + w.name + '\',' + day + ')">' + tpl.label + '<span class="s-time">' + tpl.time + '</span></div>';
-      } else {
-        cell.innerHTML = '<div class="shift off">Off</div>';
-      }
+      paintCell(cell, s);
       grid.appendChild(cell);
     });
   });
   wireDragDrop();
+  runWTRCheck();
+  recalcCost();
 }
-function editShift(el, who, day){
-  event.stopPropagation();
-  kooperToast(who + ' · ' + ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'][day] + ' shift opened · edit / delete / cover');
+function paintCell(cell, shiftKey){
+  const tpl = SHIFT_TEMPLATES[shiftKey];
+  if (shiftKey !== 'off') {
+    cell.classList.remove('empty-clickable');
+    cell.innerHTML = '<div class="shift ' + tpl.cls + '" draggable="true" data-shift-key="' + shiftKey + '">' + tpl.label + '<span class="s-time">' + tpl.time + '</span></div>';
+  } else {
+    cell.classList.add('empty-clickable');
+    cell.innerHTML = '<div class="shift off">Off</div>';
+  }
 }
+
+// ============================================================
+// CLICK-TO-EDIT POPOVER
+// ============================================================
+let popoverEl = null;
+function ensurePopover(){
+  if (popoverEl) return popoverEl;
+  popoverEl = document.createElement('div');
+  popoverEl.className = 'shift-popover';
+  popoverEl.id = 'shiftPopover';
+  popoverEl.innerHTML = '';
+  document.body.appendChild(popoverEl);
+  document.addEventListener('click', e => {
+    if (!popoverEl.contains(e.target) && !e.target.closest('.week-cell')) closePopover();
+  });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closePopover(); });
+  return popoverEl;
+}
+function closePopover(){ if (popoverEl) popoverEl.classList.remove('on'); }
+
+function openCellEditor(cell){
+  const wId = cell.dataset.worker;
+  const day = parseInt(cell.dataset.day, 10);
+  const worker = WORKERS.find(w => w.id === wId);
+  if (!worker) return;
+  const currentKey = SHIFT_STATE[wId][day];
+  const dayLabel = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'][day];
+  const conflicts = wtrConflictsFor(wId);
+  const conflictLine = conflicts.filter(c => c.day === day || c.day == null).map(c => c.msg).join(' · ');
+
+  const pop = ensurePopover();
+  const types = [
+    { key:'day-am',  label:'Day · early',  time:'07:00–15:00 · 8h' },
+    { key:'day-pm',  label:'Day · late',   time:'14:00–22:00 · 8h' },
+    { key:'evening', label:'Evening',      time:'16:00–22:00 · 6h' },
+    { key:'night',   label:'Night',        time:'22:00–07:00 · 9h' }
+  ];
+  pop.innerHTML =
+    '<div class="sp-head">' +
+      '<div><div class="sp-title">' + worker.name + '</div><div class="sp-meta">' + dayLabel.toUpperCase() + ' · ' + (currentKey === 'off' ? 'unscheduled' : 'editing shift') + '</div></div>' +
+      '<button onclick="closePopover()" aria-label="Close" style="border:0;background:transparent;cursor:pointer;color:#6B7280;font-size:1rem;line-height:1">×</button>' +
+    '</div>' +
+    (conflictLine ? '<div class="sp-conflict-line on">⚠ ' + conflictLine + '</div>' : '') +
+    '<div class="sp-grid">' +
+      types.map(t => '<button class="sp-btn ' + (t.key === currentKey ? 'active' : '') + '" onclick="setShift(\'' + wId + '\',' + day + ',\'' + t.key + '\')">' + t.label + '<span class="sp-time">' + t.time + '</span></button>').join('') +
+    '</div>' +
+    '<button class="sp-btn" style="width:100%;margin-bottom:0.5rem" onclick="setShift(\'' + wId + '\',' + day + ',\'cover\')">Mark as cover (TBC) <span class="sp-time">flag for kooper · ai matching</span></button>' +
+    '<div class="sp-foot">' +
+      (currentKey !== 'off'
+        ? '<button class="sp-delete" onclick="setShift(\'' + wId + '\',' + day + ',\'off\')">Delete shift</button>'
+        : '<span style="font-size:0.6875rem;color:#6B7280">Tap a shift type to assign</span>') +
+      '<button class="chip" onclick="closePopover()">Cancel</button>' +
+    '</div>';
+
+  // Position the popover near the clicked cell — clamped to viewport
+  const r = cell.getBoundingClientRect();
+  const popW = 280, popH = 280;
+  let left = r.left + r.width / 2 - popW / 2;
+  let top  = r.bottom + 8;
+  if (left < 8) left = 8;
+  if (left + popW > window.innerWidth - 8) left = window.innerWidth - popW - 8;
+  if (top + popH > window.innerHeight - 8) top = r.top - popH - 8;
+  if (top < 8) top = 8;
+  pop.style.left = left + 'px';
+  pop.style.top  = top + 'px';
+  pop.classList.add('on');
+}
+
+// ============================================================
+// SHIFT MUTATIONS · with undo
+// ============================================================
+let LAST_ACTION = null; // { wId, day, prevKey, nextKey }
+function setShift(wId, day, nextKey){
+  const prevKey = SHIFT_STATE[wId][day];
+  if (prevKey === nextKey) { closePopover(); return; }
+  LAST_ACTION = { wId, day, prevKey, nextKey };
+  SHIFT_STATE[wId][day] = nextKey;
+  // Repaint just this cell
+  const cell = document.querySelector('#weekGrid .week-cell[data-worker="' + wId + '"][data-day="' + day + '"]');
+  if (cell) paintCell(cell, nextKey);
+  wireDragDrop();
+  runWTRCheck();
+  recalcCost();
+  closePopover();
+  const w = WORKERS.find(x => x.id === wId);
+  const dayLabel = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'][day];
+  const verb = (prevKey === 'off' ? 'added' : (nextKey === 'off' ? 'removed' : 'changed'));
+  showUndoToast(w.name + ' · ' + dayLabel + ' shift ' + verb);
+}
+function undoLastAction(){
+  if (!LAST_ACTION) return;
+  // Drag-drop swaps store kind:'swap' with from/to data
+  if (LAST_ACTION.kind === 'swap') {
+    const { fromW, fromD, fromPrev, toW, toD, toPrev } = LAST_ACTION;
+    SHIFT_STATE[fromW][fromD] = fromPrev;
+    SHIFT_STATE[toW][toD] = toPrev;
+    const fromCell = document.querySelector('#weekGrid .week-cell[data-worker="' + fromW + '"][data-day="' + fromD + '"]');
+    const toCell   = document.querySelector('#weekGrid .week-cell[data-worker="' + toW + '"][data-day="' + toD + '"]');
+    if (fromCell) paintCell(fromCell, fromPrev);
+    if (toCell)   paintCell(toCell, toPrev);
+    wireDragDrop(); runWTRCheck(); recalcCost();
+    LAST_ACTION = null; hideUndoToast(); kooperToast('Reverted');
+    return;
+  }
+  // Single-cell setShift undo
+  const { wId, day, prevKey } = LAST_ACTION;
+  SHIFT_STATE[wId][day] = prevKey;
+  const cell = document.querySelector('#weekGrid .week-cell[data-worker="' + wId + '"][data-day="' + day + '"]');
+  if (cell) paintCell(cell, prevKey);
+  wireDragDrop();
+  runWTRCheck();
+  recalcCost();
+  LAST_ACTION = null;
+  hideUndoToast();
+  kooperToast('Reverted');
+}
+
+// ============================================================
+// UNDO TOAST
+// ============================================================
+let undoToastEl = null, undoTimer = null;
+function ensureUndoToast(){
+  if (undoToastEl) return undoToastEl;
+  undoToastEl = document.createElement('div');
+  undoToastEl.className = 'undo-toast';
+  undoToastEl.innerHTML = '<span id="utMsg">Saved</span><button class="ut-btn" onclick="undoLastAction()">Undo</button><button onclick="hideUndoToast()" style="border:0;background:transparent;color:rgba(255,255,255,0.6);cursor:pointer;font-size:1.1rem;line-height:1;padding:0 0.25rem">×</button>';
+  document.body.appendChild(undoToastEl);
+  return undoToastEl;
+}
+function showUndoToast(msg){
+  const t = ensureUndoToast();
+  t.querySelector('#utMsg').textContent = msg;
+  t.classList.add('on');
+  clearTimeout(undoTimer);
+  undoTimer = setTimeout(hideUndoToast, 6000);
+}
+function hideUndoToast(){ if (undoToastEl) undoToastEl.classList.remove('on'); }
+
+// ============================================================
+// DRAG-DROP — moves a shift to another worker/day
+// ============================================================
 function wireDragDrop(){
-  let dragging = null;
+  let dragging = null, fromCell = null;
   document.querySelectorAll('#weekGrid .shift').forEach(s => {
     if (s.classList.contains('off')) return;
-    s.addEventListener('dragstart', e => { dragging = s; s.classList.add('dragging'); e.dataTransfer.effectAllowed = 'move'; });
-    s.addEventListener('dragend',   () => { if (dragging) dragging.classList.remove('dragging'); dragging = null; document.querySelectorAll('.drop-target').forEach(c=>c.classList.remove('drop-target')); });
+    s.addEventListener('dragstart', e => {
+      dragging = s; fromCell = s.closest('.week-cell');
+      s.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    s.addEventListener('dragend', () => {
+      if (dragging) dragging.classList.remove('dragging');
+      dragging = null; fromCell = null;
+      document.querySelectorAll('.drop-target').forEach(c=>c.classList.remove('drop-target'));
+    });
   });
   document.querySelectorAll('#weekGrid .week-cell').forEach(cell => {
     if (cell.classList.contains('day-head') || cell.classList.contains('worker-row-head')) return;
+    // Click to edit (only if it's not the source of an active drag)
+    cell.onclick = function (ev) {
+      if (ev.target.closest('.shift') && !ev.target.closest('.shift.off')) {
+        // Click on existing shift opens editor for THIS cell
+        openCellEditor(cell);
+      } else if (cell.classList.contains('empty-clickable')) {
+        openCellEditor(cell);
+      }
+      ev.stopPropagation();
+    };
     cell.addEventListener('dragover',  e => { e.preventDefault(); cell.classList.add('drop-target'); });
     cell.addEventListener('dragleave', () => cell.classList.remove('drop-target'));
     cell.addEventListener('drop', e => {
       e.preventDefault();
       cell.classList.remove('drop-target');
-      if (!dragging || cell.contains(dragging)) return;
-      // Check for conflict: simple test — overlapping shift this day for same worker not done; we just move.
-      cell.appendChild(dragging);
-      checkConflicts();
-      kooperToast('Shift moved · cost recalculated · WTR re-checked');
+      if (!dragging || !fromCell || cell === fromCell) return;
+      const fromW = fromCell.dataset.worker, fromD = parseInt(fromCell.dataset.day, 10);
+      const toW   = cell.dataset.worker,     toD   = parseInt(cell.dataset.day, 10);
+      const movingKey = SHIFT_STATE[fromW][fromD];
+      const targetKey = SHIFT_STATE[toW][toD];
+      // Save undo as a paired action — represented as "swap" via two state changes
+      LAST_ACTION = { kind:'swap', fromW, fromD, fromPrev: movingKey, toW, toD, toPrev: targetKey };
+      // If target had a shift, this becomes a swap; otherwise a move.
+      SHIFT_STATE[fromW][fromD] = (targetKey === 'off' ? 'off' : targetKey);
+      SHIFT_STATE[toW][toD] = movingKey;
+      paintCell(fromCell, SHIFT_STATE[fromW][fromD]);
+      paintCell(cell,     SHIFT_STATE[toW][toD]);
+      wireDragDrop();
+      runWTRCheck();
+      recalcCost();
+      const wFrom = WORKERS.find(x=>x.id===fromW), wTo = WORKERS.find(x=>x.id===toW);
+      const dayTo = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'][toD];
+      showUndoToast(targetKey === 'off'
+        ? wTo.name + ' · ' + dayTo + ' shift moved from ' + wFrom.name
+        : wFrom.name + ' ⇄ ' + wTo.name + ' · ' + dayTo + ' swap');
     });
   });
 }
-function checkConflicts(){
-  // Demo: random tiny chance of flagging a conflict on the moved shift
-  document.querySelectorAll('.shift.conflict').forEach(s=>s.classList.remove('conflict'));
-  // Real version would check 48h cap, consecutive nights, missed breaks
+
+// ============================================================
+// REAL WTR CONFLICT ENGINE
+// Rules checked:
+//  1. Weekly hours > 48  (Working Time Regulations)
+//  2. 3+ consecutive nights
+//  3. Rest gap < 11 hours between consecutive shifts
+// ============================================================
+function wtrConflictsFor(wId){
+  const out = [];
+  const shifts = SHIFT_STATE[wId];
+  if (!shifts) return out;
+  // 1. Total hours
+  const total = shifts.reduce((acc, k) => acc + (SHIFT_HOURS[k] || 0), 0);
+  if (total > 48) out.push({ day: null, msg: 'Week hours ' + total + 'h exceed 48h cap' });
+  // 2. Consecutive nights
+  let nightRun = 0;
+  for (let d = 0; d < 7; d++) {
+    if (shifts[d] === 'night') {
+      nightRun++;
+      if (nightRun === 3) out.push({ day: d, msg: '3rd consecutive night shift' });
+      if (nightRun > 3) out.push({ day: d, msg: 'Consecutive night #' + nightRun });
+    } else { nightRun = 0; }
+  }
+  // 3. Rest gap < 11h
+  for (let d = 0; d < 6; d++) {
+    const a = shifts[d], b = shifts[d+1];
+    if (a === 'off' || b === 'off') continue;
+    const endA = SHIFT_END[a];   // hours since midnight Mon=0
+    const startB = SHIFT_START[b] + 24;
+    const gap = startB - endA;
+    if (gap < 11) out.push({ day: d+1, msg: 'Only ' + gap + 'h rest after previous shift' });
+  }
+  return out;
 }
+function runWTRCheck(){
+  // Clear old conflicts
+  document.querySelectorAll('#weekGrid .shift.conflict').forEach(s => s.classList.remove('conflict'));
+  let total = 0;
+  WORKERS.forEach(w => {
+    const cs = wtrConflictsFor(w.id);
+    if (!cs.length) return;
+    cs.forEach(c => {
+      if (c.day == null) {
+        // Whole-week — flash all worker's shifts
+        document.querySelectorAll('#weekGrid .week-cell[data-worker="' + w.id + '"] .shift:not(.off)').forEach(s => s.classList.add('conflict'));
+      } else {
+        const cell = document.querySelector('#weekGrid .week-cell[data-worker="' + w.id + '"][data-day="' + c.day + '"]');
+        const sh = cell && cell.querySelector('.shift:not(.off)');
+        if (sh) sh.classList.add('conflict');
+      }
+    });
+    total += cs.length;
+  });
+  // Update WTR flags KPI
+  const k = document.getElementById('kpiFlags');
+  if (k) {
+    k.textContent = total;
+    const sub = k.parentNode.querySelector('.k-sub');
+    if (sub) sub.textContent = total === 0 ? 'Working Time Regs · clean' : total + ' ' + (total === 1 ? 'worker' : 'workers') + ' over limit';
+  }
+}
+
+// ============================================================
+// LIVE COST RECALC
+// ============================================================
+const COST_PER_HOUR = { 'Nurse': 22, 'Senior Carer': 16, 'Carer': 13, 'Activities': 13, 'Cook': 12, 'Maintenance': 14 };
+function recalcCost(){
+  let totalHours = 0, totalCost = 0;
+  WORKERS.forEach(w => {
+    const rate = COST_PER_HOUR[w.role] || 13;
+    const wh = SHIFT_STATE[w.id].reduce((a, k) => a + (SHIFT_HOURS[k] || 0), 0);
+    totalHours += wh;
+    totalCost += wh * rate;
+  });
+  const kH = document.getElementById('kpiHours');   if (kH) kH.textContent = totalHours + 'h';
+  const kC = document.getElementById('kpiCost');    if (kC) kC.textContent = '£' + totalCost.toLocaleString();
+  const kCSub = document.getElementById('kpiCostSub'); if (kCSub) {
+    const pct = Math.round(totalCost / 6400 * 100);
+    kCSub.textContent = 'Budget £6,400 · ' + pct + '%';
+  }
+}
+
+// Backward-compat stub (older code may still call this)
+function checkConflicts(){ runWTRCheck(); }
+function editShift(){ /* deprecated — handled by openCellEditor */ }
 
 // ============================================================
 // APPROVALS

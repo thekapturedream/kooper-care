@@ -278,16 +278,36 @@ function renderStaff(host) {
   host.innerHTML =
     '<p class="text-sm muted mb-4">Tap any staff member to open <strong>their</strong> launcher and see what apps they have. Use the toolbar at the top of their launcher to tune their app set.</p>' +
     '<div class="bg-white rounded-2xl border border-[#ECEAE3] overflow-hidden">' +
-      '<div class="grid grid-cols-12 gap-3 px-5 py-3 bg-[#FAFAF7] border-b border-[#ECEAE3] font-mono text-[0.6875rem] uppercase tracking-[0.08em] text-[#6B7280]">' +
+      // Desktop header — hidden on mobile
+      '<div class="hidden md:grid grid-cols-12 gap-3 px-5 py-3 bg-[#FAFAF7] border-b border-[#ECEAE3] font-mono text-[0.6875rem] uppercase tracking-[0.08em] text-[#6B7280]">' +
         '<div class="col-span-4">Staff member</div><div class="col-span-2">Role</div><div class="col-span-2">Employment</div><div class="col-span-2">Training</div><div class="col-span-2 text-right">Last on shift</div>' +
       '</div>' +
       STAFF_LIST.map(function (s) {
-        return '<a href="kooper-staff.html?as=' + s.id + '" class="grid grid-cols-12 gap-3 px-5 py-3.5 border-b border-[#ECEAE3] hover:bg-[#FAFAF7] items-center" style="text-decoration:none;color:inherit">' +
-          '<div class="col-span-4 flex items-center gap-3"><div class="w-8 h-8 rounded-full font-mono text-xs flex items-center justify-center" style="background:' + s.bg + ';color:' + s.fg + '">' + s.init + '</div><div><div class="font-medium text-sm">' + s.name + '</div><div class="text-[0.6875rem] muted">tap to open ' + s.name.split(' ')[0] + '\'s launcher →</div></div></div>' +
-          '<div class="col-span-2 text-sm">' + s.role + '</div>' +
-          '<div class="col-span-2 text-xs muted">' + s.emp + '</div>' +
-          '<div class="col-span-2 text-xs muted">' + s.training + '</div>' +
-          '<div class="col-span-2 text-xs muted text-right font-mono">' + s.last + '</div>' +
+        var firstName = s.name.split(' ')[0];
+        return '<a href="kooper-staff.html?as=' + s.id + '" class="block border-b border-[#ECEAE3] hover:bg-[#FAFAF7]" style="text-decoration:none;color:inherit">' +
+          // ---- Mobile card layout (under md) ----
+          '<div class="md:hidden p-4 flex gap-3">' +
+            '<div class="w-10 h-10 rounded-full font-mono text-xs flex items-center justify-center flex-shrink-0" style="background:' + s.bg + ';color:' + s.fg + '">' + s.init + '</div>' +
+            '<div class="min-w-0 flex-1">' +
+              '<div class="flex items-baseline justify-between gap-2 mb-0.5">' +
+                '<div class="font-medium text-sm truncate">' + s.name + '</div>' +
+                '<div class="text-[0.625rem] font-mono muted whitespace-nowrap flex-shrink-0">' + s.last + '</div>' +
+              '</div>' +
+              '<div class="text-xs mb-1.5">' + s.role + '</div>' +
+              '<div class="flex items-center gap-1.5 flex-wrap text-[0.625rem] muted">' +
+                '<span class="px-1.5 py-0.5 rounded bg-[#FAFAF7] border border-[#ECEAE3]">' + s.emp + '</span>' +
+                '<span class="px-1.5 py-0.5 rounded bg-[#FAFAF7] border border-[#ECEAE3] truncate">' + s.training + '</span>' +
+              '</div>' +
+            '</div>' +
+          '</div>' +
+          // ---- Desktop table-style grid layout (md and up) ----
+          '<div class="hidden md:grid grid-cols-12 gap-3 px-5 py-3.5 items-center">' +
+            '<div class="col-span-4 flex items-center gap-3 min-w-0"><div class="w-8 h-8 rounded-full font-mono text-xs flex items-center justify-center flex-shrink-0" style="background:' + s.bg + ';color:' + s.fg + '">' + s.init + '</div><div class="min-w-0"><div class="font-medium text-sm truncate">' + s.name + '</div><div class="text-[0.6875rem] muted truncate">tap to open ' + firstName + '\'s launcher →</div></div></div>' +
+            '<div class="col-span-2 text-sm truncate">' + s.role + '</div>' +
+            '<div class="col-span-2 text-xs muted truncate">' + s.emp + '</div>' +
+            '<div class="col-span-2 text-xs muted truncate">' + s.training + '</div>' +
+            '<div class="col-span-2 text-xs muted text-right font-mono whitespace-nowrap">' + s.last + '</div>' +
+          '</div>' +
         '</a>';
       }).join('') +
     '</div>';

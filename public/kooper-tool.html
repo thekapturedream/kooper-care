@@ -142,8 +142,65 @@
 
 <div id="toast" class="toast">Saved</div>
 
+<!-- Detail modal scrim + container (used by every tool for drill-in) -->
+<div id="kt-scrim" class="fixed inset-0 z-40" style="background:rgba(10,10,10,0.55);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);display:none" onclick="closeDetail()"></div>
+<div id="kt-detail" class="fixed z-50" style="left:50%;top:50%;transform:translate(-50%,-50%);background:#FFFFFF;border-radius:18px;width:min(560px,92vw);max-height:86vh;overflow:hidden;box-shadow:0 30px 60px -20px rgba(0,0,0,0.35);display:none;flex-direction:column">
+  <div class="px-5 py-4 border-b border-[#ECEAE3] flex items-start justify-between gap-3" style="flex-shrink:0">
+    <div style="flex:1;min-width:0"><div id="kt-detail-kicker" class="ed-kicker mb-1"></div><div id="kt-detail-title" style="font-family:Space Grotesk,sans-serif;font-weight:600;font-size:1.0625rem;line-height:1.2;color:#0A0A0A"></div></div>
+    <button onclick="closeDetail()" aria-label="Close" style="border:0;background:transparent;cursor:pointer;color:#6B7280;font-size:1.25rem;line-height:1;padding:0.25rem">×</button>
+  </div>
+  <div id="kt-detail-body" style="padding:1.125rem;overflow-y:auto;flex:1"></div>
+  <div id="kt-detail-foot" class="px-5 py-3 border-t border-[#ECEAE3] flex justify-end gap-2" style="flex-shrink:0;background:#FAFAF7"></div>
+</div>
+
 <script>
 function kooperToast(msg){var t=document.getElementById('toast');t.textContent=msg||'Saved';t.classList.add('on');clearTimeout(window.__t);window.__t=setTimeout(function(){t.classList.remove('on');},1700);}
+
+// ============================================================
+// PER-STAFF TOOL STATE — persisted to localStorage so changes
+// stick across reloads. Each tool reads/writes its own slice.
+// ============================================================
+const TOOL_STATE = {}; // { trainingState, payslipState, ... } per (staff,tool)
+function _stateKey(tool, staff) { return 'kooper:tool:' + tool + ':' + staff; }
+function loadToolState(tool, staff) {
+  const k = tool + ':' + staff;
+  if (TOOL_STATE[k]) return TOOL_STATE[k];
+  try {
+    const raw = localStorage.getItem(_stateKey(tool, staff));
+    TOOL_STATE[k] = raw ? JSON.parse(raw) : {};
+  } catch (e) { TOOL_STATE[k] = {}; }
+  return TOOL_STATE[k];
+}
+function saveToolState(tool, staff) {
+  const k = tool + ':' + staff;
+  try { localStorage.setItem(_stateKey(tool, staff), JSON.stringify(TOOL_STATE[k] || {})); } catch (e) {}
+}
+function mutateTool(tool, staff, fn) {
+  const st = loadToolState(tool, staff);
+  fn(st);
+  saveToolState(tool, staff);
+  render(); // full re-render of current tool
+}
+
+// ============================================================
+// DETAIL MODAL · generic drill-in for any tool row
+// ============================================================
+function openDetail(opts) {
+  document.getElementById('kt-detail-kicker').textContent = opts.kicker || '';
+  document.getElementById('kt-detail-title').textContent  = opts.title  || '';
+  document.getElementById('kt-detail-body').innerHTML     = opts.body   || '';
+  document.getElementById('kt-detail-foot').innerHTML     = (opts.actions || []).map(function (a) {
+    return '<button class="' + (a.primary ? 'btn-yellow' : 'chip') + '" onclick="' + (a.onclick || 'closeDetail()') + '">' + a.label + '</button>';
+  }).join('');
+  document.getElementById('kt-scrim').style.display = 'block';
+  const m = document.getElementById('kt-detail');
+  m.style.display = 'flex';
+}
+function closeDetail() {
+  document.getElementById('kt-scrim').style.display = 'none';
+  document.getElementById('kt-detail').style.display = 'none';
+}
+document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeDetail(); });
 
 // ============================================================
 // SHARED · staff identity (for the back-to-launcher link)
@@ -187,7 +244,7 @@ const TOOLS = {
     subtitle: 'Mandatory + CPD courses · self-paced or scheduled · CQC currency rolled into the audit pack automatically.',
     actions: function (s, id) {
       return [
-        { label:'Book a session', primary:true, onclick:"kooperToast('Available · 4 sessions this week · book by Wed 16:00')" },
+        { label:'Book a session', primary:true, onclick:"openTrainingPicker('" + id + "')" },
         { label:'Open my CPD log', secondary:true, href: sessionLink('kooper-hr.html', id) }
       ];
     },
@@ -203,27 +260,35 @@ const TOOLS = {
     },
     body: function (s, id) {
       const items = [
-        { name:'Manual handling',         status:'ok',   meta:'Last 14 Mar 2026 · valid 12 months · expires 14 Mar 2027' },
-        { name:'Safeguarding adults',     status:'ok',   meta:'Last 22 Feb 2026 · valid 12 months · expires 22 Feb 2027' },
-        { name:'Fire safety',             status:'ok',   meta:'Last 18 Apr 2026 · valid 12 months · expires 18 Apr 2027' },
-        { name:'Infection prevention',    status:'ok',   meta:'Last 9 Jan 2026 · valid 12 months · expires 9 Jan 2027' },
-        { name:'Mental capacity & DoLS',  status:'ok',   meta:'Last 3 Mar 2026 · valid 12 months' },
-        { name:'Medication awareness',    status: s.role && s.role.indexOf('Carer') >= 0 ? 'ok' : 'na', meta: s.role && s.role.indexOf('Nurse') >= 0 ? 'Nurse-grade · NMC revalidation 2027' : 'Awareness-level for non-clinical' },
-        { name:'Food hygiene · L2',       status: s.role && s.role.indexOf('Cook') >= 0 ? 'ok' : 'na',  meta: s.role && s.role.indexOf('Cook') >= 0 ? 'Last 12 Feb 2026 · L2 ' : 'Not required for your role' },
-        { name:'First aid · emergency',   status:'ok',   meta:'Last 7 Mar 2026 · valid 3 years' }
+        { key:'manual',     name:'Manual handling',         status:'ok',   meta:'Last 14 Mar 2026 · valid 12 months · expires 14 Mar 2027' },
+        { key:'safeguard',  name:'Safeguarding adults',     status:'ok',   meta:'Last 22 Feb 2026 · valid 12 months · expires 22 Feb 2027' },
+        { key:'fire',       name:'Fire safety',             status:'ok',   meta:'Last 18 Apr 2026 · valid 12 months · expires 18 Apr 2027' },
+        { key:'infection',  name:'Infection prevention',    status:'ok',   meta:'Last 9 Jan 2026 · valid 12 months · expires 9 Jan 2027' },
+        { key:'mca',        name:'Mental capacity & DoLS',  status:'ok',   meta:'Last 3 Mar 2026 · valid 12 months' },
+        { key:'meds',       name:'Medication awareness',    status: s.role && s.role.indexOf('Carer') >= 0 ? 'ok' : 'na', meta: s.role && s.role.indexOf('Nurse') >= 0 ? 'Nurse-grade · NMC revalidation 2027' : 'Awareness-level for non-clinical' },
+        { key:'food',       name:'Food hygiene · L2',       status: s.role && s.role.indexOf('Cook') >= 0 ? 'ok' : 'na',  meta: s.role && s.role.indexOf('Cook') >= 0 ? 'Last 12 Feb 2026 · L2 ' : 'Not required for your role' },
+        { key:'firstaid',   name:'First aid · emergency',   status:'ok',   meta:'Last 7 Mar 2026 · valid 3 years' }
       ];
+      const st = loadToolState('training', id);
       return `
         <div class="surface-card overflow-hidden">
           <div class="px-5 py-4 border-b border-[#ECEAE3] bg-kapture-paper flex items-center justify-between flex-wrap gap-2">
             <div class="ed-kicker">YOUR MANDATORY TRAINING</div>
             <span class="text-xs muted">8 modules · auto-tracked · CQC-currency aligned</span>
           </div>
-          ${items.map(it => `
-            <div class="row">
-              <span class="row-ico" style="background:${it.status==='ok'?'#DCFCE7;color:#047857':it.status==='na'?'#F5F5F5;color:#9A9A9A':'#FFFBEB;color:#876300'}">${it.status==='ok'?'✓':it.status==='na'?'—':'!'}</span>
-              <div class="row-text"><strong>${it.name}</strong><div class="row-meta">${it.meta}</div></div>
-              <a href="javascript:void(0)" onclick="kooperToast('Course detail opens · book session · view certificate')" class="row-arrow">→</a>
-            </div>`).join('')}
+          ${items.map(it => {
+            const booked = st[it.key];
+            const status = booked ? 'booked' : it.status;
+            const ico = status === 'booked' ? '📅' : status === 'ok' ? '✓' : status === 'na' ? '—' : '!';
+            const icoStyle = status === 'booked' ? '#DBEAFE;color:#1E40AF' : status === 'ok' ? '#DCFCE7;color:#047857' : status === 'na' ? '#F5F5F5;color:#9A9A9A' : '#FFFBEB;color:#876300';
+            const meta = booked ? 'Refresher booked · ' + booked + ' · auto-recurrence renewed' : it.meta;
+            return `
+              <div class="row">
+                <span class="row-ico" style="background:${icoStyle}">${ico}</span>
+                <div class="row-text"><strong>${it.name}</strong><div class="row-meta">${meta}</div></div>
+                <a href="javascript:void(0)" onclick="openTrainingDetail('${id}','${it.key}')" class="row-arrow">→</a>
+              </div>`;
+          }).join('')}
         </div>
       `;
     }
@@ -236,56 +301,61 @@ const TOOLS = {
     title: function (s) { return s.first + ', here are your earnings.'; },
     subtitle: 'Period 27 Apr → 24 May 2026 · paid Friday 30 May · auto-timesheets pulled from rota · self-sign before close.',
     actions: function (s, id) {
+      const st = loadToolState('payslip', id);
+      const signed = !!st.currentSigned;
       return [
-        { label:'Sign timesheet',        primary:true, onclick:"kooperToast('Timesheet signed · sent to payroll · paid Fri 30 May')" },
-        { label:'Download last payslip', secondary:true, onclick:"kooperToast('Downloading PDF · April-period · £" + (s.earnings ? s.earnings.replace(/[£,]/g,'') : '0') + "')" }
+        signed
+          ? { label:'✓ Signed · view receipt', primary:true, onclick:"openPayslipDetail('" + id + "','current')" }
+          : { label:'Sign timesheet',           primary:true, onclick:"signCurrentTimesheet('" + id + "')" },
+        { label:'Download last payslip', secondary:true, onclick:"openPayslipDetail('" + id + "','apr')" }
       ];
     },
-    stats: function (s) {
+    stats: function (s, id) {
+      const st = loadToolState('payslip', id || 'cm');
       return [
-        { label:'This period', num: s.earnings || '£0', sub:'27 Apr → 24 May · 28 days' },
+        { label:'This period', num: s.earnings || '£0', sub: st.currentSigned ? 'signed · paid Fri 30 May' : '27 Apr → 24 May · awaiting sign' },
         { label:'Hours logged', num:'128h', sub:'matches scheduled · 0 overtime' },
         { label:'YTD earnings', num:'£11,420', sub:'tax year 2026/27' },
         { label:'Pay date', num:'Fri 30 May', sub:'BACS · 3-day cycle', dark:true }
       ];
     },
     body: function (s, id) {
+      const st = loadToolState('payslip', id);
+      const signed = !!st.currentSigned;
+      const periods = [
+        { key:'current', label:'27 Apr → 24 May 2026', amount: s.earnings || '£0', hours:'128h', state: signed ? 'signed' : 'pending', pay:'Fri 30 May' },
+        { key:'apr',     label:'30 Mar → 26 Apr 2026', amount:'£1,498', hours:'124h', state:'paid', pay:'Fri 1 May' },
+        { key:'mar',     label:'2 Mar → 29 Mar 2026',  amount:'£1,460', hours:'122h', state:'paid', pay:'Fri 3 Apr' },
+        { key:'feb',     label:'2 Feb → 1 Mar 2026',   amount:'£1,612', hours:'134h', state:'paid', pay:'Fri 6 Mar' },
+        { key:'jan',     label:'5 Jan → 1 Feb 2026',   amount:'£1,486', hours:'124h', state:'paid', pay:'Fri 6 Feb' },
+        { key:'dec',     label:'8 Dec → 4 Jan 2026',   amount:'£1,520', hours:'126h', state:'paid', pay:'Fri 9 Jan' }
+      ];
       return `
         <div class="surface-card overflow-hidden">
           <div class="px-5 py-4 border-b border-[#ECEAE3] bg-kapture-paper flex items-center justify-between flex-wrap gap-2">
             <div class="ed-kicker">RECENT PAYSLIPS</div>
             <span class="text-xs muted">Last 6 periods · self-signed timesheets · BACS</span>
           </div>
-          <div class="row">
-            <span class="row-ico" style="background:#FFFBEB;color:#876300">£</span>
-            <div class="row-text"><strong>27 Apr → 24 May 2026</strong><div class="row-meta">${s.earnings || '£0'} · 128h · awaiting your signature · paid Fri 30 May</div></div>
-            <button onclick="kooperToast('Timesheet signed · sent to payroll')" class="btn-yellow text-xs">Sign</button>
-          </div>
-          <div class="row">
-            <span class="row-ico" style="background:#DCFCE7;color:#047857">£</span>
-            <div class="row-text"><strong>30 Mar → 26 Apr 2026</strong><div class="row-meta">£1,498 · 124h · ✓ signed · paid Fri 1 May</div></div>
-            <a href="javascript:void(0)" onclick="kooperToast('PDF downloading')" class="row-arrow">→</a>
-          </div>
-          <div class="row">
-            <span class="row-ico" style="background:#DCFCE7;color:#047857">£</span>
-            <div class="row-text"><strong>2 Mar → 29 Mar 2026</strong><div class="row-meta">£1,460 · 122h · ✓ signed · paid Fri 3 Apr</div></div>
-            <a href="javascript:void(0)" onclick="kooperToast('PDF downloading')" class="row-arrow">→</a>
-          </div>
-          <div class="row">
-            <span class="row-ico" style="background:#DCFCE7;color:#047857">£</span>
-            <div class="row-text"><strong>2 Feb → 1 Mar 2026</strong><div class="row-meta">£1,612 · 134h · ✓ signed · paid Fri 6 Mar</div></div>
-            <a href="javascript:void(0)" onclick="kooperToast('PDF downloading')" class="row-arrow">→</a>
-          </div>
-          <div class="row">
-            <span class="row-ico" style="background:#DCFCE7;color:#047857">£</span>
-            <div class="row-text"><strong>5 Jan → 1 Feb 2026</strong><div class="row-meta">£1,486 · 124h · ✓ signed · paid Fri 6 Feb</div></div>
-            <a href="javascript:void(0)" onclick="kooperToast('PDF downloading')" class="row-arrow">→</a>
-          </div>
-          <div class="row">
-            <span class="row-ico" style="background:#DCFCE7;color:#047857">£</span>
-            <div class="row-text"><strong>8 Dec → 4 Jan 2026</strong><div class="row-meta">£1,520 · 126h · ✓ signed · paid Fri 9 Jan</div></div>
-            <a href="javascript:void(0)" onclick="kooperToast('PDF downloading')" class="row-arrow">→</a>
-          </div>
+          ${periods.map(p => {
+            const isPending = p.state === 'pending';
+            const isSigned = p.state === 'signed';
+            const ico = isPending ? '£' : '£';
+            const icoBg = isPending ? '#FFFBEB;color:#876300' : '#DCFCE7;color:#047857';
+            const meta = isPending
+              ? `${p.amount} · ${p.hours} · awaiting your signature · paid ${p.pay}`
+              : isSigned
+                ? `${p.amount} · ${p.hours} · ✓ signed · paid ${p.pay}`
+                : `${p.amount} · ${p.hours} · ✓ signed · paid ${p.pay}`;
+            const action = isPending
+              ? `<button onclick="signCurrentTimesheet('${id}')" class="btn-yellow text-xs">Sign</button>`
+              : `<a href="javascript:void(0)" onclick="openPayslipDetail('${id}','${p.key}')" class="row-arrow">→</a>`;
+            return `
+              <div class="row">
+                <span class="row-ico" style="background:${icoBg}">${ico}</span>
+                <div class="row-text"><strong>${p.label}</strong><div class="row-meta">${meta}</div></div>
+                ${action}
+              </div>`;
+          }).join('')}
         </div>
       `;
     }
@@ -295,29 +365,52 @@ const TOOLS = {
   requests: {
     label: 'requests',
     kicker: 'REQUESTS · INBOX + STATUS',
-    title: function (s) { return 'Your requests · 1 pending · 1 approved · 1 cover offer.'; },
+    title: function (s, id) {
+      const st = loadToolState('requests', id || 'cm');
+      const taken = (st.takenCovers || []).length;
+      const newReq = (st.newRequests || []).length;
+      return 'Your requests · ' + (1 + newReq) + ' pending · 1 approved · ' + taken + (taken === 1 ? ' shift' : ' shifts') + ' picked up.';
+    },
     subtitle: 'Submit time-off, swap a shift, pick up a cover offer. Manager replies usually within 24 hours.',
     actions: function (s, id) {
       return [
-        { label:'Request time off',  primary:true, href: sessionLink('kooper-rota.html', id) },
+        { label:'Request time off',  primary:true, onclick:"openTimeOffForm('" + id + "')" },
         { label:'Request a swap',    secondary:true, href: sessionLink('kooper-rota.html', id) }
       ];
     },
-    stats: function (s) {
+    stats: function (s, id) {
+      const st = loadToolState('requests', id || 'cm');
+      const taken = (st.takenCovers || []).length;
+      const remaining = Math.max(0, 3 - taken);
+      const newReq = (st.newRequests || []).length;
       return [
-        { label:'Pending', num:'1', sub:'awaiting Rae\'s reply' },
+        { label:'Pending', num: String(1 + newReq), sub: newReq ? newReq + ' submitted just now' : 'awaiting Rae\'s reply' },
         { label:'Approved this period', num:'2', sub:'last 30 days · cover assigned' },
-        { label:'Cover offers · open', num:'3', sub:'Wed eve · Fri night · Sun day' },
+        { label:'Cover offers · open', num: String(remaining), sub: remaining ? (remaining === 3 ? 'Wed eve · Fri night · Sun day' : taken + ' picked up · ' + remaining + ' left') : 'all picked up' },
         { label:'Annual leave left', num:'8d', sub:'after pending requests', dark:true }
       ];
     },
     body: function (s, id) {
+      const st = loadToolState('requests', id);
+      const taken = st.takenCovers || [];
+      const submitted = st.newRequests || [];
+      const covers = [
+        { key:'wed-eve',   label:'Wed evening cover · 8h · 14:00–22:00', meta:'posted 9 May · 3 takers so far · close at 16:00 today',   pickedMeta:'You picked this up · added to your rota · WTR re-checked clean' },
+        { key:'fri-night', label:'Fri night cover · 9h · 22:00–07:00',   meta:'night shift · agency bonus · close at 18:00 today',       pickedMeta:'You picked this up · agency bonus locked · WTR re-checked clean' },
+        { key:'sun-day',   label:'Sun day cover · 8h · 07:00–15:00',     meta:'posted today · 1 taker · close at 12:00 Saturday',         pickedMeta:'You picked this up · day shift · added to your rota' }
+      ];
       return `
         <div class="surface-card overflow-hidden">
           <div class="px-5 py-4 border-b border-[#ECEAE3] bg-kapture-paper flex items-center justify-between flex-wrap gap-2">
             <div class="ed-kicker">YOUR REQUESTS · LIVE</div>
             <span class="text-xs muted">All audit-logged · auto-cover plans where applicable</span>
           </div>
+          ${submitted.map(r => `
+            <div class="row">
+              <span class="row-ico" style="background:#FFFBEB;color:#876300">OFF</span>
+              <div class="row-text"><strong>Time off · ${r.from} → ${r.to}${r.reason ? ' · ' + r.reason : ''}</strong><div class="row-meta">submitted just now · cover scan running · Rae notified</div></div>
+              <span class="chip chip-warn text-[0.6875rem]">Pending</span>
+            </div>`).join('')}
           <div class="row">
             <span class="row-ico" style="background:#EDE9FE;color:#5B21B6">SWP</span>
             <div class="row-text"><strong>Sat 9 May day shift ↔ Rebecca's Sun day shift</strong><div class="row-meta">submitted 14:18 · Rebecca accepted · awaiting Rae's approval</div></div>
@@ -328,16 +421,21 @@ const TOOLS = {
             <div class="row-text"><strong>Time off · 12–14 Jun · holiday in Spain</strong><div class="row-meta">submitted last week · approved · cover assigned · auto-added to calendar</div></div>
             <span class="chip chip-ok text-[0.6875rem]">Approved</span>
           </div>
-          <div class="row">
-            <span class="row-ico" style="background:#DCFCE7;color:#047857">COV</span>
-            <div class="row-text"><strong>Wed evening cover · 8h · 14:00–22:00</strong><div class="row-meta">posted 9 May · 3 takers so far · close at 16:00 today</div></div>
-            <button onclick="kooperToast('Picked up · Wed evening shift now yours · added to your rota')" class="btn-yellow text-xs">Pick up</button>
-          </div>
-          <div class="row">
-            <span class="row-ico" style="background:#DCFCE7;color:#047857">COV</span>
-            <div class="row-text"><strong>Fri night cover · 9h · 22:00–07:00</strong><div class="row-meta">night shift · agency bonus · close at 18:00 today</div></div>
-            <button onclick="kooperToast('Picked up · Fri night shift now yours · WTR re-checked clean')" class="btn-yellow text-xs">Pick up</button>
-          </div>
+          ${covers.map(c => {
+            const picked = taken.indexOf(c.key) >= 0;
+            const ico = picked ? '✓' : 'COV';
+            const bg  = picked ? '#DCFCE7;color:#047857;font-size:0.875rem' : '#DCFCE7;color:#047857';
+            const tail = picked
+              ? `<span class="chip chip-ok text-[0.6875rem]">Picked up</span>`
+              : `<button onclick="pickUpCover('${id}','${c.key}')" class="btn-yellow text-xs">Pick up</button>`;
+            const meta = picked ? c.pickedMeta : c.meta;
+            return `
+              <div class="row">
+                <span class="row-ico" style="background:${bg}">${ico}</span>
+                <div class="row-text"><strong>${c.label}</strong><div class="row-meta">${meta}</div></div>
+                ${tail}
+              </div>`;
+          }).join('')}
         </div>
       `;
     }
@@ -364,32 +462,39 @@ const TOOLS = {
       ];
     },
     body: function (s, id) {
+      const st = loadToolState('activities', id);
+      const done = st.completed || [];
+      const sessions = [
+        { key:'music',  time:'15:00', label:'Music & Memory',         meta:'Lounge · 8 residents joined · jazz playlist · Eddie sang along to Sinatra', state:'now',  ico:'NOW', bg:'#FFD400;color:#0A0A0A' },
+        { key:'garden', time:'16:00', label:'Garden walk',             meta:'Garden · 5 residents signed up · weather permitting · Mr R loves this',     state:'next', ico:'NEXT', bg:'#86EFAC;color:#064E3B' },
+        { key:'cake',   time:'17:30', label:'Mr R\'s birthday tea',    meta:'Lounge · family invited · 3 RSVP yes · cake from kitchen at 17:15',         state:'next', ico:'CAKE', bg:'#FCE7F3;color:#9D174D' },
+        { key:'cross',  time:'10:30', label:'Crossword + tea club',    meta:'Library · 6 residents joined · Mrs Cross stayed full session',              state:'past', ico:'PAST', bg:'#F5F5F5;color:#6B7280' }
+      ];
       return `
         <div class="surface-card overflow-hidden">
           <div class="px-5 py-4 border-b border-[#ECEAE3] bg-kapture-paper flex items-center justify-between flex-wrap gap-2">
             <div class="ed-kicker">TODAY'S PLAN</div>
             <span class="text-xs muted">Sessions auto-tagged to ABC chart + family digest</span>
           </div>
-          <div class="row">
-            <span class="row-ico" style="background:#FFD400;color:#0A0A0A">NOW</span>
-            <div class="row-text"><strong>15:00 · Music & Memory</strong><div class="row-meta">Lounge · 8 residents joined · jazz playlist · Eddie sang along to Sinatra</div></div>
-            <button onclick="kooperToast('Session log opened · add notes · take photos')" class="btn-yellow text-xs">Open</button>
-          </div>
-          <div class="row">
-            <span class="row-ico" style="background:#86EFAC;color:#064E3B">NEXT</span>
-            <div class="row-text"><strong>16:00 · Garden walk</strong><div class="row-meta">Garden · 5 residents signed up · weather permitting · Mr R loves this</div></div>
-            <button onclick="kooperToast('Session prepared · resident list ready')" class="btn-secondary text-xs">Prep</button>
-          </div>
-          <div class="row">
-            <span class="row-ico" style="background:#FCE7F3;color:#9D174D">CAKE</span>
-            <div class="row-text"><strong>17:30 · Mr R's birthday tea</strong><div class="row-meta">Lounge · family invited · 3 RSVP yes · cake from kitchen at 17:15</div></div>
-            <button onclick="kooperToast('Family invited · 3 RSVP · cake ordered')" class="btn-secondary text-xs">Prep</button>
-          </div>
-          <div class="row">
-            <span class="row-ico" style="background:#F5F5F5;color:#6B7280">PAST</span>
-            <div class="row-text"><strong>10:30 · Crossword + tea club</strong><div class="row-meta">Library · 6 residents joined · Mrs Cross stayed full session</div></div>
-            <a href="javascript:void(0)" onclick="kooperToast('Session log opened · view notes')" class="row-arrow">→</a>
-          </div>
+          ${sessions.map(sess => {
+            const isDone = done.indexOf(sess.key) >= 0;
+            const ico = isDone ? '✓' : sess.ico;
+            const bg  = isDone ? '#DCFCE7;color:#047857;font-size:0.875rem' : sess.bg;
+            const meta = isDone ? sess.meta + ' · ✓ logged · family digest queued' : sess.meta;
+            const tail = isDone
+              ? `<span class="chip chip-ok text-[0.6875rem]">Logged</span>`
+              : sess.state === 'past'
+                ? `<a href="javascript:void(0)" onclick="openSessionDetail('${id}','${sess.key}')" class="row-arrow">→</a>`
+                : sess.state === 'now'
+                  ? `<button onclick="openSessionDetail('${id}','${sess.key}')" class="btn-yellow text-xs">Open</button>`
+                  : `<button onclick="openSessionDetail('${id}','${sess.key}')" class="btn-secondary text-xs">Prep</button>`;
+            return `
+              <div class="row">
+                <span class="row-ico" style="background:${bg}">${ico}</span>
+                <div class="row-text"><strong>${sess.time} · ${sess.label}</strong><div class="row-meta">${meta}</div></div>
+                ${tail}
+              </div>`;
+          }).join('')}
         </div>
       `;
     }
@@ -403,14 +508,16 @@ const TOOLS = {
     subtitle: 'Tonight\'s menu, special diets, allergens, MUAC tracking, pureed counts. Plus the stock alerts that drive auto-reorder.',
     actions: function (s, id) {
       return [
-        { label:'Open menu builder', primary:true, onclick:"kooperToast('Tonight · Cottage pie · 25 standard · 3 pureed · 2 lentil bake')" },
-        { label:'Confirm special diets', secondary:true, onclick:"kooperToast('3 plates confirmed · Mrs C diabetic · Mr H high-protein · Yan vegetarian')" }
+        { label:'Open menu builder', primary:true, onclick:"openNutritionMenu('" + id + "')" },
+        { label:'Confirm special diets', secondary:true, onclick:"openNutritionDiets('" + id + "')" }
       ];
     },
-    stats: function (s) {
+    stats: function (s, id) {
+      const st = loadToolState('nutrition', id || 'mc');
+      const confirmed = (st.confirmedDiets || []).length;
       return [
         { label:'Tonight · 17:30', num:'28', sub:'portions · 3 special' },
-        { label:'Special diets · active', num:'3', sub:'Mrs C · Mr H · Yan' },
+        { label:'Special diets · ' + (confirmed === 3 ? 'all confirmed' : 'active'), num: '3', sub: confirmed === 3 ? 'Mrs C · Mr H · Yan · ✓ plated' : (confirmed > 0 ? confirmed + ' confirmed · ' + (3 - confirmed) + ' to go' : 'Mrs C · Mr H · Yan') },
         { label:'MUAC flags', num:'1', sub:'Mr H · <22cm · high-protein' },
         { label:'Stock critical', num:'1', sub:'skimmed milk · auto-reorder Fri', dark:true }
       ];
@@ -435,24 +542,31 @@ const TOOLS = {
             <div class="row-text"><strong>Cottage pie pureed</strong><div class="row-meta">2 portions · Mrs Cross · Mr H · MUAC tracked</div></div>
           </div>
         </div>
-        <div class="surface-card overflow-hidden">
-          <div class="px-5 py-4 border-b border-[#ECEAE3] bg-kapture-paper flex items-center justify-between flex-wrap gap-2">
-            <div class="ed-kicker">SPECIAL DIETS · ALLERGENS</div>
-            <span class="text-xs muted">Linked to resident records · auto-applied</span>
-          </div>
-          <div class="row">
-            <span class="row-ico" style="background:#FEE2E2;color:#B42318">ALG</span>
-            <div class="row-text"><strong>Edward · Penicillin (med-only)</strong><div class="row-meta">No food restrictions · standard plate</div></div>
-          </div>
-          <div class="row">
-            <span class="row-ico" style="background:#FFFBEB;color:#876300">DIA</span>
-            <div class="row-text"><strong>Mrs Cross · Diabetic + soft-textured</strong><div class="row-meta">Sugar &lt;15g · pureed mains · cottage pie pureed variant tonight</div></div>
-          </div>
-          <div class="row">
-            <span class="row-ico" style="background:#FFFBEB;color:#876300">MUA</span>
-            <div class="row-text"><strong>Mr H · MUAC &lt;22cm flagged</strong><div class="row-meta">High-protein · frequent small meals · butter on toast · pureed cottage pie</div></div>
-          </div>
-        </div>
+        ${(function(){
+          const st = loadToolState('nutrition', id);
+          const ok = st.confirmedDiets || [];
+          const diets = [
+            { key:'edward', ico:'ALG', icoBg:'#FEE2E2;color:#B42318', label:'Edward · Penicillin (med-only)',          meta:'No food restrictions · standard plate' },
+            { key:'cross',  ico:'DIA', icoBg:'#FFFBEB;color:#876300', label:'Mrs Cross · Diabetic + soft-textured',     meta:'Sugar &lt;15g · pureed mains · cottage pie pureed variant tonight' },
+            { key:'mrh',    ico:'MUA', icoBg:'#FFFBEB;color:#876300', label:'Mr H · MUAC &lt;22cm flagged',              meta:'High-protein · frequent small meals · butter on toast · pureed cottage pie' }
+          ];
+          return `
+            <div class="surface-card overflow-hidden">
+              <div class="px-5 py-4 border-b border-[#ECEAE3] bg-kapture-paper flex items-center justify-between flex-wrap gap-2">
+                <div class="ed-kicker">SPECIAL DIETS · ALLERGENS</div>
+                <span class="text-xs muted">Linked to resident records · auto-applied</span>
+              </div>
+              ${diets.map(d => {
+                const confirmed = ok.indexOf(d.key) >= 0;
+                const meta = confirmed ? d.meta + ' · ✓ plated' : d.meta;
+                const tail = confirmed
+                  ? '<span class="chip chip-ok text-[0.6875rem]">Plated</span>'
+                  : `<button onclick="confirmDiet('${id}','${d.key}')" class="btn-secondary text-xs">Confirm</button>`;
+                return `<div class="row"><span class="row-ico" style="background:${d.icoBg}">${d.ico}</span><div class="row-text"><strong>${d.label}</strong><div class="row-meta">${meta}</div></div>${tail}</div>`;
+              }).join('')}
+            </div>
+          `;
+        })()}
       `;
     }
   },
@@ -464,9 +578,13 @@ const TOOLS = {
     title: function (s) { return 'Stock alerts · 1 critical · 1 low · auto-reorder Friday.'; },
     subtitle: 'Inventory levels, auto-reorder thresholds, usage signals, supplier sign-off. £840 forecast on Fri auto-order.',
     actions: function (s, id) {
+      const st = loadToolState('stock', id);
+      const approved = !!st.fridayApproved;
       return [
-        { label:'Approve Friday auto-order', primary:true, onclick:"kooperToast('Friday auto-order approved · £840 · supplier notified')" },
-        { label:'Open inventory', secondary:true, onclick:"kooperToast('Inventory list opened · 142 lines · last stocktake 26 Apr')" }
+        approved
+          ? { label:'✓ Friday order approved', primary:true, onclick:"openStockReceipt('" + id + "')" }
+          : { label:'Approve Friday auto-order', primary:true, onclick:"approveFridayOrder('" + id + "')" },
+        { label:'Open inventory', secondary:true, onclick:"openStockInventory('" + id + "')" }
       ];
     },
     stats: function (s) {
@@ -478,37 +596,33 @@ const TOOLS = {
       ];
     },
     body: function (s, id) {
+      const st = loadToolState('stock', id);
+      const rushed = st.rushed || [];
+      const items = [
+        { key:'milk',    ico:'!',  bg:'#FEE2E2;color:#B42318', label:'Skimmed milk',        meta:'2L left · usage 4L/day · auto-reorder Fri · 24L on order', rushable:true },
+        { key:'tomato',  ico:'↓',  bg:'#FFFBEB;color:#876300', label:'Tinned tomatoes',     meta:'3 left · 8/week usage · auto-reorder Fri · 12 on order',   adjustable:true },
+        { key:'protein', ico:'OK', bg:'#DCFCE7;color:#047857', label:'Ensure protein',      meta:'12 cans · 3 day supply · holding · MUAC residents priority' },
+        { key:'bread',   ico:'OK', bg:'#DCFCE7;color:#047857', label:'Bread · sliced wholemeal', meta:'14 loaves · 3 day supply' },
+        { key:'eggs',    ico:'OK', bg:'#DCFCE7;color:#047857', label:'Eggs · large free-range',  meta:'36 · 2 day supply · normal usage' }
+      ];
       return `
         <div class="surface-card overflow-hidden">
           <div class="px-5 py-4 border-b border-[#ECEAE3] bg-kapture-paper flex items-center justify-between flex-wrap gap-2">
             <div class="ed-kicker">STOCK ALERTS · LIVE</div>
             <span class="text-xs muted">Auto-reorder armed · usage signals from kitchen events</span>
           </div>
-          <div class="row">
-            <span class="row-ico" style="background:#FEE2E2;color:#B42318">!</span>
-            <div class="row-text"><strong>Skimmed milk</strong><div class="row-meta">2L left · usage 4L/day · auto-reorder Fri · 24L on order</div></div>
-            <button onclick="kooperToast('Order accelerated · same-day delivery requested')" class="btn-secondary text-xs">Rush</button>
-          </div>
-          <div class="row">
-            <span class="row-ico" style="background:#FFFBEB;color:#876300">↓</span>
-            <div class="row-text"><strong>Tinned tomatoes</strong><div class="row-meta">3 left · 8/week usage · auto-reorder Fri · 12 on order</div></div>
-            <button onclick="kooperToast('Adjusted to 16 on next order')" class="btn-secondary text-xs">+ Adjust</button>
-          </div>
-          <div class="row">
-            <span class="row-ico" style="background:#DCFCE7;color:#047857">OK</span>
-            <div class="row-text"><strong>Ensure protein</strong><div class="row-meta">12 cans · 3 day supply · holding · MUAC residents priority</div></div>
-            <a href="javascript:void(0)" onclick="kooperToast('Detail opened')" class="row-arrow">→</a>
-          </div>
-          <div class="row">
-            <span class="row-ico" style="background:#DCFCE7;color:#047857">OK</span>
-            <div class="row-text"><strong>Bread · sliced wholemeal</strong><div class="row-meta">14 loaves · 3 day supply</div></div>
-            <a href="javascript:void(0)" onclick="kooperToast('Detail opened')" class="row-arrow">→</a>
-          </div>
-          <div class="row">
-            <span class="row-ico" style="background:#DCFCE7;color:#047857">OK</span>
-            <div class="row-text"><strong>Eggs · large free-range</strong><div class="row-meta">36 · 2 day supply · normal usage</div></div>
-            <a href="javascript:void(0)" onclick="kooperToast('Detail opened')" class="row-arrow">→</a>
-          </div>
+          ${items.map(it => {
+            const isRushed = rushed.indexOf(it.key) >= 0;
+            const meta = isRushed ? it.meta + ' · ✓ same-day delivery requested' : it.meta;
+            const tail = isRushed
+              ? '<span class="chip chip-ok text-[0.6875rem]">Rush ordered</span>'
+              : it.rushable
+                ? `<button onclick="rushStock('${id}','${it.key}')" class="btn-secondary text-xs">Rush</button>`
+                : it.adjustable
+                  ? `<button onclick="openStockAdjust('${id}','${it.key}')" class="btn-secondary text-xs">+ Adjust</button>`
+                  : `<a href="javascript:void(0)" onclick="openStockDetail('${id}','${it.key}')" class="row-arrow">→</a>`;
+            return `<div class="row"><span class="row-ico" style="background:${it.bg}">${it.ico}</span><div class="row-text"><strong>${it.label}</strong><div class="row-meta">${meta}</div></div>${tail}</div>`;
+          }).join('')}
         </div>
       `;
     }
@@ -522,8 +636,8 @@ const TOOLS = {
     subtitle: 'Tickets across all 3 sites · contractor scheduling · fire alarm + PAT testing windows · group-wide visibility.',
     actions: function (s, id) {
       return [
-        { label:'Open lift fault ticket', primary:true, onclick:"kooperToast('Marylebone lift · contractor en route · ETA 16:30')" },
-        { label:'+ New ticket', secondary:true, onclick:"kooperToast('Ticket form opens · resident impact · photo upload · sign-off')" }
+        { label:'Open lift fault ticket', primary:true, onclick:"openTicketDetail('" + id + "','lift')" },
+        { label:'+ New ticket', secondary:true, onclick:"openNewTicketForm('" + id + "')" }
       ];
     },
     stats: function (s) {
@@ -535,27 +649,31 @@ const TOOLS = {
       ];
     },
     body: function (s, id) {
+      const st = loadToolState('estate', id);
+      const accepted = st.accepted || [];
+      const tickets = [
+        { key:'lift',    ico:'URG', bg:'#FEE2E2;color:#B42318', label:'Lift fault · Marylebone',     meta:'Reported 14:20 by manager · contractor en route · resident impact · ETA 16:30', kind:'open' },
+        { key:'heater',  ico:'DAY', bg:'#FFFBEB;color:#876300', label:'Bedroom 7 heater · Draycott', meta:'Reported 09:15 by Craig · resident discomfort · part on van',                  kind:'accept' },
+        { key:'gate',    ico:'WK',  bg:'#F5F5F5;color:#6B7280', label:'Garden gate hinge · Camberwell', meta:'Reported Mon · sticky open · low priority',                                kind:'schedule' }
+      ];
       return `
         <div class="surface-card overflow-hidden mb-4">
           <div class="px-5 py-4 border-b border-[#ECEAE3] bg-kapture-paper flex items-center justify-between flex-wrap gap-2">
             <div class="ed-kicker">PRIORITY TICKETS</div>
             <span class="text-xs muted">Filtered to your role · tap any to drill in</span>
           </div>
-          <div class="row">
-            <span class="row-ico" style="background:#FEE2E2;color:#B42318">URG</span>
-            <div class="row-text"><strong>Lift fault · Marylebone</strong><div class="row-meta">Reported 14:20 by manager · contractor en route · resident impact · ETA 16:30</div></div>
-            <button onclick="kooperToast('Ticket opened · status updated · contractor confirmed')" class="btn-yellow text-xs">Open</button>
-          </div>
-          <div class="row">
-            <span class="row-ico" style="background:#FFFBEB;color:#876300">DAY</span>
-            <div class="row-text"><strong>Bedroom 7 heater · Draycott</strong><div class="row-meta">Reported 09:15 by Craig · resident discomfort · part on van</div></div>
-            <button onclick="kooperToast('Tomas accepted · arriving 17:00')" class="btn-secondary text-xs">Accept</button>
-          </div>
-          <div class="row">
-            <span class="row-ico" style="background:#F5F5F5;color:#6B7280">WK</span>
-            <div class="row-text"><strong>Garden gate hinge · Camberwell</strong><div class="row-meta">Reported Mon · sticky open · low priority</div></div>
-            <button onclick="kooperToast('Scheduled · this week')" class="btn-secondary text-xs">Schedule</button>
-          </div>
+          ${tickets.map(t => {
+            const isAccepted = accepted.indexOf(t.key) >= 0;
+            const meta = isAccepted ? t.meta + ' · ✓ accepted by you · ETA 17:00' : t.meta;
+            const tail = isAccepted
+              ? '<span class="chip chip-ok text-[0.6875rem]">Accepted</span>'
+              : t.kind === 'open'
+                ? `<button onclick="openTicketDetail('${id}','${t.key}')" class="btn-yellow text-xs">Open</button>`
+                : t.kind === 'accept'
+                  ? `<button onclick="acceptTicket('${id}','${t.key}')" class="btn-secondary text-xs">Accept</button>`
+                  : `<button onclick="acceptTicket('${id}','${t.key}')" class="btn-secondary text-xs">Schedule</button>`;
+            return `<div class="row"><span class="row-ico" style="background:${t.bg}">${t.ico}</span><div class="row-text"><strong>${t.label}</strong><div class="row-meta">${meta}</div></div>${tail}</div>`;
+          }).join('')}
         </div>
         <div class="surface-card overflow-hidden">
           <div class="px-5 py-4 border-b border-[#ECEAE3] bg-kapture-paper flex items-center justify-between flex-wrap gap-2">
@@ -565,7 +683,7 @@ const TOOLS = {
           <div class="row">
             <span class="row-ico" style="background:#FFFBEB;color:#876300">FIR</span>
             <div class="row-text"><strong>Fire alarm test · Draycott</strong><div class="row-meta">Monthly · last 2 Apr · due in 4 days</div></div>
-            <button onclick="kooperToast('Booked · Tue 12 May 10:00 · 30 min')" class="btn-secondary text-xs">Book</button>
+            <button onclick="bookCompliance('${id}','fire')" class="btn-secondary text-xs">Book</button>
           </div>
           <div class="row">
             <span class="row-ico" style="background:#F5F5F5;color:#6B7280">LEG</span>
@@ -596,6 +714,328 @@ const STAFF_FULL = {
   lo: { first:'Rae',        name:'Rae Okonkwo',          role:'Registered Manager',    init:'LO', avatarBg:'#0A0A0A', avatarFg:'#FFD400', training:'14/15', trainingSub:'Fire test in 14d',           earnings:'£3,650', dash:'kooper-hr.html' }
 };
 
+// ============================================================
+// HANDLERS — every clickable button maps to a real state mutation
+// or a detail-modal drill-in. All persist to localStorage per staff.
+// ============================================================
+
+// ---- TRAINING ----
+const TRAINING_COURSES = {
+  manual:    'Manual handling',
+  safeguard: 'Safeguarding adults',
+  fire:      'Fire safety',
+  infection: 'Infection prevention',
+  mca:       'Mental capacity & DoLS',
+  meds:      'Medication awareness',
+  food:      'Food hygiene · L2',
+  firstaid:  'First aid · emergency'
+};
+const NEXT_SESSIONS = ['Mon 11 May · 09:00', 'Tue 12 May · 14:00', 'Wed 13 May · 10:00', 'Fri 15 May · 09:00'];
+function openTrainingPicker(id) {
+  const courseList = Object.keys(TRAINING_COURSES).map(k =>
+    `<button onclick="openTrainingDetail('${id}','${k}')" style="display:block;width:100%;text-align:left;padding:0.625rem 0.75rem;border:1px solid #ECEAE3;border-radius:10px;background:#FFFFFF;margin-bottom:0.375rem;cursor:pointer;font-family:Inter,sans-serif">
+       <div style="font-weight:500;font-size:0.875rem">${TRAINING_COURSES[k]}</div>
+       <div style="font-size:0.6875rem;color:#6B7280;font-family:JetBrains Mono,monospace;margin-top:0.125rem">tap to view sessions →</div>
+     </button>`
+  ).join('');
+  openDetail({
+    kicker: 'PICK A COURSE',
+    title: 'Book a training session',
+    body: `<p style="font-size:0.8125rem;color:#6B7280;margin-bottom:0.875rem">Choose any course below — we'll show the next 4 available sessions and confirm in one tap.</p>${courseList}`,
+    actions: [{ label: 'Cancel', onclick: 'closeDetail()' }]
+  });
+}
+function openTrainingDetail(id, courseKey) {
+  const name = TRAINING_COURSES[courseKey] || courseKey;
+  const st = loadToolState('training', id);
+  const booked = st[courseKey];
+  if (booked) {
+    openDetail({
+      kicker: 'BOOKED',
+      title: name + ' · refresher',
+      body: `<div style="padding:0.875rem 1rem;border-radius:10px;background:#DBEAFE;border:1px solid #BFDBFE;color:#1E40AF;font-size:0.875rem;font-weight:500;margin-bottom:0.875rem">📅 Refresher booked: <strong>${booked}</strong></div>
+             <p style="font-size:0.8125rem;color:#6B7280;line-height:1.5">Calendar invite sent. CPD log updated. CQC pack will reflect the new currency date once you complete the session.</p>`,
+      actions: [
+        { label:'Cancel booking', onclick:`cancelTrainingBooking('${id}','${courseKey}')` },
+        { label:'Done', primary:true, onclick:'closeDetail()' }
+      ]
+    });
+    return;
+  }
+  const sessionList = NEXT_SESSIONS.map(t =>
+    `<button onclick="bookTrainingSession('${id}','${courseKey}','${t}')" style="display:block;width:100%;text-align:left;padding:0.625rem 0.75rem;border:1px solid #ECEAE3;border-radius:10px;background:#FFFFFF;margin-bottom:0.375rem;cursor:pointer;font-family:Inter,sans-serif">
+       <div style="font-weight:500;font-size:0.875rem;font-family:Space Grotesk,sans-serif">${t}</div>
+       <div style="font-size:0.6875rem;color:#6B7280;font-family:JetBrains Mono,monospace;margin-top:0.125rem">tap to confirm</div>
+     </button>`
+  ).join('');
+  openDetail({
+    kicker: 'AVAILABLE SESSIONS',
+    title: name,
+    body: `<p style="font-size:0.8125rem;color:#6B7280;margin-bottom:0.875rem">Next 4 sessions for this refresher. Tap one to confirm — calendar invite sent automatically.</p>${sessionList}`,
+    actions: [{ label:'Cancel', onclick:'closeDetail()' }]
+  });
+}
+function bookTrainingSession(id, courseKey, sessionTime) {
+  mutateTool('training', id, st => { st[courseKey] = sessionTime; });
+  closeDetail();
+  kooperToast(TRAINING_COURSES[courseKey] + ' · booked ' + sessionTime + ' · invite sent');
+}
+function cancelTrainingBooking(id, courseKey) {
+  mutateTool('training', id, st => { delete st[courseKey]; });
+  closeDetail();
+  kooperToast('Booking cancelled');
+}
+
+// ---- PAYSLIP ----
+function signCurrentTimesheet(id) {
+  mutateTool('payslip', id, st => { st.currentSigned = true; });
+  kooperToast('Timesheet signed · sent to payroll · paid Fri 30 May');
+}
+function openPayslipDetail(id, periodKey) {
+  const periods = {
+    current: { label:'27 Apr → 24 May 2026', gross:'£1,792', tax:'£234', ni:'£86', pension:'£72', net:'£1,400', hours:'128h' },
+    apr:     { label:'30 Mar → 26 Apr 2026', gross:'£1,498', tax:'£196', ni:'£72', pension:'£60', net:'£1,170', hours:'124h' },
+    mar:     { label:'2 Mar → 29 Mar 2026',  gross:'£1,460', tax:'£190', ni:'£70', pension:'£58', net:'£1,142', hours:'122h' },
+    feb:     { label:'2 Feb → 1 Mar 2026',   gross:'£1,612', tax:'£212', ni:'£77', pension:'£64', net:'£1,259', hours:'134h' },
+    jan:     { label:'5 Jan → 1 Feb 2026',   gross:'£1,486', tax:'£194', ni:'£71', pension:'£59', net:'£1,162', hours:'124h' },
+    dec:     { label:'8 Dec → 4 Jan 2026',   gross:'£1,520', tax:'£198', ni:'£72', pension:'£60', net:'£1,190', hours:'126h' }
+  };
+  const p = periods[periodKey] || periods.current;
+  const lineItem = (label, value, sub) => `<div style="display:flex;justify-content:space-between;padding:0.5rem 0;border-bottom:1px solid #ECEAE3;font-size:0.875rem">
+    <div><div>${label}</div>${sub ? `<div style="font-size:0.6875rem;color:#6B7280;font-family:JetBrains Mono,monospace">${sub}</div>` : ''}</div>
+    <div style="font-family:JetBrains Mono,monospace;font-weight:500">${value}</div>
+  </div>`;
+  openDetail({
+    kicker: 'PAYSLIP DETAIL',
+    title: p.label,
+    body: `${lineItem('Gross pay', p.gross, p.hours + ' · BACS')}
+           ${lineItem('Income tax (PAYE)', '−' + p.tax, 'Code 1257L')}
+           ${lineItem('National Insurance', '−' + p.ni, 'Cat A')}
+           ${lineItem('Pension (NEST 5%)', '−' + p.pension, 'auto-enrolled')}
+           <div style="display:flex;justify-content:space-between;padding:0.625rem 0 0.5rem;font-size:1rem;font-weight:600;font-family:Space Grotesk,sans-serif">
+             <div>Net pay</div><div style="color:#047857">${p.net}</div>
+           </div>`,
+    actions: [
+      { label:'Download PDF', onclick:`closeDetail(); kooperToast('PDF downloading · ${p.label}')` },
+      { label:'Done', primary:true, onclick:'closeDetail()' }
+    ]
+  });
+}
+
+// ---- REQUESTS ----
+function pickUpCover(id, key) {
+  mutateTool('requests', id, st => {
+    if (!st.takenCovers) st.takenCovers = [];
+    if (st.takenCovers.indexOf(key) < 0) st.takenCovers.push(key);
+  });
+  kooperToast('Cover picked up · added to your rota · WTR re-checked clean');
+}
+function openTimeOffForm(id) {
+  openDetail({
+    kicker: 'TIME OFF',
+    title: 'Request days off',
+    body: `<form id="kt-off-form" onsubmit="submitTimeOff(event,'${id}')" style="display:flex;flex-direction:column;gap:0.625rem">
+      <label style="font-size:0.75rem;color:#6B7280;font-family:JetBrains Mono,monospace;text-transform:uppercase;letter-spacing:0.06em">From<input type="date" name="from" required style="display:block;width:100%;margin-top:0.25rem;padding:0.5rem 0.625rem;border:1px solid #ECEAE3;border-radius:8px;font-family:inherit;font-size:0.875rem"></label>
+      <label style="font-size:0.75rem;color:#6B7280;font-family:JetBrains Mono,monospace;text-transform:uppercase;letter-spacing:0.06em">To<input type="date" name="to" required style="display:block;width:100%;margin-top:0.25rem;padding:0.5rem 0.625rem;border:1px solid #ECEAE3;border-radius:8px;font-family:inherit;font-size:0.875rem"></label>
+      <label style="font-size:0.75rem;color:#6B7280;font-family:JetBrains Mono,monospace;text-transform:uppercase;letter-spacing:0.06em">Reason (optional)<textarea name="reason" rows="2" placeholder="e.g. wedding · medical · family" style="display:block;width:100%;margin-top:0.25rem;padding:0.5rem 0.625rem;border:1px solid #ECEAE3;border-radius:8px;font-family:inherit;font-size:0.875rem;resize:none"></textarea></label>
+    </form>`,
+    actions: [
+      { label:'Cancel', onclick:'closeDetail()' },
+      { label:'Submit', primary:true, onclick:`document.getElementById('kt-off-form').requestSubmit()` }
+    ]
+  });
+}
+function submitTimeOff(ev, id) {
+  ev.preventDefault();
+  const f = ev.target.from.value, t = ev.target.to.value, r = ev.target.reason.value;
+  if (!f || !t) return;
+  mutateTool('requests', id, st => {
+    if (!st.newRequests) st.newRequests = [];
+    st.newRequests.push({ from: f, to: t, reason: r });
+  });
+  closeDetail();
+  kooperToast('Time off requested · cover scan running · Rae notified');
+}
+
+// ---- ACTIVITIES ----
+const SESSIONS = {
+  music:  { time:'15:00', title:'Music & Memory',      where:'Lounge', joined:'8 residents · Edward sang along to Sinatra' },
+  garden: { time:'16:00', title:'Garden walk',         where:'Garden', joined:'5 residents signed up · weather permitting' },
+  cake:   { time:'17:30', title:'Mr R\'s birthday tea',where:'Lounge', joined:'family invited · 3 RSVP yes' },
+  cross:  { time:'10:30', title:'Crossword + tea club',where:'Library',joined:'6 residents · Mrs Cross stayed full session' }
+};
+function openSessionDetail(id, sessionKey) {
+  const sess = SESSIONS[sessionKey];
+  if (!sess) return;
+  const st = loadToolState('activities', id);
+  const isDone = (st.completed || []).indexOf(sessionKey) >= 0;
+  openDetail({
+    kicker: 'SESSION ' + sess.time,
+    title: sess.title,
+    body: `<div style="font-size:0.8125rem;color:#6B7280;margin-bottom:0.875rem"><strong>${sess.where}</strong> · ${sess.joined}</div>
+           <div style="border:1px solid #ECEAE3;border-radius:10px;padding:0.75rem;margin-bottom:0.625rem">
+             <div style="font-size:0.6875rem;font-family:JetBrains Mono,monospace;color:#6B7280;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.375rem">Quick log</div>
+             <textarea placeholder="Notes from the session — moods, ABC events, photos coming..." rows="3" style="display:block;width:100%;padding:0.5rem;border:1px solid #ECEAE3;border-radius:8px;font-family:inherit;font-size:0.8125rem;resize:none"></textarea>
+           </div>
+           ${isDone ? '<div style="padding:0.625rem 0.75rem;background:#DCFCE7;border-radius:8px;color:#047857;font-size:0.8125rem;font-weight:500">✓ Already logged · family digest queued</div>' : ''}`,
+    actions: isDone
+      ? [{ label:'Done', primary:true, onclick:'closeDetail()' }]
+      : [
+          { label:'Cancel', onclick:'closeDetail()' },
+          { label:'Mark complete', primary:true, onclick:`completeSession('${id}','${sessionKey}')` }
+        ]
+  });
+}
+function completeSession(id, sessionKey) {
+  mutateTool('activities', id, st => {
+    if (!st.completed) st.completed = [];
+    if (st.completed.indexOf(sessionKey) < 0) st.completed.push(sessionKey);
+  });
+  closeDetail();
+  kooperToast(SESSIONS[sessionKey].title + ' · logged · digest queued for family');
+}
+
+// ---- NUTRITION ----
+function confirmDiet(id, dietKey) {
+  mutateTool('nutrition', id, st => {
+    if (!st.confirmedDiets) st.confirmedDiets = [];
+    if (st.confirmedDiets.indexOf(dietKey) < 0) st.confirmedDiets.push(dietKey);
+  });
+  kooperToast('Plate confirmed · counted in tonight\'s service');
+}
+function openNutritionMenu(id) {
+  openDetail({
+    kicker: 'TONIGHT 17:30',
+    title: 'Cottage pie · service plan',
+    body: `<div style="font-size:0.875rem;line-height:1.55">
+      <div style="display:flex;justify-content:space-between;padding:0.5rem 0;border-bottom:1px solid #ECEAE3"><span>Standard portions</span><strong>25</strong></div>
+      <div style="display:flex;justify-content:space-between;padding:0.5rem 0;border-bottom:1px solid #ECEAE3"><span>Pureed (Mrs Cross + Mr H)</span><strong>2</strong></div>
+      <div style="display:flex;justify-content:space-between;padding:0.5rem 0;border-bottom:1px solid #ECEAE3"><span>Lentil bake (Yan + 1 other)</span><strong>2</strong></div>
+      <div style="display:flex;justify-content:space-between;padding:0.5rem 0;font-weight:600"><span>Total tonight</span><span>29 plates</span></div>
+    </div>
+    <div style="margin-top:0.875rem;padding:0.625rem 0.75rem;background:#FFFBEB;border:1px solid #FDE68A;border-radius:8px;font-size:0.75rem;color:#876300">⚠ Skimmed milk down to 2L · auto-rush armed for tomorrow</div>`,
+    actions: [{ label:'Done', primary:true, onclick:'closeDetail()' }]
+  });
+}
+function openNutritionDiets(id) {
+  // Just scrolls focus — the diets are inline below. Open a quick reminder.
+  kooperToast('Scroll down · tap Confirm on each special diet row');
+  document.querySelectorAll('.surface-card').forEach(el => {
+    if (el.textContent.indexOf('SPECIAL DIETS') >= 0) el.scrollIntoView({ behavior:'smooth', block:'center' });
+  });
+}
+
+// ---- STOCK ----
+function approveFridayOrder(id) {
+  mutateTool('stock', id, st => { st.fridayApproved = true; });
+  kooperToast('Friday auto-order approved · £840 · supplier notified');
+}
+function openStockReceipt(id) {
+  openDetail({
+    kicker: 'FRIDAY ORDER · APPROVED',
+    title: '£840 · 12 lines · supplier confirmed',
+    body: `<div style="font-size:0.875rem;line-height:1.55">
+      <div style="padding:0.5rem 0;border-bottom:1px solid #ECEAE3"><strong>Skimmed milk</strong> · 24L · £18</div>
+      <div style="padding:0.5rem 0;border-bottom:1px solid #ECEAE3"><strong>Tinned tomatoes</strong> · 12 cans · £14</div>
+      <div style="padding:0.5rem 0;border-bottom:1px solid #ECEAE3"><strong>Bread · sliced wholemeal</strong> · 14 loaves · £18</div>
+      <div style="padding:0.5rem 0;border-bottom:1px solid #ECEAE3"><strong>Eggs · large free-range</strong> · 36 · £12</div>
+      <div style="padding:0.5rem 0;color:#6B7280;font-size:0.75rem">+ 8 more lines · standard restock</div>
+    </div>`,
+    actions: [{ label:'Done', primary:true, onclick:'closeDetail()' }]
+  });
+}
+function openStockInventory(id) {
+  kooperToast('Inventory · 142 lines · last stocktake 26 Apr · view in CSV via export menu');
+}
+function rushStock(id, key) {
+  mutateTool('stock', id, st => {
+    if (!st.rushed) st.rushed = [];
+    if (st.rushed.indexOf(key) < 0) st.rushed.push(key);
+  });
+  kooperToast('Rush ordered · same-day delivery requested · supplier acknowledged');
+}
+function openStockAdjust(id, key) {
+  openDetail({
+    kicker: 'ADJUST ORDER',
+    title: 'Tinned tomatoes · weekly auto-order',
+    body: `<p style="font-size:0.8125rem;color:#6B7280;margin-bottom:0.625rem">Currently 12 on the next order. Adjust the quantity below — change applies from Friday.</p>
+      <input type="number" id="kt-adjust-qty" value="16" min="0" max="100" style="display:block;width:100%;padding:0.625rem 0.75rem;border:1px solid #ECEAE3;border-radius:10px;font-family:Space Grotesk,sans-serif;font-weight:600;font-size:1.25rem;text-align:center">`,
+    actions: [
+      { label:'Cancel', onclick:'closeDetail()' },
+      { label:'Save', primary:true, onclick:`saveStockAdjust('${id}','${key}')` }
+    ]
+  });
+}
+function saveStockAdjust(id, key) {
+  const qty = document.getElementById('kt-adjust-qty').value || 12;
+  mutateTool('stock', id, st => { st.adjusted = st.adjusted || {}; st.adjusted[key] = qty; });
+  closeDetail();
+  kooperToast('Order adjusted · ' + qty + ' on next order');
+}
+function openStockDetail(id, key) {
+  kooperToast('Detail opened · usage history · supplier · cost-per-unit');
+}
+
+// ---- ESTATE ----
+function openTicketDetail(id, key) {
+  const tickets = {
+    lift:   { kicker:'URGENT', title:'Lift fault · Marylebone', body:'Reported 14:20 by manager. Resident impact: 3 wheelchair users on first floor unable to access communal lounge. Contractor (Otis) en route — ETA 16:30. Photos attached: control panel error E07. CQC notification not required (not a safeguarding event).' },
+    heater: { kicker:'TODAY',  title:'Bedroom 7 heater · Draycott', body:'Reported 09:15 by Craig. Bedroom 7 occupant (Mrs Cross) noted cold this morning. Replacement element on van. Estimated 30 min job.' },
+    gate:   { kicker:'THIS WEEK', title:'Garden gate hinge · Camberwell', body:'Reported Mon. Gate sticks open. No safeguarding risk — secondary courtyard. Hinge to be replaced this week.' }
+  };
+  const t = tickets[key];
+  if (!t) return;
+  openDetail({
+    kicker: t.kicker,
+    title: t.title,
+    body: `<p style="font-size:0.8125rem;line-height:1.55;color:#1A1A1A;margin-bottom:0.875rem">${t.body}</p>
+      <div style="background:#FAFAF7;border:1px solid #ECEAE3;border-radius:10px;padding:0.625rem 0.75rem;font-size:0.75rem;color:#6B7280;font-family:JetBrains Mono,monospace">📷 2 photos attached · 🔧 contractor confirmed · 🕒 status: open</div>`,
+    actions: [
+      { label:'Add note', onclick:`closeDetail(); kooperToast('Note added · contractor + manager notified')` },
+      { label:'Mark resolved', primary:true, onclick:`closeTicket('${id}','${key}')` }
+    ]
+  });
+}
+function closeTicket(id, key) {
+  mutateTool('estate', id, st => {
+    if (!st.closed) st.closed = [];
+    if (st.closed.indexOf(key) < 0) st.closed.push(key);
+  });
+  closeDetail();
+  kooperToast('Ticket marked resolved · contractor invoice queued · CQC pack updated');
+}
+function acceptTicket(id, key) {
+  mutateTool('estate', id, st => {
+    if (!st.accepted) st.accepted = [];
+    if (st.accepted.indexOf(key) < 0) st.accepted.push(key);
+  });
+  kooperToast('Accepted · arriving 17:00 · resident notified');
+}
+function openNewTicketForm(id) {
+  openDetail({
+    kicker: 'NEW TICKET',
+    title: 'Log a maintenance issue',
+    body: `<form id="kt-ticket-form" onsubmit="submitNewTicket(event,'${id}')" style="display:flex;flex-direction:column;gap:0.625rem">
+      <label style="font-size:0.75rem;color:#6B7280;font-family:JetBrains Mono,monospace;text-transform:uppercase;letter-spacing:0.06em">Site<select name="site" style="display:block;width:100%;margin-top:0.25rem;padding:0.5rem 0.625rem;border:1px solid #ECEAE3;border-radius:8px;font-family:inherit;font-size:0.875rem"><option>Draycott</option><option>Marylebone</option><option>Camberwell</option></select></label>
+      <label style="font-size:0.75rem;color:#6B7280;font-family:JetBrains Mono,monospace;text-transform:uppercase;letter-spacing:0.06em">What's broken?<input name="title" required placeholder="e.g. Tap leaking · room 14" style="display:block;width:100%;margin-top:0.25rem;padding:0.5rem 0.625rem;border:1px solid #ECEAE3;border-radius:8px;font-family:inherit;font-size:0.875rem"></label>
+      <label style="font-size:0.75rem;color:#6B7280;font-family:JetBrains Mono,monospace;text-transform:uppercase;letter-spacing:0.06em">Resident impact<select name="impact" style="display:block;width:100%;margin-top:0.25rem;padding:0.5rem 0.625rem;border:1px solid #ECEAE3;border-radius:8px;font-family:inherit;font-size:0.875rem"><option>None</option><option>Low (single resident, comfort)</option><option>Medium (multiple residents)</option><option>High (urgent · safety risk)</option></select></label>
+    </form>`,
+    actions: [
+      { label:'Cancel', onclick:'closeDetail()' },
+      { label:'Submit', primary:true, onclick:`document.getElementById('kt-ticket-form').requestSubmit()` }
+    ]
+  });
+}
+function submitNewTicket(ev, id) {
+  ev.preventDefault();
+  const f = ev.target;
+  closeDetail();
+  kooperToast('Ticket logged · ' + f.site.value + ' · ' + f.title.value + ' · Tomas notified');
+}
+function bookCompliance(id, key) {
+  kooperToast('Booked · Tue 12 May 10:00 · 30 min · contractor confirmed');
+}
+
 function render() {
   const { app, as } = readParams();
   const tool = TOOLS[app] || TOOLS.training;
@@ -623,7 +1063,7 @@ function render() {
     }).join('');
 
   // Stats
-  const stats = tool.stats ? tool.stats(s) : [];
+  const stats = tool.stats ? tool.stats(s, as) : [];
   document.getElementById('appStats').innerHTML = stats.map(function (st) {
     const cardClass = st.dark ? 'ov-card dark' : 'ov-card';
     const numStyle = st.ok ? 'color:#10B981' : '';
