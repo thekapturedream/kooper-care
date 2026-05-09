@@ -135,6 +135,7 @@
       </div>
       <div class="flex items-center gap-2">
         <span class="hidden xl:inline-flex chip chip-yellow font-mono text-[0.6875rem] tracking-widest whitespace-nowrap">LIVE DEMO</span>
+        <button id="kooperHintsBtn" type="button" aria-label="Toggle hints"><span class="kt-hint-dot-mini" aria-hidden="true"></span><span data-kt-label>Hints</span></button>
         <button onclick="kooperToast('Synced to demo home')" class="btn-yellow text-sm whitespace-nowrap">Save shift</button>
         <a href="kooper-sign-in.html" class="hidden md:inline-flex p-1.5 rounded text-white/60 hover:text-white hover:bg-kapture-coal transition" title="Sign out" aria-label="Sign out">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
@@ -1326,5 +1327,66 @@ function generateReport(eventId) {
   }
 }
 </script>
+
+<!-- ============================================================ -->
+<!-- GUIDED TOUR + HINTS                                            -->
+<!-- ============================================================ -->
+<script id="kooper-tour-config" type="application/json">
+{
+  "page": "reporting",
+  "steps": [
+    {
+      "target": "#userTypeRail",
+      "placement": "bottom",
+      "title": "Switch persona, see the page their way",
+      "body": "kooper · reporting adapts to the role on shift. Tap any pill to swap context — Carer, Senior Carer, Nurse, Manager, or Activities. The active subject, visit, and events feed all update."
+    },
+    {
+      "target": "#step1Tiles",
+      "placement": "bottom",
+      "title": "Three taps. The note writes itself.",
+      "body": "Tap one tile per step. Level of support, then consent + dignity, then outcome. The AI watches your taps and drafts a CQC-ready narrative live — not after the shift."
+    },
+    {
+      "target": "#aiProse",
+      "placement": "left",
+      "title": "Live narrative builds as you tap",
+      "body": "Watch this paragraph rewrite itself with every tile. Consent phrasing, dignity language, SAF tagging — all generated and traceable. Confirm in 14 seconds, lock it forever."
+    },
+    {
+      "target": "#evidence",
+      "placement": "left",
+      "title": "Mapped to CQC SAF in real time",
+      "body": "Every recording event already routes to the right quality statement — Safe, Effective, Caring, Responsive, Well-led. Inspector questions answer themselves."
+    },
+    {
+      "target": "#eventsToday",
+      "placement": "top",
+      "title": "Every event saved. Every report ready.",
+      "body": "Today's captured events live here. Tap any row to expand the structured detail — consent, dignity, support, outcome, SAF tag — and one button generates a print-ready report file."
+    },
+    {
+      "target": "#evCountAll",
+      "placement": "left",
+      "title": "Filter the feed by status or persona",
+      "body": "All / Locked / Drafts / Flags filters combine with the persona switcher up top. Each role sees only events in their scope. Manager sees everything."
+    },
+    {
+      "target": "#kooperHintsBtn",
+      "placement": "bottom",
+      "title": "Hints stay on after the tour",
+      "body": "Toggle Hints in the header any time — yellow pulse dots will sit next to key features and explain themselves on tap. You can take this tour again from here too."
+    }
+  ],
+  "hints": [
+    { "target": "#userTypeRail", "label": "Persona switcher · changes context across the page" },
+    { "target": "#step1Tiles", "label": "Three-tap flow · level of support" },
+    { "target": "#aiProse", "label": "AI narrative · rewrites live as you tap" },
+    { "target": "#eventsToday", "label": "Events feed · tap any event to generate a report" }
+  ]
+}
+</script>
+<script src="kooper-tour.js" defer></script>
+
 </body>
 </html>

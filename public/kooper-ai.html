@@ -157,6 +157,7 @@
       </div>
       <div class="flex items-center gap-2">
         <span class="hidden xl:inline-flex chip chip-outline-light text-[0.6875rem] whitespace-nowrap"><span class="pulse-dot"></span> Claude · Sonnet 4.6</span>
+        <button id="kooperHintsBtn" type="button" aria-label="Toggle hints"><span class="kt-hint-dot-mini" aria-hidden="true"></span><span data-kt-label>Hints</span></button>
         <button onclick="kooperToast('Cmd+K opens AI everywhere')" class="hidden md:inline-flex items-center gap-1 px-2.5 py-1.5 bg-kapture-coal text-white/80 rounded-md text-xs hover:bg-kapture-ash">
           <span>Ask</span><span class="cmd-key">⌘K</span>
         </button>
@@ -849,5 +850,52 @@ document.addEventListener('DOMContentLoaded', () => {
   if (allBtn) allBtn.classList.add('chip-yellow');
 });
 </script>
+
+<!-- ============================================================ -->
+<!-- GUIDED TOUR + HINTS                                            -->
+<!-- ============================================================ -->
+<script id="kooper-tour-config" type="application/json">
+{
+  "page": "ai",
+  "steps": [
+    {
+      "target": "#convStream",
+      "placement": "top",
+      "title": "Conversation, with citations",
+      "body": "Plain English in. Cited evidence out. Every answer traces back to source events you can verify. 40 keyword groups built in — residents, time markers, clinical, ops, drafts."
+    },
+    {
+      "target": "#convSuggestions",
+      "placement": "top",
+      "title": "Suggestion chips lead the way",
+      "body": "Tap any suggestion to fire the query. After each reply, the chips refresh to follow-ups: see source events, draft a summary, notify the manager."
+    },
+    {
+      "target": "#aiInput",
+      "placement": "top",
+      "title": "Cmd+K from anywhere",
+      "body": "On any kooper page with AI on, ⌘K (or Ctrl+K) drops you into this input. Ask anything that crosses apps — kooper · ai already has the context loaded."
+    },
+    {
+      "target": "#activity",
+      "placement": "top",
+      "title": "Live AI activity · no black box",
+      "body": "Every draft, classification, flag, and pattern appears here with timestamp + confidence. Tap a row to see the source events and the prompt — no opaque decisions."
+    },
+    {
+      "target": "#kooperHintsBtn",
+      "placement": "bottom",
+      "title": "Hints stay on after the tour",
+      "body": "Toggle Hints in the header to keep yellow pulse dots near every key feature. Re-take this tour from here any time."
+    }
+  ],
+  "hints": [
+    { "target": "#aiInput", "label": "Cmd+K from any kooper page lands here" },
+    { "target": "#convStream", "label": "Conversation history · cited replies" },
+    { "target": "#activity", "label": "Live AI activity · every move on the record" }
+  ]
+}
+</script>
+<script src="kooper-tour.js" defer></script>
 </body>
 </html>

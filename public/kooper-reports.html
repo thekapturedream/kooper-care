@@ -181,6 +181,7 @@
       </div>
       <div class="flex items-center gap-2">
         <span class="hidden xl:inline-flex chip chip-outline-light text-[0.6875rem] whitespace-nowrap"><span class="pulse-dot"></span> Live · 9d window</span>
+        <button id="kooperHintsBtn" type="button" aria-label="Toggle hints"><span class="kt-hint-dot-mini" aria-hidden="true"></span><span data-kt-label>Hints</span></button>
         <button id="exportBtn" onclick="openExportPopover(this)" class="btn-yellow text-xs whitespace-nowrap">Export</button>
         <a href="kooper-sign-in.html" class="hidden md:inline-flex p-1.5 rounded text-white/60 hover:text-white hover:bg-kapture-coal transition" title="Sign out" aria-label="Sign out">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
@@ -1229,5 +1230,59 @@ function toggleMoreExamples() {
   });
 })();
 </script>
+
+<!-- ============================================================ -->
+<!-- GUIDED TOUR + HINTS                                            -->
+<!-- ============================================================ -->
+<script id="kooper-tour-config" type="application/json">
+{
+  "page": "reports",
+  "steps": [
+    {
+      "target": "#aiSearch",
+      "placement": "bottom",
+      "title": "Ask in plain English",
+      "body": "Type \"every fall in the last 30 days\" or \"Mr H NEWS2\" — Claude returns a citation-backed summary plus the matching report tiles. 36 keyword groups built in. Hit Enter to fire."
+    },
+    {
+      "target": "section[class*='AUDIENCE'], section.bg-kapture-paper.py-5",
+      "placement": "bottom",
+      "title": "Audience tabs filter the whole grid",
+      "body": "CQC pack · Operations · Clinical · Family · Board. Each tab actually filters the tiles below to that audience's pack. The title and tile count update live."
+    },
+    {
+      "target": "#filterBtn",
+      "placement": "bottom",
+      "title": "Filter by SAF + severity",
+      "body": "Open Filter to combine CQC SAF domains (Safe / Effective / Caring / Responsive / Well-led) with severity. Sort changes the order. Compile pack ships an audit-hashed PDF."
+    },
+    {
+      "target": "#tileGrid .report-tile.featured",
+      "placement": "bottom",
+      "title": "Tap any tile to drill in",
+      "body": "Every tile opens a detail modal — full sparkline, source apps, recent events with timestamps, and an Open in app CTA. The featured tile shows the live SAF readiness score."
+    },
+    {
+      "target": "#exportBtn",
+      "placement": "bottom",
+      "title": "Export in 4 formats",
+      "body": "PDF · XLSX · CSV · API. Each export downloads a file containing only the tiles currently visible — your filters become the export scope. Audit-hashed at the moment of compile."
+    },
+    {
+      "target": "#kooperHintsBtn",
+      "placement": "bottom",
+      "title": "Hints stay on after the tour",
+      "body": "Toggle Hints in the header to keep yellow pulse dots near every key feature. Re-take this tour from here any time."
+    }
+  ],
+  "hints": [
+    { "target": "#aiSearch", "label": "AI search · plain English in, citations out" },
+    { "target": "#tileGrid", "label": "Tap any tile to drill in" },
+    { "target": "#filterBtn", "label": "Filter by SAF + severity" },
+    { "target": "#exportBtn", "label": "Export current view · PDF / XLSX / CSV / API" }
+  ]
+}
+</script>
+<script src="kooper-tour.js" defer></script>
 </body>
 </html>

@@ -146,6 +146,7 @@
         <a href="#cta" class="nav-link">Contact</a>
       </div>
       <div class="flex items-center gap-2">
+        <button id="kooperHintsBtn" type="button" aria-label="Toggle hints"><span class="kt-hint-dot-mini" aria-hidden="true"></span><span data-kt-label>Hints</span></button>
         <a href="kooper-sign-in.html" class="hidden md:inline-flex btn-secondary-on-dark text-sm">Sign in</a>
         <a href="#cta" class="btn-yellow text-sm">Book demo</a>
       </div>
@@ -1057,5 +1058,52 @@
     });
   });
 </script>
+
+<!-- ============================================================ -->
+<!-- GUIDED TOUR + HINTS                                            -->
+<!-- ============================================================ -->
+<script id="kooper-tour-config" type="application/json">
+{
+  "page": "landing",
+  "steps": [
+    {
+      "target": "#persona-rail",
+      "placement": "bottom",
+      "title": "12 personas, one sign-in",
+      "body": "Tap any persona to enter their workspace. The whole product reshapes for that role — clinical for nurses, pictograms for residents, audit for inspectors. No re-architecting per role."
+    },
+    {
+      "target": "#layers",
+      "placement": "top",
+      "title": "Three layers, one platform",
+      "body": "Spine + apps + intelligence. Pay only for the apps your team uses, layered on top of one auth + RBAC backbone. The AI synthesises everything underneath."
+    },
+    {
+      "target": "#personaTable",
+      "placement": "top",
+      "title": "Default app stacks per role",
+      "body": "Each persona gets a curated app stack and a Wants line. Tap any chip in a row to drop straight into that kooper · app, or tap the row to enter the dashboard."
+    },
+    {
+      "target": "#pricing",
+      "placement": "top",
+      "title": "Per-app per-user, no bundle lock-in",
+      "body": "Operators graduate from Single home → Group → NHS block contract. Apps you don't need don't bill. AI is included."
+    },
+    {
+      "target": "#kooperHintsBtn",
+      "placement": "bottom",
+      "title": "Hints stay on if you want them",
+      "body": "Toggle Hints in the header — yellow pulse dots will explain key features as you explore. You can re-take this tour from here."
+    }
+  ],
+  "hints": [
+    { "target": "#persona-rail", "label": "Choose any of 12 personas to sign in as" },
+    { "target": "#personaTable", "label": "Tap a row · enter that role's dashboard" },
+    { "target": "#layers", "label": "Three-layer architecture · spine + apps + AI" }
+  ]
+}
+</script>
+<script src="kooper-tour.js" defer></script>
 </body>
 </html>

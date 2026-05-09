@@ -110,6 +110,7 @@
       </div>
 
       <div class="flex items-center gap-3 flex-1 sm:flex-none justify-end">
+        <button id="kooperHintsBtn" type="button" aria-label="Toggle hints"><span class="kt-hint-dot-mini" aria-hidden="true"></span><span data-kt-label>Hints</span></button>
         <a href="kooper-sign-in.html" class="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium text-white/70 hover:text-white hover:bg-kapture-coal transition" title="Sign out">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
           Sign out
@@ -1226,5 +1227,45 @@
     }
   });
 </script>
+
+<!-- ============================================================ -->
+<!-- GUIDED TOUR + HINTS                                            -->
+<!-- ============================================================ -->
+<script id="kooper-tour-config" type="application/json">
+{
+  "page": "dashboards",
+  "steps": [
+    {
+      "target": "#roleSwitcher",
+      "placement": "bottom",
+      "title": "12 personas, 12 dashboards",
+      "body": "Pick any role from the dropdown — the entire page swaps to that persona's view. Owner sees multi-site, carer sees their 4 residents, inspector sees the audit trail. Same data, different lens."
+    },
+    {
+      "target": ".dash.active .persona-context-strip",
+      "placement": "bottom",
+      "title": "Active context · always visible",
+      "body": "Avatar, role pill, site, and the app stack assigned to this persona. Tap any chip to drop straight into that kooper · app — no menu hunting."
+    },
+    {
+      "target": ".dash.active main > section:first-of-type",
+      "placement": "top",
+      "title": "Action card · today's must-do",
+      "body": "What needs you right now. Tap any card to jump to the resident screen with the action pre-focused. Manager sees sign-offs; nurse sees the med round; carer sees the voice quick-action."
+    },
+    {
+      "target": "#kooperHintsBtn",
+      "placement": "bottom",
+      "title": "Hints stay on after the tour",
+      "body": "Toggle Hints in the header — yellow pulse dots will explain key features. Re-take this tour from here any time."
+    }
+  ],
+  "hints": [
+    { "target": "#roleSwitcher", "label": "Persona switcher · view as any of 12 roles" },
+    { "target": ".dash.active .persona-context-strip", "label": "Active context + app stack · chips are tappable" }
+  ]
+}
+</script>
+<script src="kooper-tour.js" defer></script>
 </body>
 </html>
