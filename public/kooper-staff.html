@@ -429,6 +429,18 @@ function readStaffId() {
   return STAFF[k] ? k : 'sa'; // default to Sister Anne
 }
 
+function loadCustomApps(id) {
+  // If a manager has tuned this staff member's apps in HR, those win.
+  try {
+    const raw = localStorage.getItem('kooper:staff:apps:' + id);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length) return parsed;
+    }
+  } catch (e) {}
+  return null;
+}
+
 function render() {
   const id = readStaffId();
   const s = STAFF[id]; if (!s) return;
@@ -464,11 +476,12 @@ function render() {
     pa.onclick = () => kooperToast(s.primaryAction.toast);
   }
 
-  // App launcher
-  document.getElementById('appsCount').textContent = s.apps.length;
+  // App launcher — manager-tuned list wins, otherwise role default
+  const liveApps = loadCustomApps(id) || s.apps;
+  document.getElementById('appsCount').textContent = liveApps.length;
   document.getElementById('appsRoleLabel').textContent = roleSlug;
   const launcher = document.getElementById('appLauncher');
-  launcher.innerHTML = s.apps.map((k, i) => {
+  launcher.innerHTML = liveApps.map((k, i) => {
     const a = APPS[k]; if (!a) return '';
     const isFeatured = i === 0; // first app is the showcase tile (always rota for staff)
     const accent = ACCENT_BG[a.accent] || ACCENT_BG.yellow;

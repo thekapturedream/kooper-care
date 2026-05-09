@@ -1445,6 +1445,29 @@
   </div>
 </div>
 
+<!-- ============================================== -->
+<!-- TUNE APPS MODAL                                  -->
+<!-- ============================================== -->
+<div id="tuneScrim" onclick="closeTuneApps()" style="position:fixed;inset:0;background:rgba(10,10,10,0.55);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);z-index:90;opacity:0;pointer-events:none;transition:opacity 0.18s ease"></div>
+<div id="tuneModal" role="dialog" aria-label="Tune staff apps" style="position:fixed;left:50%;top:50%;transform:translate(-50%,-48%);background:#FFFFFF;border-radius:18px;max-width:min(640px,92vw);width:100%;max-height:86vh;overflow:hidden;z-index:95;opacity:0;pointer-events:none;transition:opacity 0.18s ease,transform 0.18s ease;box-shadow:0 30px 60px -20px rgba(0,0,0,0.35);display:flex;flex-direction:column;font-family:'Inter',sans-serif">
+  <div style="padding:1rem 1.125rem;border-bottom:1px solid #ECEAE3;display:flex;align-items:flex-start;justify-content:space-between;gap:0.75rem">
+    <div style="flex:1;min-width:0">
+      <div id="tuneStaffPill" style="display:inline-flex;align-items:center;gap:0.5rem;padding:0.1875rem 0.625rem;border-radius:999px;background:#FFFBEB;border:1px solid rgba(255,212,0,0.5);font-family:'JetBrains Mono';font-size:0.625rem;font-weight:600;color:#876300;letter-spacing:0.04em;text-transform:uppercase;margin-bottom:0.5rem">TUNING APPS FOR · <span id="tuneStaffName">Staff</span></div>
+      <div style="font-family:'Space Grotesk';font-weight:600;font-size:1.0625rem;line-height:1.2;color:#0A0A0A">Add or remove apps from their launcher</div>
+      <div style="font-size:0.75rem;color:#6B7280;margin-top:0.125rem">Toggle apps on/off · changes save instantly · staff sees the updated set on next sign-in.</div>
+    </div>
+    <button onclick="closeTuneApps()" aria-label="Close" style="background:transparent;border:0;cursor:pointer;color:#6B7280;padding:0.25rem;border-radius:6px;line-height:0;flex-shrink:0"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button>
+  </div>
+  <div id="tuneList" style="padding:0.875rem 1.125rem;overflow-y:auto"></div>
+  <div style="padding:0.875rem 1.125rem;border-top:1px solid #ECEAE3;background:#FAFAF7;display:flex;align-items:center;justify-content:space-between;gap:0.5rem;flex-wrap:wrap">
+    <button onclick="resetTuneToDefault()" class="chip">Reset to role default</button>
+    <div style="display:flex;gap:0.5rem">
+      <button onclick="closeTuneApps()" class="chip">Cancel</button>
+      <button onclick="saveTuneApps()" class="btn-yellow text-xs">Save changes</button>
+    </div>
+  </div>
+</div>
+
 <div id="toast" class="toast">Saved</div>
 
 <script>
@@ -1551,7 +1574,7 @@ function openStaffDashboard(id) {
         <div class="flex gap-2 flex-wrap">
           <button onclick="kooperToast('${s.name.split(' ')[0]} sent a sign-in link · magic link expires in 1h')" class="chip text-xs">Send sign-in link</button>
           <button onclick="kooperToast('Editing ${s.name.split(' ')[0]} · contract, role, qualifications, RTW evidence')" class="btn-secondary text-xs">Edit profile</button>
-          <button onclick="kooperToast('Tune apps for ${s.name.split(' ')[0]} · add or remove app tiles')" class="btn-yellow text-xs">Tune apps</button>
+          <button onclick="openTuneApps('${id}')" class="btn-yellow text-xs">Tune apps</button>
         </div>
       </div>
     </div>
@@ -1569,6 +1592,133 @@ function closeStaffDashboard() {
   if (host) { host.classList.add('hidden'); host.innerHTML = ''; }
   document.getElementById('staffList').scrollIntoView({ behavior:'smooth', block:'start' });
 }
+
+// ============================================================
+// TUNE APPS — manager edits which apps appear on a staff
+// member's launcher. Persists to localStorage so kooper-staff
+// reads the custom list on next render.
+// ============================================================
+const APP_LIBRARY_FOR_TUNE = {
+  rota:       { ico:'📅', label:'kooper · rota',       desc:'Week, swaps, time-off, clock-in' },
+  recording:  { ico:'🎙', label:'kooper · reporting',  desc:'3-tap event capture · AI narrative' },
+  clinical:   { ico:'🩺', label:'kooper · clinical',   desc:'NEWS2 · MHA · DoLS · pathology' },
+  mar:        { ico:'💊', label:'kooper · mar',        desc:'Medication round · PRN · refusals' },
+  activities: { ico:'🎵', label:'kooper · activities', desc:'Sessions · engagement · ABC chart' },
+  nutrition:  { ico:'🍽', label:'kooper · nutrition',  desc:'Menus · diets · allergens · MUAC' },
+  stock:      { ico:'📦', label:'kooper · stock',      desc:'Inventory · auto-reorder · usage' },
+  estate:     { ico:'🔧', label:'kooper · estate',     desc:'Tickets · compliance · contractors' },
+  reports:    { ico:'📊', label:'kooper · reports',    desc:'CQC · ops · clinical · family · board' },
+  training:   { ico:'🎓', label:'kooper · training',   desc:'Mandatory currency · CPD' },
+  payslip:    { ico:'💷', label:'kooper · payslip',    desc:'Earnings · timesheets · sign-off' },
+  requests:   { ico:'📨', label:'kooper · requests',   desc:'Time-off · swaps · cover offers' },
+  ai:         { ico:'⚡', label:'kooper · ai',         desc:'Conversational search · drafts' },
+  staff:      { ico:'👥', label:'kooper · staff',      desc:'Team list · roles · personalize' },
+  account:    { ico:'🏠', label:'kooper · account',    desc:'Account type · billing · upgrade' }
+};
+
+let TUNE_TARGET_ID = null;
+let TUNE_PENDING = []; // current selection while modal is open
+
+function loadStaffApps(id) {
+  // Try custom from localStorage first
+  try {
+    const raw = localStorage.getItem('kooper:staff:apps:' + id);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) return parsed;
+    }
+  } catch (e) {}
+  // Fall back to role default
+  const s = STAFF_DATA[id];
+  return s ? s.apps.slice() : [];
+}
+
+function openTuneApps(id) {
+  const s = STAFF_DATA[id]; if (!s) return;
+  TUNE_TARGET_ID = id;
+  TUNE_PENDING = loadStaffApps(id);
+  document.getElementById('tuneStaffName').textContent = s.name + ' · ' + s.role;
+  renderTuneList();
+  document.getElementById('tuneScrim').style.opacity = '1';
+  document.getElementById('tuneScrim').style.pointerEvents = 'auto';
+  document.getElementById('tuneModal').style.opacity = '1';
+  document.getElementById('tuneModal').style.pointerEvents = 'auto';
+  document.getElementById('tuneModal').style.transform = 'translate(-50%,-50%)';
+}
+function closeTuneApps() {
+  document.getElementById('tuneScrim').style.opacity = '0';
+  document.getElementById('tuneScrim').style.pointerEvents = 'none';
+  document.getElementById('tuneModal').style.opacity = '0';
+  document.getElementById('tuneModal').style.pointerEvents = 'none';
+  document.getElementById('tuneModal').style.transform = 'translate(-50%,-48%)';
+}
+function renderTuneList() {
+  const host = document.getElementById('tuneList');
+  const enabled = new Set(TUNE_PENDING);
+  const keys = Object.keys(APP_LIBRARY_FOR_TUNE);
+  host.innerHTML = keys.map(function (k) {
+    const a = APP_LIBRARY_FOR_TUNE[k];
+    const isOn = enabled.has(k);
+    return `
+      <label data-tune-key="${k}" style="display:flex;align-items:center;gap:0.75rem;padding:0.625rem 0.75rem;border-radius:10px;border:1px solid ${isOn ? '#0A0A0A' : '#ECEAE3'};background:${isOn ? '#FFFBEB' : '#FFFFFF'};cursor:pointer;transition:all 0.12s ease;margin-bottom:0.375rem">
+        <span style="width:34px;height:34px;border-radius:8px;background:${isOn ? '#FFD400' : '#F5F5F5'};color:${isOn ? '#0A0A0A' : '#9A9A9A'};display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0">${a.ico}</span>
+        <span style="flex:1;min-width:0">
+          <span style="display:block;font-family:'Space Grotesk';font-weight:600;font-size:0.875rem;color:#0A0A0A">${a.label}</span>
+          <span style="display:block;font-size:0.6875rem;color:#6B7280;margin-top:0.0625rem">${a.desc}</span>
+        </span>
+        <span style="width:36px;height:20px;border-radius:999px;background:${isOn ? '#0A0A0A' : '#D4D4D4'};position:relative;flex-shrink:0;transition:background 0.15s ease">
+          <span style="position:absolute;top:2px;left:${isOn ? '18px' : '2px'};width:16px;height:16px;background:${isOn ? '#FFD400' : '#FFFFFF'};border-radius:50%;transition:left 0.18s ease,background 0.15s ease;box-shadow:0 1px 3px rgba(0,0,0,0.18)"></span>
+        </span>
+      </label>
+    `;
+  }).join('');
+  // Wire toggles
+  host.querySelectorAll('[data-tune-key]').forEach(function (label) {
+    label.addEventListener('click', function () {
+      const k = label.dataset.tuneKey;
+      const i = TUNE_PENDING.indexOf(k);
+      if (i >= 0) TUNE_PENDING.splice(i, 1); else TUNE_PENDING.push(k);
+      renderTuneList(); // redraw
+    });
+  });
+}
+function saveTuneApps() {
+  if (!TUNE_TARGET_ID) return;
+  // Preserve order roughly: original role default order first, then any added not in default
+  const s = STAFF_DATA[TUNE_TARGET_ID];
+  const defaultOrder = s ? s.apps : [];
+  const ordered = [];
+  defaultOrder.forEach(function (k) { if (TUNE_PENDING.indexOf(k) >= 0) ordered.push(k); });
+  TUNE_PENDING.forEach(function (k) { if (ordered.indexOf(k) < 0) ordered.push(k); });
+  localStorage.setItem('kooper:staff:apps:' + TUNE_TARGET_ID, JSON.stringify(ordered));
+  closeTuneApps();
+  kooperToast('Saved · ' + s.name.split(' ')[0] + ' will see ' + ordered.length + ' apps on next sign-in');
+  // Re-render the inline staff dashboard if open
+  setTimeout(function () { openStaffDashboard(TUNE_TARGET_ID); }, 280);
+}
+function resetTuneToDefault() {
+  if (!TUNE_TARGET_ID) return;
+  localStorage.removeItem('kooper:staff:apps:' + TUNE_TARGET_ID);
+  TUNE_PENDING = STAFF_DATA[TUNE_TARGET_ID].apps.slice();
+  renderTuneList();
+  kooperToast('Reset to role default');
+}
+
+// Override openStaffDashboard's app list to use the customized version if present
+const _origOpenStaffDashboard = openStaffDashboard;
+openStaffDashboard = function (id) {
+  const s = STAFF_DATA[id]; if (!s) return _origOpenStaffDashboard(id);
+  // Swap the apps list with the persisted custom one for the duration of this render
+  const original = s.apps;
+  s.apps = loadStaffApps(id);
+  _origOpenStaffDashboard(id);
+  s.apps = original; // restore so toggling another staff member doesn't carry over
+};
+document.addEventListener('keydown', function (e) {
+  if (e.key === 'Escape') {
+    closeTuneApps();
+  }
+});
 
 function showTab(btn, key){
   document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
