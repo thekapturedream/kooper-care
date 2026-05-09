@@ -210,18 +210,20 @@
   <div class="container-r relative py-8 lg:py-10">
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-end">
       <div class="lg:col-span-7">
-        <div class="ed-kicker on-dark mb-3">KOOPER · ROTA · MICRO-APP</div>
-        <h1 class="h-hero text-white mb-2">Manage the week. Work the week.</h1>
-        <p class="text-white/70 max-w-2xl text-sm lg:text-base">Drag-drop shifts, WTR conflict detection, swap requests, time-off, live cost tracking — and a Worker view that gives every staff member their own week, payslips and clock-in. One micro-app, two sides.</p>
+        <div class="ed-kicker on-dark mb-3" id="rotaKicker">KOOPER · ROTA</div>
+        <h1 class="h-hero text-white mb-2" id="rotaTitle">Your week, ready to go.</h1>
+        <p class="text-white/70 max-w-2xl text-sm lg:text-base" id="rotaLede">Your shifts, your hours, your pay. Switch to Team Rota to see who else is on. Request swaps and time off, pick up open cover.</p>
 
-        <!-- View toggle -->
-        <div class="mt-6">
-          <div class="text-[0.6875rem] uppercase tracking-widest text-kapture-mist font-mono mb-2">View as</div>
-          <div class="flex flex-wrap gap-2" id="viewToggle">
-            <button class="view-pill active" data-view="manager" onclick="switchView(this,'manager')">Manager <span class="vp-key">M</span></button>
-            <button class="view-pill" data-view="worker" onclick="switchView(this,'worker')">Worker <span class="vp-key">W</span></button>
-            <button class="view-pill" data-view="day" onclick="switchView(this,'day')">Day · today <span class="vp-key">D</span></button>
-          </div>
+        <!-- View toggle · My Rota / Team Rota / (Manage Rota for managers) -->
+        <div class="mt-6 flex flex-wrap gap-2 items-center" id="viewToggle">
+          <button class="view-pill active" data-view="my" onclick="switchView(this,'my')">My Rota <span class="vp-key">M</span></button>
+          <button class="view-pill" data-view="team" onclick="switchView(this,'team')">Team Rota <span class="vp-key">T</span></button>
+          <a id="manageRotaBtn" href="#" onclick="event.preventDefault(); var b=document.querySelector('[data-view=manage]'); if(b) switchView(b,'manage');" class="btn-yellow text-xs whitespace-nowrap" style="display:none;text-decoration:none">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            Manage Rota
+          </a>
+          <!-- Manage view is hidden from the toggle row but reachable via the Manage Rota button above -->
+          <button class="view-pill" data-view="manage" onclick="switchView(this,'manage')" style="display:none">Manage</button>
         </div>
       </div>
 
@@ -285,7 +287,7 @@
 <!-- ============================================== -->
 <!-- VIEW · MANAGER                                   -->
 <!-- ============================================== -->
-<section class="view is-active py-8 lg:py-10" data-view="manager">
+<section class="view py-8 lg:py-10" data-view="manage">
   <div class="container-r space-y-8">
 
     <!-- Cost panel -->
@@ -428,7 +430,7 @@
 <!-- ============================================== -->
 <!-- VIEW · WORKER                                    -->
 <!-- ============================================== -->
-<section class="view py-8 lg:py-10" data-view="worker">
+<section class="view is-active py-8 lg:py-10" data-view="my">
   <div class="container-r space-y-8">
 
     <!-- Worker header -->
@@ -475,7 +477,7 @@
         <div class="ms-meta">128h · period 27 Apr → 24 May · paid Fri 30 May</div>
         <div class="mt-4 pt-4 border-t border-kapture-fog flex flex-wrap gap-2">
           <button onclick="kooperToast('Last 3 payslips opened in new tab')" class="chip text-xs">Payslips</button>
-          <button onclick="kooperToast('Timesheet signed · sent to Lola for approval')" class="chip text-xs">Sign timesheet</button>
+          <button onclick="kooperToast('Timesheet signed · sent to Rae for approval')" class="chip text-xs">Sign timesheet</button>
         </div>
       </div>
     </div>
@@ -490,7 +492,7 @@
           <span class="ap-icon swap">SWAP</span>
           <div class="flex-1">
             <div class="ap-text">Swap requested · my Sat day shift ↔ Rebecca's Sun day shift.</div>
-            <div class="ap-meta">submitted 14:18 · Rebecca accepted · awaiting Lola's approval</div>
+            <div class="ap-meta">submitted 14:18 · Rebecca accepted · awaiting Rae's approval</div>
           </div>
           <div class="ap-actions">
             <span class="chip chip-warn text-xs">Pending</span>
@@ -554,7 +556,7 @@
 <!-- ============================================== -->
 <!-- VIEW · DAY                                       -->
 <!-- ============================================== -->
-<section class="view py-8 lg:py-10" data-view="day">
+<section class="view py-8 lg:py-10" data-view="team">
   <div class="container-r space-y-8">
     <div>
       <div class="ed-kicker">TODAY · WED 6 MAY</div>
@@ -791,9 +793,9 @@ function switchView(btn, key){
 // Keyboard shortcuts
 document.addEventListener('keydown', e => {
   if (e.target.matches('input, textarea, select')) return;
-  if (e.key.toLowerCase() === 'm') { var b = document.querySelector('[data-view="manager"]'); if (b) switchView(b,'manager'); }
-  if (e.key.toLowerCase() === 'w') { var b = document.querySelector('[data-view="worker"]');  if (b) switchView(b,'worker'); }
-  if (e.key.toLowerCase() === 'd') { var b = document.querySelector('[data-view="day"]');     if (b) switchView(b,'day'); }
+  if (e.key.toLowerCase() === 'm') { var b = document.querySelector('[data-view="my"]'); if (b) switchView(b,'my'); }
+  if (e.key.toLowerCase() === 't') { var b = document.querySelector('[data-view="team"]'); if (b) switchView(b,'team'); }
+  if (e.key.toLowerCase() === 'r') { var b = document.querySelector('[data-view="manage"]'); if (b && b.style.display !== 'none') switchView(b,'manage'); }
 });
 
 // ============================================================
@@ -929,7 +931,7 @@ function submitTimeOff(e){
   closeAll();
   const f = document.getElementById('offFrom').value;
   const t = document.getElementById('offTo').value;
-  kooperToast('Time off requested · ' + f + ' → ' + t + ' · sent to Lola');
+  kooperToast('Time off requested · ' + f + ' → ' + t + ' · sent to Rae');
 }
 function submitSwap(e){
   e.preventDefault();
@@ -1072,9 +1074,69 @@ function acceptCover(name) {
 }
 
 // ============================================================
+// SESSION-AWARE rota personalization
+// Reads ?as=<id> (or persisted session) and:
+//   - tunes the hero kicker / title / lede to that user
+//   - personalizes the My Rota header (avatar, name, role)
+//   - shows the Manage Rota button only for the manager (lo)
+// ============================================================
+const ROTA_USERS = {
+  sa: { first:'Sister Anne', name:'Sister Anne Whitfield', role:'Nurse · RGN',                init:'SA', bg:'#1A1A1A', fg:'#FFD400', site:'Draycott House', contracted:'37.5h contracted weekly' },
+  cm: { first:'Craig',       name:'Craig Musara',          role:'Carer',                       init:'CM', bg:'#FCD34D', fg:'#0A0A0A', site:'Draycott House', contracted:'32h contracted weekly' },
+  ra: { first:'Rebecca',     name:'Rebecca Adesina',       role:'Senior Carer · Shift Lead',   init:'RA', bg:'#0A0A0A', fg:'#FFD400', site:'Draycott House', contracted:'37.5h contracted weekly' },
+  dk: { first:'Daniel',      name:'Daniel Kowalski',       role:'Activities Coordinator',      init:'DK', bg:'#A5B4FC', fg:'#0A0A0A', site:'Draycott House', contracted:'24h contracted weekly' },
+  mc: { first:'Mary',        name:'Mary Chen',             role:'Cook · Catering Lead',        init:'MC', bg:'#FDA4AF', fg:'#0A0A0A', site:'Draycott House', contracted:'30h contracted weekly' },
+  tb: { first:'Tomas',       name:'Tomas Bauer',           role:'Maintenance · Contractor',    init:'TB', bg:'#FCD34D', fg:'#0A0A0A', site:'Group · 3 sites', contracted:'Self-employed · variable' },
+  jm: { first:'Joy',         name:'Joy Munemo',            role:'Carer · Agency',              init:'JM', bg:'#FFE39A', fg:'#0A0A0A', site:'Hello Care Agency', contracted:'Agency · variable' },
+  bp: { first:'Ben',         name:'Ben Pearce',            role:'Volunteer Carer',             init:'BP', bg:'#86EFAC', fg:'#064E3B', site:'Draycott House', contracted:'Volunteer · 6h/wk' },
+  lo: { first:'Rae',         name:'Rae Okonkwo',           role:'Registered Manager',          init:'LO', bg:'#0A0A0A', fg:'#FFD400', site:'Draycott House', contracted:'Manager · 40h contracted weekly' }
+};
+function readRotaUser() {
+  try {
+    var p = new URLSearchParams(window.location.search);
+    var k = p.get('as');
+    if (k && ROTA_USERS[k]) return ROTA_USERS[k];
+    var stored = localStorage.getItem('kooper:session:as');
+    if (stored && ROTA_USERS[stored]) return ROTA_USERS[stored];
+  } catch (e) {}
+  return ROTA_USERS.cm;
+}
+function personalizeRota() {
+  var u = readRotaUser();
+  var isManager = (u === ROTA_USERS.lo);
+
+  var kicker = document.getElementById('rotaKicker');
+  var title  = document.getElementById('rotaTitle');
+  var lede   = document.getElementById('rotaLede');
+  if (kicker) kicker.textContent = isManager ? 'KOOPER · ROTA · MANAGER' : ('KOOPER · ROTA · ' + u.role.split(' · ')[0].toUpperCase());
+  if (title)  title.textContent  = isManager ? 'Run the rota. Hold the team.' : (u.first + ", here's your week.");
+  if (lede)   lede.textContent   = isManager
+    ? "Drag-drop the week, fix coverage gaps with AI suggestions, approve swaps and time-off in one tap. Your team's shifts on a single grid."
+    : "Your shifts, your hours, your pay. Switch to Team Rota to see who else is on. Request swaps and time off, pick up open cover.";
+
+  // Manage Rota button — manager-only
+  var manageBtn = document.getElementById('manageRotaBtn');
+  if (manageBtn) manageBtn.style.display = isManager ? 'inline-flex' : 'none';
+
+  // My Rota worker header — rewrite avatar + name + role line per signed-in user
+  var myView = document.querySelector('[data-view="my"]');
+  if (myView) {
+    var avatarEl = myView.querySelector('.w-12.h-12.rounded-full');
+    var nameEl   = myView.querySelector('.font-display.text-lg');
+    var metaEl   = nameEl ? nameEl.nextElementSibling : null;
+    if (avatarEl) { avatarEl.style.background = u.bg; avatarEl.style.color = u.fg; avatarEl.textContent = u.init; }
+    if (nameEl)   nameEl.textContent = u.name;
+    if (metaEl)   metaEl.textContent = u.role + ' · ' + u.site.split(' ·')[0] + ' · ' + u.contracted;
+  }
+}
+
+// ============================================================
 // INIT
 // ============================================================
-document.addEventListener('DOMContentLoaded', renderWeekGrid);
+document.addEventListener('DOMContentLoaded', function(){
+  renderWeekGrid();
+  personalizeRota();
+});
 </script>
 
 <!-- ============================================================ -->
@@ -1116,7 +1178,7 @@ document.addEventListener('DOMContentLoaded', renderWeekGrid);
     }
   ],
   "hints": [
-    { "target": "#viewToggle", "label": "Three views · M (manager) W (worker) D (day)" },
+    { "target": "#viewToggle", "label": "My Rota / Team Rota · M and T to switch" },
     { "target": "#weekGrid", "label": "Drag-drop shifts · WTR auto-checks" },
     { "target": "#approvalsList", "label": "Approvals queue · 1-tap decisions" }
   ]
