@@ -284,10 +284,10 @@
           </div>
           <span style="background:#F5F5F5;color:#6B7280;padding:0.1875rem 0.5rem;border-radius:999px;font-family:'JetBrains Mono';font-size:0.625rem;font-weight:700;letter-spacing:0.04em">INLINE</span>
         </div>
-        <div style="font-family:'Space Grotesk';font-weight:600;font-size:1.25rem;color:#0A0A0A;margin-bottom:0.375rem">kooper · workers</div>
-        <p style="color:#6B7280;font-size:0.8125rem;line-height:1.5;margin-bottom:1rem">16 workers · roles, contracts, RTW evidence, DBS, qualifications. The identity layer every other app inherits.</p>
+        <div style="font-family:'Space Grotesk';font-weight:600;font-size:1.25rem;color:#0A0A0A;margin-bottom:0.375rem">kooper · staff</div>
+        <p style="color:#6B7280;font-size:0.8125rem;line-height:1.5;margin-bottom:1rem">9 staff members · each with a personalized dashboard. Tap any staff card to see their app launcher, this week's hours, training, payslip and pending requests.</p>
         <div style="display:flex;align-items:center;gap:0.5rem;font-family:'JetBrains Mono';font-size:0.6875rem;color:#876300">
-          <span>Open workers</span><span>→</span>
+          <span>Open staff</span><span>→</span>
         </div>
       </button>
 
@@ -364,7 +364,7 @@
   <div class="container-h">
     <div class="flex items-center gap-2 overflow-x-auto pb-1">
       <a href="kooper-rota.html" class="tab" style="text-decoration:none">Rota <span class="tab-count">↗</span></a>
-      <button class="tab active" data-tab="workers" onclick="showTab(this,'workers')">Workers <span class="tab-count">16</span></button>
+      <button class="tab active" data-tab="workers" onclick="showTab(this,'workers')">Staff <span class="tab-count">9</span></button>
       <button class="tab" data-tab="requests" onclick="showTab(this,'requests')">Time off &amp; swaps <span class="tab-count">4</span></button>
       <button class="tab" data-tab="training" onclick="showTab(this,'training')">Training <span class="tab-count">3</span></button>
       <button class="tab" data-tab="account" onclick="showTab(this,'account')">Account type</button>
@@ -990,10 +990,15 @@
 <!-- WORKERS TAB                                      -->
 <!-- ============================================== -->
 <div id="pane-workers" class="pane active">
+  <!-- Personalized staff dashboard panel — appears when a staff card is clicked -->
+  <div id="staffDashboard" class="hidden mb-6 rounded-2xl border border-[#0A0A0A] bg-white overflow-hidden">
+    <!-- Populated by openStaffDashboard() -->
+  </div>
+
   <div class="flex items-center justify-between gap-3 flex-wrap mb-4">
     <div>
-      <h2 class="h-display text-2xl">Workers</h2>
-      <p class="text-sm text-[#6B7280] mt-0.5">8 workers shown · filter by employment type or role.</p>
+      <h2 class="h-display text-2xl">Staff</h2>
+      <p class="text-sm text-[#6B7280] mt-0.5">9 staff members · tap any card to open their personalized dashboard with role-specific app launchers.</p>
     </div>
     <div class="flex items-center gap-2 flex-wrap">
       <button onclick="kooperToast('Filter · all employment types')" class="chip">All types</button>
@@ -1002,85 +1007,31 @@
       <button onclick="kooperToast('Filter · agency')" class="chip">Agency</button>
       <button onclick="kooperToast('Filter · contractor')" class="chip">Contractor</button>
       <button onclick="kooperToast('Filter · volunteer')" class="chip">Volunteer</button>
-      <button onclick="kooperToast('+ Add worker form opens')" class="btn-yellow text-xs">+ Add worker</button>
+      <button onclick="kooperToast('+ Add staff form opens')" class="btn-yellow text-xs">+ Add staff</button>
     </div>
   </div>
 
-  <div class="bg-white rounded-2xl border border-[#ECEAE3] overflow-hidden">
+  <div class="bg-white rounded-2xl border border-[#ECEAE3] overflow-hidden" id="staffList">
     <div class="grid grid-cols-12 gap-3 px-5 py-3 bg-[#FAFAF7] border-b border-[#ECEAE3] font-mono text-[0.6875rem] uppercase tracking-[0.08em] text-[#6B7280]">
-      <div class="col-span-4">Worker</div>
+      <div class="col-span-4">Staff member</div>
       <div class="col-span-2">Role</div>
       <div class="col-span-2">Employment</div>
       <div class="col-span-2">Training</div>
       <div class="col-span-2 text-right">Last on shift</div>
     </div>
 
-    <div onclick="kooperToast('Open Sister Anne')" class="grid grid-cols-12 gap-3 px-5 py-3.5 border-b border-[#ECEAE3] hover:bg-[#FAFAF7] cursor-pointer items-center">
-      <div class="col-span-4 flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-[#1A1A1A] text-[#FFD400] font-mono text-xs flex items-center justify-center">SA</div><div><div class="font-medium text-sm">Sister Anne</div><div class="text-[0.6875rem] text-[#6B7280]">RN · NMC 12345678</div></div></div>
-      <div class="col-span-2 text-sm">Nurse</div>
-      <div class="col-span-2"><span class="chip chip-dark text-[0.625rem]">Full-time</span></div>
-      <div class="col-span-2"><span class="chip chip-ok text-[0.625rem]">All current</span></div>
-      <div class="col-span-2 text-xs text-[#6B7280] text-right font-mono">Today · 07:00</div>
-    </div>
-    <div onclick="kooperToast('Open Craig Musara')" class="grid grid-cols-12 gap-3 px-5 py-3.5 border-b border-[#ECEAE3] hover:bg-[#FAFAF7] cursor-pointer items-center">
-      <div class="col-span-4 flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-[#FCD34D] text-black font-mono text-xs flex items-center justify-center">CM</div><div><div class="font-medium text-sm">Craig Musara</div><div class="text-[0.6875rem] text-[#6B7280]">Care certificate · 18m</div></div></div>
-      <div class="col-span-2 text-sm">Carer</div>
-      <div class="col-span-2"><span class="chip chip-dark text-[0.625rem]">Full-time</span></div>
-      <div class="col-span-2"><span class="chip chip-ok text-[0.625rem]">All current</span></div>
-      <div class="col-span-2 text-xs text-[#6B7280] text-right font-mono">Today · 07:00</div>
-    </div>
-    <div onclick="kooperToast('Open Lola Okonkwo')" class="grid grid-cols-12 gap-3 px-5 py-3.5 border-b border-[#ECEAE3] hover:bg-[#FAFAF7] cursor-pointer items-center">
-      <div class="col-span-4 flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-black text-[#FFD400] font-mono text-xs flex items-center justify-center">LO</div><div><div class="font-medium text-sm">Lola Okonkwo</div><div class="text-[0.6875rem] text-[#6B7280]">CQC registered · L5</div></div></div>
-      <div class="col-span-2 text-sm">Manager</div>
-      <div class="col-span-2"><span class="chip chip-dark text-[0.625rem]">Full-time</span></div>
-      <div class="col-span-2"><span class="chip chip-warn text-[0.625rem]">Fire · 14d</span></div>
-      <div class="col-span-2 text-xs text-[#6B7280] text-right font-mono">Today · 09:00</div>
-    </div>
-    <div onclick="kooperToast('Open Daniel Kowalski')" class="grid grid-cols-12 gap-3 px-5 py-3.5 border-b border-[#ECEAE3] hover:bg-[#FAFAF7] cursor-pointer items-center">
-      <div class="col-span-4 flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-[#A5B4FC] text-black font-mono text-xs flex items-center justify-center">DK</div><div><div class="font-medium text-sm">Daniel Kowalski</div><div class="text-[0.6875rem] text-[#6B7280]">Activities lead · 24h/wk</div></div></div>
-      <div class="col-span-2 text-sm">Activities</div>
-      <div class="col-span-2"><span class="chip text-[0.625rem]" style="background:#A5B4FC;color:#0A0A0A">Part-time</span></div>
-      <div class="col-span-2"><span class="chip chip-ok text-[0.625rem]">All current</span></div>
-      <div class="col-span-2 text-xs text-[#6B7280] text-right font-mono">Today · 10:00</div>
-    </div>
-    <div onclick="kooperToast('Open Mary Chen')" class="grid grid-cols-12 gap-3 px-5 py-3.5 border-b border-[#ECEAE3] hover:bg-[#FAFAF7] cursor-pointer items-center">
-      <div class="col-span-4 flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-[#FDA4AF] text-black font-mono text-xs flex items-center justify-center">MC</div><div><div class="font-medium text-sm">Mary Chen</div><div class="text-[0.6875rem] text-[#6B7280]">Level 2 food safety</div></div></div>
-      <div class="col-span-2 text-sm">Cook</div>
-      <div class="col-span-2"><span class="chip text-[0.625rem]" style="background:#A5B4FC;color:#0A0A0A">Part-time</span></div>
-      <div class="col-span-2"><span class="chip chip-ok text-[0.625rem]">All current</span></div>
-      <div class="col-span-2 text-xs text-[#6B7280] text-right font-mono">Today · 06:00</div>
-    </div>
-    <div onclick="kooperToast('Open Tomas Bauer')" class="grid grid-cols-12 gap-3 px-5 py-3.5 border-b border-[#ECEAE3] hover:bg-[#FAFAF7] cursor-pointer items-center">
-      <div class="col-span-4 flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-[#FCD34D] text-black font-mono text-xs flex items-center justify-center">TB</div><div><div class="font-medium text-sm">Tomas Bauer</div><div class="text-[0.6875rem] text-[#6B7280]">Self-employed · UTR on file</div></div></div>
-      <div class="col-span-2 text-sm">Maintenance</div>
-      <div class="col-span-2"><span class="chip text-[0.625rem]" style="background:#FCD34D;color:#0A0A0A">Contractor</span></div>
-      <div class="col-span-2"><span class="chip chip-ok text-[0.625rem]">N/A</span></div>
-      <div class="col-span-2 text-xs text-[#6B7280] text-right font-mono">2 days ago</div>
-    </div>
-    <div onclick="kooperToast('Open Rebecca Adesina')" class="grid grid-cols-12 gap-3 px-5 py-3.5 border-b border-[#ECEAE3] hover:bg-[#FAFAF7] cursor-pointer items-center">
-      <div class="col-span-4 flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-[#0A0A0A] text-[#FFD400] font-mono text-xs flex items-center justify-center">RA</div><div><div class="font-medium text-sm">Rebecca Adesina</div><div class="text-[0.6875rem] text-[#6B7280]">L3 lead · 6 night-shifts</div></div></div>
-      <div class="col-span-2 text-sm">Senior Carer</div>
-      <div class="col-span-2"><span class="chip chip-dark text-[0.625rem]">Full-time</span></div>
-      <div class="col-span-2"><span class="chip chip-ok text-[0.625rem]">All current</span></div>
-      <div class="col-span-2 text-xs text-[#6B7280] text-right font-mono">Last night</div>
-    </div>
-    <div onclick="kooperToast('Open Joy Munemo')" class="grid grid-cols-12 gap-3 px-5 py-3.5 border-b border-[#ECEAE3] hover:bg-[#FAFAF7] cursor-pointer items-center">
-      <div class="col-span-4 flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-[#FFE39A] text-black font-mono text-xs flex items-center justify-center">JM</div><div><div class="font-medium text-sm">Joy Munemo</div><div class="text-[0.6875rem] text-[#6B7280]">Hello Care Agency</div></div></div>
-      <div class="col-span-2 text-sm">Carer</div>
-      <div class="col-span-2"><span class="chip text-[0.625rem]" style="background:#FFE39A;color:#0A0A0A">Agency</span></div>
-      <div class="col-span-2"><span class="chip chip-warn text-[0.625rem]">DBS · 28d</span></div>
-      <div class="col-span-2 text-xs text-[#6B7280] text-right font-mono">3 days ago</div>
-    </div>
-    <div onclick="kooperToast('Open Ben Pearce')" class="grid grid-cols-12 gap-3 px-5 py-3.5 hover:bg-[#FAFAF7] cursor-pointer items-center">
-      <div class="col-span-4 flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-[#86EFAC] text-[#064E3B] font-mono text-xs flex items-center justify-center">BP</div><div><div class="font-medium text-sm">Ben Pearce</div><div class="text-[0.6875rem] text-[#6B7280]">Volunteer · 6 hrs/wk</div></div></div>
-      <div class="col-span-2 text-sm">Carer (vol)</div>
-      <div class="col-span-2"><span class="chip text-[0.625rem]" style="background:#86EFAC;color:#064E3B">Volunteer</span></div>
-      <div class="col-span-2"><span class="chip chip-ok text-[0.625rem]">All current</span></div>
-      <div class="col-span-2 text-xs text-[#6B7280] text-right font-mono">2 days ago</div>
-    </div>
+    <div onclick="openStaffDashboard('sa')" class="grid grid-cols-12 gap-3 px-5 py-3.5 border-b border-[#ECEAE3] hover:bg-[#FAFAF7] cursor-pointer items-center"><div class="col-span-4 flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-[#1A1A1A] text-[#FFD400] font-mono text-xs flex items-center justify-center">SA</div><div><div class="font-medium text-sm">Sister Anne</div><div class="text-[0.6875rem] text-[#6B7280]">RN · NMC 12345678</div></div></div><div class="col-span-2 text-sm">Nurse</div><div class="col-span-2"><span class="chip chip-dark text-[0.625rem]">Full-time</span></div><div class="col-span-2"><span class="chip chip-ok text-[0.625rem]">All current</span></div><div class="col-span-2 text-xs text-[#6B7280] text-right font-mono">Today · 07:00</div></div>
+    <div onclick="openStaffDashboard('cm')" class="grid grid-cols-12 gap-3 px-5 py-3.5 border-b border-[#ECEAE3] hover:bg-[#FAFAF7] cursor-pointer items-center"><div class="col-span-4 flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-[#FCD34D] text-black font-mono text-xs flex items-center justify-center">CM</div><div><div class="font-medium text-sm">Craig Musara</div><div class="text-[0.6875rem] text-[#6B7280]">Care certificate · 18m</div></div></div><div class="col-span-2 text-sm">Carer</div><div class="col-span-2"><span class="chip chip-dark text-[0.625rem]">Full-time</span></div><div class="col-span-2"><span class="chip chip-ok text-[0.625rem]">All current</span></div><div class="col-span-2 text-xs text-[#6B7280] text-right font-mono">Today · 14:00</div></div>
+    <div onclick="openStaffDashboard('lo')" class="grid grid-cols-12 gap-3 px-5 py-3.5 border-b border-[#ECEAE3] hover:bg-[#FAFAF7] cursor-pointer items-center"><div class="col-span-4 flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-black text-[#FFD400] font-mono text-xs flex items-center justify-center">LO</div><div><div class="font-medium text-sm">Lola Okonkwo</div><div class="text-[0.6875rem] text-[#6B7280]">CQC registered · L5</div></div></div><div class="col-span-2 text-sm">Manager</div><div class="col-span-2"><span class="chip chip-dark text-[0.625rem]">Full-time</span></div><div class="col-span-2"><span class="chip chip-warn text-[0.625rem]">Fire · 14d</span></div><div class="col-span-2 text-xs text-[#6B7280] text-right font-mono">Today · 09:00</div></div>
+    <div onclick="openStaffDashboard('dk')" class="grid grid-cols-12 gap-3 px-5 py-3.5 border-b border-[#ECEAE3] hover:bg-[#FAFAF7] cursor-pointer items-center"><div class="col-span-4 flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-[#A5B4FC] text-black font-mono text-xs flex items-center justify-center">DK</div><div><div class="font-medium text-sm">Daniel Kowalski</div><div class="text-[0.6875rem] text-[#6B7280]">Activities lead · 24h/wk</div></div></div><div class="col-span-2 text-sm">Activities</div><div class="col-span-2"><span class="chip text-[0.625rem]" style="background:#A5B4FC;color:#0A0A0A">Part-time</span></div><div class="col-span-2"><span class="chip chip-ok text-[0.625rem]">All current</span></div><div class="col-span-2 text-xs text-[#6B7280] text-right font-mono">Today · 09:00</div></div>
+    <div onclick="openStaffDashboard('mc')" class="grid grid-cols-12 gap-3 px-5 py-3.5 border-b border-[#ECEAE3] hover:bg-[#FAFAF7] cursor-pointer items-center"><div class="col-span-4 flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-[#FDA4AF] text-black font-mono text-xs flex items-center justify-center">MC</div><div><div class="font-medium text-sm">Mary Chen</div><div class="text-[0.6875rem] text-[#6B7280]">Level 2 food safety</div></div></div><div class="col-span-2 text-sm">Cook</div><div class="col-span-2"><span class="chip text-[0.625rem]" style="background:#A5B4FC;color:#0A0A0A">Part-time</span></div><div class="col-span-2"><span class="chip chip-ok text-[0.625rem]">All current</span></div><div class="col-span-2 text-xs text-[#6B7280] text-right font-mono">Today · 06:00</div></div>
+    <div onclick="openStaffDashboard('tb')" class="grid grid-cols-12 gap-3 px-5 py-3.5 border-b border-[#ECEAE3] hover:bg-[#FAFAF7] cursor-pointer items-center"><div class="col-span-4 flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-[#FCD34D] text-black font-mono text-xs flex items-center justify-center">TB</div><div><div class="font-medium text-sm">Tomas Bauer</div><div class="text-[0.6875rem] text-[#6B7280]">Self-employed · UTR on file</div></div></div><div class="col-span-2 text-sm">Maintenance</div><div class="col-span-2"><span class="chip text-[0.625rem]" style="background:#FCD34D;color:#0A0A0A">Contractor</span></div><div class="col-span-2"><span class="chip chip-ok text-[0.625rem]">N/A</span></div><div class="col-span-2 text-xs text-[#6B7280] text-right font-mono">2 days ago</div></div>
+    <div onclick="openStaffDashboard('ra')" class="grid grid-cols-12 gap-3 px-5 py-3.5 border-b border-[#ECEAE3] hover:bg-[#FAFAF7] cursor-pointer items-center"><div class="col-span-4 flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-[#0A0A0A] text-[#FFD400] font-mono text-xs flex items-center justify-center">RA</div><div><div class="font-medium text-sm">Rebecca Adesina</div><div class="text-[0.6875rem] text-[#6B7280]">L3 lead · 6 night-shifts</div></div></div><div class="col-span-2 text-sm">Senior Carer</div><div class="col-span-2"><span class="chip chip-dark text-[0.625rem]">Full-time</span></div><div class="col-span-2"><span class="chip chip-ok text-[0.625rem]">All current</span></div><div class="col-span-2 text-xs text-[#6B7280] text-right font-mono">Last night</div></div>
+    <div onclick="openStaffDashboard('jm')" class="grid grid-cols-12 gap-3 px-5 py-3.5 border-b border-[#ECEAE3] hover:bg-[#FAFAF7] cursor-pointer items-center"><div class="col-span-4 flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-[#FFE39A] text-black font-mono text-xs flex items-center justify-center">JM</div><div><div class="font-medium text-sm">Joy Munemo</div><div class="text-[0.6875rem] text-[#6B7280]">Hello Care Agency</div></div></div><div class="col-span-2 text-sm">Carer</div><div class="col-span-2"><span class="chip text-[0.625rem]" style="background:#FFE39A;color:#0A0A0A">Agency</span></div><div class="col-span-2"><span class="chip chip-warn text-[0.625rem]">DBS · 28d</span></div><div class="col-span-2 text-xs text-[#6B7280] text-right font-mono">3 days ago</div></div>
+    <div onclick="openStaffDashboard('bp')" class="grid grid-cols-12 gap-3 px-5 py-3.5 hover:bg-[#FAFAF7] cursor-pointer items-center"><div class="col-span-4 flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-[#86EFAC] text-[#064E3B] font-mono text-xs flex items-center justify-center">BP</div><div><div class="font-medium text-sm">Ben Pearce</div><div class="text-[0.6875rem] text-[#6B7280]">Volunteer · 6 hrs/wk</div></div></div><div class="col-span-2 text-sm">Carer (vol)</div><div class="col-span-2"><span class="chip text-[0.625rem]" style="background:#86EFAC;color:#064E3B">Volunteer</span></div><div class="col-span-2"><span class="chip chip-ok text-[0.625rem]">All current</span></div><div class="col-span-2 text-xs text-[#6B7280] text-right font-mono">2 days ago</div></div>
   </div>
 
-  <div class="mt-3 text-xs text-[#6B7280]">Worker types affect rota constraints (max hours, weekend ratios), payroll exports (PAYE vs CIS vs invoice), training requirements, and which apps default-on for the role.</div>
+  <div class="mt-3 text-xs text-[#6B7280]">Staff types affect rota constraints (max hours, weekend ratios), payroll exports (PAYE vs CIS vs invoice), training requirements, and which apps default-on for the role.</div>
 </div>
 
 <!-- ============================================== -->
@@ -1498,6 +1449,126 @@
 
 <script>
 function kooperToast(msg){var t=document.getElementById('toast');t.textContent=msg||'Saved';t.classList.add('on');clearTimeout(window.__t);window.__t=setTimeout(function(){t.classList.remove('on');},1700);}
+
+// ============================================================
+// PERSONALIZED STAFF DASHBOARD
+// Each staff member opens an inline dashboard with apps tailored
+// to their role. Tap any app launcher card to deep-link.
+// ============================================================
+const STAFF_DATA = {
+  sa: { name:'Sister Anne Whitfield', role:'Nurse · RGN',          contract:'Full-time · 37.5h/wk',  init:'SA', avatarBg:'#1A1A1A', avatarFg:'#FFD400', shift:'Today · 12:00–22:00 · Day shift', earnings:'£2,180 this period',     hours:'34h scheduled this week', training:'15/15 current',              apps:['rota','clinical','mar','recording','training','payslip','requests'] },
+  cm: { name:'Craig Musara',          role:'Carer',                contract:'Full-time · 37.5h/wk',  init:'CM', avatarBg:'#FCD34D', avatarFg:'#0A0A0A', shift:'Today · 14:00–22:00 · Day shift', earnings:'£1,548 this period',     hours:'32h scheduled this week', training:'15/15 current',              apps:['rota','recording','training','payslip','requests'] },
+  lo: { name:'Lola Okonkwo',          role:'Registered Manager',   contract:'Full-time · 40h/wk',    init:'LO', avatarBg:'#0A0A0A', avatarFg:'#FFD400', shift:'Today · 09:00–17:00 · On-call',  earnings:'£3,650 this period',     hours:'40h scheduled this week', training:'14/15 · Fire test 14d',     apps:['rota','reports','requests','training','staff','account','payslip','clinical'] },
+  dk: { name:'Daniel Kowalski',       role:'Activities Coord',     contract:'Part-time · 24h/wk',    init:'DK', avatarBg:'#A5B4FC', avatarFg:'#0A0A0A', shift:'Today · 09:00–17:00 · Activities',earnings:'£928 this period',       hours:'24h scheduled this week', training:'15/15 current',              apps:['rota','activities','recording','training','payslip','requests'] },
+  mc: { name:'Mary Chen',             role:'Cook · Catering Lead', contract:'Part-time · 30h/wk',    init:'MC', avatarBg:'#FDA4AF', avatarFg:'#0A0A0A', shift:'Today · 06:00–14:00 · Kitchen',  earnings:'£1,140 this period',     hours:'30h scheduled this week', training:'15/15 current',              apps:['rota','nutrition','stock','training','payslip','requests'] },
+  tb: { name:'Tomas Bauer',           role:'Maintenance',          contract:'Contractor · variable', init:'TB', avatarBg:'#FCD34D', avatarFg:'#0A0A0A', shift:'No shift today · on call 24/7',  earnings:'£740 invoiced this period', hours:'Variable',             training:'N/A',                        apps:['rota','estate','training','payslip','requests'] },
+  ra: { name:'Rebecca Adesina',       role:'Senior Carer',         contract:'Full-time · 37.5h/wk',  init:'RA', avatarBg:'#0A0A0A', avatarFg:'#FFD400', shift:'Today · 14:00–22:00 · Shift lead',earnings:'£1,820 this period',    hours:'36h scheduled this week', training:'15/15 current',              apps:['rota','recording','training','payslip','requests','clinical'] },
+  jm: { name:'Joy Munemo',            role:'Carer · Agency',       contract:'Agency · Hello Care',   init:'JM', avatarBg:'#FFE39A', avatarFg:'#0A0A0A', shift:'No shift today',                 earnings:'£420 last 7 days',       hours:'12h scheduled this week', training:'14/15 · DBS expires 28d',  apps:['rota','recording','training','payslip','requests'] },
+  bp: { name:'Ben Pearce',            role:'Volunteer Carer',      contract:'Volunteer · 6h/wk',     init:'BP', avatarBg:'#86EFAC', avatarFg:'#064E3B', shift:'No shift today',                 earnings:'Volunteer · expenses only', hours:'6h scheduled this week', training:'15/15 current',              apps:['rota','activities','training','requests'] }
+};
+
+const APP_TILES = {
+  rota:       { label:'kooper · rota',       icon:'📅', desc:'Your week, swap requests, time-off',          href:'kooper-rota.html',          accent:'yellow' },
+  recording:  { label:'kooper · reporting',  icon:'🎙', desc:'3-tap event capture · AI narrative',          href:'kooper-recording-demo.html', accent:'yellow' },
+  clinical:   { label:'kooper · clinical',   icon:'🩺', desc:'Major Active Problems · NEWS2 · MAR',          href:'kooper-clinical.html',       accent:'dark' },
+  mar:        { label:'kooper · mar',        icon:'💊', desc:'Medication round · PRN tracking',              href:'kooper-recording-demo.html', accent:'dark' },
+  training:   { label:'kooper · training',   icon:'🎓', desc:'Mandatory currency · CPD · expiring',          href:'kooper-hr.html#training',    accent:'green' },
+  payslip:    { label:'kooper · payslip',    icon:'💷', desc:'Earnings · timesheets · self-sign-off',        href:'kooper-hr.html#payslip',     accent:'green' },
+  requests:   { label:'kooper · requests',   icon:'📨', desc:'Time-off · swap · cover offers',                href:'kooper-rota.html',           accent:'purple' },
+  activities: { label:'kooper · activities', icon:'🎵', desc:'Sessions · engagement · ABC chart',            href:'kooper-care-dashboards.html?as=activities', accent:'blue' },
+  reports:    { label:'kooper · reports',    icon:'📊', desc:'CQC · ops · clinical · family · board',         href:'kooper-reports.html',        accent:'dark' },
+  staff:      { label:'kooper · staff',      icon:'👥', desc:'Manage team · roles · contracts',              href:'kooper-hr.html#workers',     accent:'yellow' },
+  account:    { label:'kooper · account',    icon:'🏠', desc:'Account type · billing · upgrade',             href:'kooper-hr.html#account',     accent:'dark' },
+  nutrition:  { label:'kooper · nutrition',  icon:'🍽', desc:'Menus · diets · allergens',                    href:'kooper-care-dashboards.html?as=cook', accent:'rose' },
+  stock:      { label:'kooper · stock',      icon:'📦', desc:'Inventory · auto-reorder · supply chain',      href:'kooper-care-dashboards.html?as=cook', accent:'amber' },
+  estate:     { label:'kooper · estate',     icon:'🔧', desc:'Tickets · compliance dates · contractors',     href:'kooper-care-dashboards.html?as=maintenance', accent:'amber' }
+};
+
+const ACCENT_STYLE = {
+  yellow: 'background:#FFD400;color:#0A0A0A',
+  dark:   'background:#0A0A0A;color:#FFD400',
+  green:  'background:#DCFCE7;color:#047857',
+  purple: 'background:#EDE9FE;color:#5B21B6',
+  blue:   'background:#DBEAFE;color:#1E40AF',
+  rose:   'background:#FCE7F3;color:#9D174D',
+  amber:  'background:#FEF3C7;color:#876300'
+};
+
+function openStaffDashboard(id) {
+  const s = STAFF_DATA[id]; if (!s) return;
+  const host = document.getElementById('staffDashboard');
+  const tilesHTML = s.apps.map(function(k){
+    const a = APP_TILES[k]; if (!a) return '';
+    const accent = ACCENT_STYLE[a.accent] || ACCENT_STYLE.yellow;
+    return `
+      <a href="${a.href}" class="staff-tile" style="display:block;background:#FFFFFF;border:1px solid #ECEAE3;border-radius:14px;padding:0.875rem 1rem;text-decoration:none;color:#0A0A0A;transition:all 0.15s ease" onmouseover="this.style.borderColor='#0A0A0A'; this.style.transform='translateY(-1px)'; this.style.boxShadow='0 8px 18px -10px rgba(0,0,0,0.16)'" onmouseout="this.style.borderColor='#ECEAE3'; this.style.transform=''; this.style.boxShadow=''">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem">
+          <div style="width:32px;height:32px;border-radius:8px;${accent};display:flex;align-items:center;justify-content:center;font-size:1rem;line-height:1">${a.icon}</div>
+          <span style="color:#9A9A9A;font-size:0.875rem">→</span>
+        </div>
+        <div style="font-family:'Space Grotesk';font-weight:600;font-size:0.9375rem;line-height:1.15;margin-bottom:0.1875rem">${a.label}</div>
+        <div style="font-size:0.6875rem;color:#6B7280;line-height:1.35">${a.desc}</div>
+      </a>
+    `;
+  }).join('');
+
+  host.innerHTML = `
+    <div class="px-5 py-4 bg-[#0A0A0A] text-white relative overflow-hidden">
+      <div style="position:absolute;right:-60px;top:-60px;width:200px;height:200px;border-radius:50%;background:rgba(255,212,0,0.12);filter:blur(40px);pointer-events:none"></div>
+      <div class="relative flex items-start justify-between gap-4 flex-wrap">
+        <div class="flex items-center gap-3" style="flex:1;min-width:0">
+          <div style="width:48px;height:48px;border-radius:50%;background:${s.avatarBg};color:${s.avatarFg};font-family:'Space Grotesk';font-weight:700;font-size:0.9375rem;display:flex;align-items:center;justify-content:center;flex-shrink:0">${s.init}</div>
+          <div style="min-width:0">
+            <div class="font-mono text-[0.6875rem] uppercase tracking-widest text-kapture-yellow mb-0.5">PERSONALIZED DASHBOARD</div>
+            <div class="font-display font-semibold text-xl">${s.name}</div>
+            <div class="text-xs text-white/65 mt-0.5">${s.role} · ${s.contract}</div>
+          </div>
+        </div>
+        <button onclick="closeStaffDashboard()" class="text-white/60 hover:text-white" aria-label="Close" style="background:transparent;border:0;cursor:pointer;padding:0.25rem">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
+        </button>
+      </div>
+      <div class="relative grid grid-cols-2 md:grid-cols-4 gap-3 mt-4 pt-4 border-t border-white/10 text-xs">
+        <div><div class="text-white/50 font-mono text-[0.625rem] uppercase tracking-widest">Next shift</div><div class="font-mono font-semibold mt-0.5">${s.shift}</div></div>
+        <div><div class="text-white/50 font-mono text-[0.625rem] uppercase tracking-widest">Hours</div><div class="font-mono font-semibold mt-0.5">${s.hours}</div></div>
+        <div><div class="text-white/50 font-mono text-[0.625rem] uppercase tracking-widest">Earnings</div><div class="font-mono font-semibold mt-0.5">${s.earnings}</div></div>
+        <div><div class="text-white/50 font-mono text-[0.625rem] uppercase tracking-widest">Training</div><div class="font-mono font-semibold mt-0.5">${s.training}</div></div>
+      </div>
+    </div>
+    <div class="px-5 py-5 bg-[#FAFAF7]">
+      <div class="flex items-baseline justify-between mb-3">
+        <div>
+          <div class="font-mono text-[0.6875rem] font-semibold uppercase tracking-[0.14em] text-[#876300] inline-flex items-center gap-2">
+            <span aria-hidden class="inline-block h-[2px] w-[18px] bg-[#FFD400]"></span>
+            APP LAUNCHER · ${s.apps.length} APPS
+          </div>
+          <p class="text-xs text-[#6B7280] mt-1">Apps tuned to ${s.role.split(' · ')[0]}'s daily work. Tap any tile to enter that app.</p>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">${tilesHTML}</div>
+      <div class="mt-4 pt-4 border-t border-[#ECEAE3] flex items-center justify-between flex-wrap gap-2">
+        <span class="text-xs text-[#6B7280] italic font-serif">Apps default-on for ${s.role.split(' · ')[0]} · manager can tune per staff member</span>
+        <div class="flex gap-2 flex-wrap">
+          <button onclick="kooperToast('${s.name.split(' ')[0]} sent a sign-in link · magic link expires in 1h')" class="chip text-xs">Send sign-in link</button>
+          <button onclick="kooperToast('Editing ${s.name.split(' ')[0]} · contract, role, qualifications, RTW evidence')" class="btn-secondary text-xs">Edit profile</button>
+          <button onclick="kooperToast('Tune apps for ${s.name.split(' ')[0]} · add or remove app tiles')" class="btn-yellow text-xs">Tune apps</button>
+        </div>
+      </div>
+    </div>
+  `;
+  host.classList.remove('hidden');
+  // Scroll the dashboard into view
+  host.scrollIntoView({ behavior:'smooth', block:'start' });
+  // Subtle highlight ring on open
+  host.style.transition = 'box-shadow 0.4s ease';
+  host.style.boxShadow = '0 0 0 4px rgba(255,212,0,0.25)';
+  setTimeout(function(){ host.style.boxShadow = ''; }, 1200);
+}
+function closeStaffDashboard() {
+  const host = document.getElementById('staffDashboard');
+  if (host) { host.classList.add('hidden'); host.innerHTML = ''; }
+  document.getElementById('staffList').scrollIntoView({ behavior:'smooth', block:'start' });
+}
 
 function showTab(btn, key){
   document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });

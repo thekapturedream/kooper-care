@@ -312,15 +312,36 @@
     <!-- Coverage gaps banner -->
     <div class="bg-kapture-black text-white rounded-2xl p-5 relative overflow-hidden">
       <div class="absolute -right-16 -top-16 w-48 h-48 rounded-full bg-status-critical/20 blur-3xl pointer-events-none"></div>
-      <div class="relative flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 flex-wrap">
-        <div>
-          <div class="ed-kicker on-dark">COVERAGE GAPS · 2</div>
-          <h3 class="font-display text-xl font-semibold mt-1">Wed evening + Fri night need cover</h3>
-          <p class="text-white/65 text-sm mt-1">Bank carer auto-suggested for both. Tap accept to slot in.</p>
+      <div class="relative">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 flex-wrap">
+          <div>
+            <div class="ed-kicker on-dark">COVERAGE GAPS · 2</div>
+            <h3 class="font-display text-xl font-semibold mt-1">Wed evening + Fri night need cover</h3>
+            <p class="text-white/65 text-sm mt-1">kooper · ai ranked 4 bank carers by fit · review and accept below.</p>
+          </div>
+          <div class="flex gap-2 flex-wrap">
+            <button onclick="openCoverModal('wed-eve')" class="btn-yellow">▶ AI suggest cover</button>
+            <button onclick="kooperToast('Open call sent · 4 bank carers + 2 staff')" class="btn-secondary-on-dark">Open call</button>
+          </div>
         </div>
-        <div class="flex gap-2 flex-wrap">
-          <button onclick="kooperToast('Auto-cover applied · Wed eve 14:00–22:00 + Fri night 22:00–07:00')" class="btn-yellow">Auto-fill from bank</button>
-          <button onclick="kooperToast('Open call sent · 4 bank carers + 2 staff')" class="btn-secondary-on-dark">Open call</button>
+        <!-- Inline gap list -->
+        <div class="mt-4 pt-4 border-t border-white/10 grid grid-cols-1 md:grid-cols-2 gap-3">
+          <button onclick="openCoverModal('wed-eve')" class="text-left rounded-xl p-3 bg-white/5 border border-white/10 hover:bg-white/10 transition" style="font-family:inherit">
+            <div class="flex items-center justify-between mb-1">
+              <span class="font-mono text-[0.6875rem] text-kapture-yellow uppercase tracking-widest">Wed · 6 May</span>
+              <span class="font-mono text-[0.6875rem] text-white/60">14:00–22:00 · 8h</span>
+            </div>
+            <div class="font-medium text-sm">Evening shift · carer</div>
+            <div class="text-xs text-white/60 mt-0.5 flex items-center gap-1.5"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="9"/><path d="M9 12l2 2 4-4"/></svg> 4 bank carers ranked</div>
+          </button>
+          <button onclick="openCoverModal('fri-night')" class="text-left rounded-xl p-3 bg-white/5 border border-white/10 hover:bg-white/10 transition" style="font-family:inherit">
+            <div class="flex items-center justify-between mb-1">
+              <span class="font-mono text-[0.6875rem] text-kapture-yellow uppercase tracking-widest">Fri · 8 May</span>
+              <span class="font-mono text-[0.6875rem] text-white/60">22:00–07:00 · 9h</span>
+            </div>
+            <div class="font-medium text-sm">Night shift · nurse</div>
+            <div class="text-xs text-white/60 mt-0.5 flex items-center gap-1.5"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="9"/><path d="M9 12l2 2 4-4"/></svg> 3 night-trained nurses ranked</div>
+          </button>
         </div>
       </div>
     </div>
@@ -691,6 +712,44 @@
   </div>
 </div>
 
+<!-- AI cover suggestions modal -->
+<div id="coverModal" class="modal" role="dialog" aria-label="AI cover suggestions" style="max-width:min(640px,92vw)">
+  <div class="modal-head">
+    <div style="flex:1;min-width:0">
+      <div class="flex items-center gap-2 mb-1">
+        <span class="chip chip-yellow text-[0.6875rem] font-mono">▶ KOOPER · AI</span>
+        <span id="coverShiftLabel" class="font-mono text-[0.6875rem] text-kapture-smoke">Wed · 6 May · 14:00–22:00</span>
+      </div>
+      <div class="modal-title">Suggested cover · ranked by fit</div>
+      <div class="modal-sub" id="coverSubLine">4 candidates considered across availability, cost, history, and current weekly hours. Top match green-lit.</div>
+    </div>
+    <button class="modal-x" onclick="closeAll()" aria-label="Close"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg></button>
+  </div>
+  <div class="modal-body">
+    <!-- Ranking criteria summary -->
+    <div class="rounded-lg bg-kapture-paper p-3 mb-4 text-xs text-kapture-smoke flex items-center gap-2 flex-wrap">
+      <span class="font-mono uppercase tracking-widest text-[0.625rem] text-kapture-mist">Ranked by</span>
+      <span class="chip text-[0.6875rem]">Availability</span>
+      <span class="chip text-[0.6875rem]">Hourly cost</span>
+      <span class="chip text-[0.6875rem]">Cover history</span>
+      <span class="chip text-[0.6875rem]">Weekly hours · WTR</span>
+      <span class="chip text-[0.6875rem]">Skill match</span>
+    </div>
+
+    <!-- Suggestions list -->
+    <div id="coverSuggestionsList" class="space-y-2"></div>
+
+    <!-- Open call fallback -->
+    <div class="mt-4 pt-4 border-t border-kapture-fog text-xs text-kapture-smoke flex items-center justify-between flex-wrap gap-2">
+      <span>None of these work? Send the shift to an open call.</span>
+      <button onclick="kooperToast('Open call posted · 6 takers will see the alert')" class="chip">Send to open call →</button>
+    </div>
+  </div>
+  <div class="modal-foot">
+    <button onclick="closeAll()" class="chip">Cancel</button>
+  </div>
+</div>
+
 <!-- Publish modal -->
 <div id="publishModal" class="modal" role="dialog" aria-label="Publish week">
   <div class="modal-head">
@@ -884,6 +943,132 @@ function publishWeek(){
 
 function bulkImport(){
   kooperToast('CSV import opens · paste rows or upload .csv (worker, day, type, hours)');
+}
+
+// ============================================================
+// AI COVER SUGGESTIONS — kooper · ai ranks bank carers per gap
+// ============================================================
+const COVER_GAPS = {
+  'wed-eve': {
+    label: 'Wed · 6 May · 14:00–22:00',
+    skillNeeded: 'Carer',
+    sub: '4 carers considered across availability, cost, history, and current weekly hours. Top match green-lit.',
+    candidates: [
+      { name:'Bola Adesanya',     init:'BA', role:'Bank carer',    hourly:'£14.20', score:0.96, fit:'best',
+        reasons: [
+          { ico:'✓', label:'Available — opted into Wed evenings', tone:'ok' },
+          { ico:'✓', label:'Cover history at Draycott · 11 shifts · 4.9 rating', tone:'ok' },
+          { ico:'✓', label:'Skill match · Carer · Personal care + Continence trained', tone:'ok' },
+          { ico:'£', label:'Lowest hourly cost in the bank pool', tone:'ok' },
+          { ico:'h', label:'24h scheduled this week · room under 48h cap', tone:'ok' }
+        ] },
+      { name:'Mehmet Yilmaz',     init:'MY', role:'Bank carer',    hourly:'£15.00', score:0.88, fit:'good',
+        reasons: [
+          { ico:'✓', label:'Available — Wed evening matches preference', tone:'ok' },
+          { ico:'✓', label:'Cover history at Marylebone · 6 shifts · 4.7 rating', tone:'ok' },
+          { ico:'·', label:'No prior shifts at Draycott · induction needed (~15 min)', tone:'warn' },
+          { ico:'h', label:'18h this week · WTR clean', tone:'ok' }
+        ] },
+      { name:'Linda Okafor',      init:'LO', role:'Bank · senior carer', hourly:'£16.80', score:0.79, fit:'fair',
+        reasons: [
+          { ico:'✓', label:'Available · Wed evening + Wed night both', tone:'ok' },
+          { ico:'·', label:'Senior carer (overqualified for shift) · cost +£21', tone:'warn' },
+          { ico:'✓', label:'Strong rating · 4.8 · Draycott familiar', tone:'ok' }
+        ] },
+      { name:'Saoirse Brennan',   init:'SB', role:'Bank carer',    hourly:'£14.50', score:0.62, fit:'low',
+        reasons: [
+          { ico:'·', label:'Available · but flagged 14:00 conflict at Camberwell', tone:'warn' },
+          { ico:'!', label:'Prefers mornings · not opted in to evenings', tone:'crit' },
+          { ico:'h', label:'42h this week · accepting would breach 48h cap', tone:'crit' }
+        ] }
+    ]
+  },
+  'fri-night': {
+    label: 'Fri · 8 May · 22:00–07:00',
+    skillNeeded: 'Nurse',
+    sub: '3 night-trained nurses considered. Top match has the highest fit + lowest cost combination.',
+    candidates: [
+      { name:'Yvonne Patel',      init:'YP', role:'Substantive nurse',   hourly:'£24.00', score:0.94, fit:'best',
+        reasons: [
+          { ico:'✓', label:'Substantive · already on rota Wed + Thu nights', tone:'ok' },
+          { ico:'✓', label:'Night-worker opt-in · WTR night-cap 35h · she is at 18h', tone:'ok' },
+          { ico:'£', label:'Substantive cost is lower than agency · saves £142', tone:'ok' },
+          { ico:'✓', label:'Continuity · same nurse for 3 of 4 nights', tone:'ok' }
+        ] },
+      { name:'Francis Cole',      init:'FC', role:'Bank · RGN',           hourly:'£32.00', score:0.74, fit:'fair',
+        reasons: [
+          { ico:'✓', label:'Available · 11 shifts at Draycott in past quarter', tone:'ok' },
+          { ico:'·', label:'Higher hourly · agency loading', tone:'warn' },
+          { ico:'·', label:'WTR clean but no day-time visibility on next-day rest', tone:'warn' }
+        ] },
+      { name:'Helena Rossi',      init:'HR', role:'Agency · RGN',         hourly:'£36.00', score:0.55, fit:'low',
+        reasons: [
+          { ico:'·', label:'Available but new to Draycott · induction needed', tone:'warn' },
+          { ico:'!', label:'Highest hourly · agency premium', tone:'crit' },
+          { ico:'·', label:'Weekend bookings often cancelled · 18% rate', tone:'warn' }
+        ] }
+    ]
+  }
+};
+
+let CURRENT_GAP_KEY = null;
+function openCoverModal(key) {
+  const gap = COVER_GAPS[key]; if (!gap) return;
+  CURRENT_GAP_KEY = key;
+  document.getElementById('coverShiftLabel').textContent = gap.label;
+  document.getElementById('coverSubLine').textContent = gap.sub;
+  document.getElementById('coverSuggestionsList').innerHTML = renderCoverList(gap.candidates);
+  openModal('coverModal');
+}
+function renderCoverList(candidates) {
+  const fitColor = { best:'#10B981', good:'#10B981', fair:'#FFD400', low:'#E5484D' };
+  const fitLabel = { best:'BEST FIT', good:'GOOD FIT', fair:'FAIR', low:'WEAK' };
+  const toneClass = { ok:'#047857', warn:'#876300', crit:'#B42318' };
+  return candidates.map((c, i) => {
+    const reasonsHTML = c.reasons.map(r =>
+      `<li style="display:flex;gap:0.5rem;align-items:flex-start;font-size:0.75rem;line-height:1.4;color:#1A1A1A">
+        <span style="color:${toneClass[r.tone]||'#6B7280'};font-family:'JetBrains Mono';font-weight:700;flex-shrink:0;width:14px;text-align:center">${r.ico}</span>
+        <span>${r.label}</span>
+      </li>`
+    ).join('');
+    const score = Math.round(c.score * 100);
+    const isBest = c.fit === 'best';
+    return `
+      <div class="rounded-xl border ${isBest ? 'border-status-ok' : 'border-kapture-fog'} bg-white p-3" style="${isBest ? 'background:linear-gradient(180deg,#F0FDF4 0%,#FFFFFF 60%);' : ''}">
+        <div class="flex items-start justify-between gap-3 flex-wrap">
+          <div class="flex items-center gap-3" style="flex:1;min-width:0">
+            <div style="width:36px;height:36px;border-radius:50%;background:#0A0A0A;color:#FFD400;display:flex;align-items:center;justify-content:center;font-family:'Space Grotesk';font-weight:700;font-size:0.75rem;flex-shrink:0">${c.init}</div>
+            <div style="min-width:0">
+              <div class="font-medium text-sm text-kapture-black">${c.name}</div>
+              <div class="text-xs text-kapture-smoke font-mono">${c.role} · ${c.hourly}/h</div>
+            </div>
+          </div>
+          <div style="text-align:right;flex-shrink:0">
+            <div style="font-family:'JetBrains Mono';font-size:0.625rem;text-transform:uppercase;letter-spacing:0.08em;color:${fitColor[c.fit]};font-weight:700">${fitLabel[c.fit]}</div>
+            <div style="font-family:'Space Grotesk';font-weight:600;font-size:1.125rem;color:#0A0A0A;margin-top:0.125rem">${score}<span style="font-size:0.625rem;color:#9A9A9A;margin-left:0.0625rem">%</span></div>
+          </div>
+        </div>
+        <ul class="mt-2 pt-2 border-t border-kapture-fog space-y-1">${reasonsHTML}</ul>
+        <div class="mt-3 pt-2 border-t border-kapture-fog flex items-center justify-between gap-2 flex-wrap">
+          <span class="text-[0.6875rem] text-kapture-mist font-mono">Score combines availability · cost · history · WTR · skill match</span>
+          <div class="flex gap-1.5 flex-shrink-0">
+            <button onclick="kooperToast('Notes opened · ${c.name}')" class="chip text-[0.6875rem]">Details</button>
+            <button onclick="acceptCover('${c.name}')" class="${isBest ? 'btn-yellow' : 'btn-secondary'} text-xs py-1.5">Accept &amp; assign</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+function acceptCover(name) {
+  const gap = COVER_GAPS[CURRENT_GAP_KEY];
+  closeAll();
+  kooperToast(`${name} assigned to ${gap.label} · ${name.split(' ')[0]} notified · cost recalculated`);
+  // Decrement coverage gap KPI
+  const k = document.getElementById('kpiGaps');
+  if (k) k.textContent = Math.max(0, parseInt(k.textContent,10) - 1);
+  const c = document.getElementById('hCoverage');
+  if (c) c.textContent = '100%';
 }
 
 // ============================================================
