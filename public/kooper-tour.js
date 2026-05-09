@@ -82,6 +82,16 @@
   .kt-hint-tooltip { position: fixed; z-index: 90; background: #0A0A0A; color: #FFFFFF; padding: 0.5rem 0.75rem; border-radius: 8px; font-size: 0.75rem; max-width: 240px; line-height: 1.4; box-shadow: 0 12px 28px -10px rgba(0,0,0,0.4); opacity: 0; pointer-events: none; transition: opacity 0.14s ease; }
   .kt-hint-tooltip.on { opacity: 1; pointer-events: auto; }
 
+  /* Hints button menu (right-click / long-press) */
+  .kt-menu { position: fixed; z-index: 9996; background: #FFFFFF; border: 1px solid #ECEAE3; border-radius: 12px; box-shadow: 0 18px 40px -14px rgba(0,0,0,0.22); padding: 0.375rem; min-width: 220px; opacity: 0; pointer-events: none; transform: translateY(-4px); transition: opacity 0.14s ease, transform 0.14s ease; }
+  .kt-menu.on { opacity: 1; pointer-events: auto; transform: translateY(0); }
+  .kt-menu-item { display: flex; align-items: center; gap: 0.625rem; padding: 0.5rem 0.625rem; border-radius: 8px; cursor: pointer; font-size: 0.8125rem; color: #1A1A1A; transition: background 0.12s ease; user-select: none; border: 0; background: transparent; width: 100%; text-align: left; font-family: inherit; }
+  .kt-menu-item:hover { background: #FAFAF7; }
+  .kt-menu-item .kt-menu-ico { width: 22px; height: 22px; border-radius: 6px; background: #FFFBEB; color: #876300; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; font-weight: 700; }
+  .kt-menu-item .kt-menu-ico.dark { background: #0A0A0A; color: #FFD400; }
+  .kt-menu-divider { height: 1px; background: #ECEAE3; margin: 0.25rem 0.375rem; }
+  .kt-menu-foot { padding: 0.4375rem 0.625rem 0.25rem; font-family: 'JetBrains Mono', monospace; font-size: 0.625rem; text-transform: uppercase; letter-spacing: 0.08em; color: #9A9A9A; }
+
   /* Tour launch button — for first-time visitors */
   .kt-launch-strip { position: fixed; bottom: 1rem; left: 50%; transform: translateX(-50%); z-index: 70; background: #0A0A0A; color: #FFFFFF; padding: 0.625rem 1rem 0.625rem 0.75rem; border-radius: 999px; box-shadow: 0 14px 36px -12px rgba(0,0,0,0.45); display: inline-flex; align-items: center; gap: 0.625rem; font-size: 0.8125rem; font-weight: 500; opacity: 0; pointer-events: none; transition: opacity 0.2s ease, transform 0.2s ease; max-width: calc(100vw - 32px); }
   .kt-launch-strip.on { opacity: 1; pointer-events: auto; transform: translateX(-50%) translateY(0); }
@@ -391,11 +401,108 @@
     else if (e.key === 'ArrowLeft')  prevStep();
   });
 
+  // --- Hints button options menu --------------------------------
+  var menuEl;
+  function buildMenu() {
+    if (menuEl) return menuEl;
+    menuEl = document.createElement('div');
+    menuEl.className = 'kt-menu';
+    menuEl.setAttribute('role', 'menu');
+    menuEl.innerHTML =
+      '<div class="kt-menu-foot">Hints &amp; tour</div>' +
+      '<button class="kt-menu-item" data-kt-menu="replay" role="menuitem">' +
+        '<span class="kt-menu-ico dark">▶</span>' +
+        '<span>Replay this page\'s tour</span>' +
+      '</button>' +
+      '<button class="kt-menu-item" data-kt-menu="hints" role="menuitem">' +
+        '<span class="kt-menu-ico"><svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="6"/></svg></span>' +
+        '<span data-kt-menu-hints-label>Toggle hints</span>' +
+      '</button>' +
+      '<div class="kt-menu-divider"></div>' +
+      '<button class="kt-menu-item" data-kt-menu="reset" role="menuitem">' +
+        '<span class="kt-menu-ico">↺</span>' +
+        '<span>Reset all tours · show launch strip again</span>' +
+      '</button>' +
+      '<div class="kt-menu-foot">Tip · right-click Hints to open this menu</div>';
+    document.body.appendChild(menuEl);
+    return menuEl;
+  }
+  function openMenu(anchor) {
+    var m = buildMenu();
+    var lbl = m.querySelector('[data-kt-menu-hints-label]');
+    if (lbl) lbl.textContent = state.hintsOn ? 'Turn hints off' : 'Turn hints on';
+    var r = anchor.getBoundingClientRect();
+    var mw = 240; // approx min-width
+    m.style.top  = (r.bottom + 8) + 'px';
+    var left = r.right - mw;
+    if (left < 12) left = 12;
+    if (left + mw > window.innerWidth - 12) left = window.innerWidth - mw - 12;
+    m.style.left = left + 'px';
+    m.classList.add('on');
+  }
+  function closeMenu() { if (menuEl) menuEl.classList.remove('on'); }
+
+  // Long-press detection for touch
+  function attachHintsBtnHandlers() {
+    var btn = document.getElementById('kooperHintsBtn');
+    if (!btn || btn.dataset.ktAttached === '1') return;
+    btn.dataset.ktAttached = '1';
+    // Right-click → open menu
+    btn.addEventListener('contextmenu', function (e) {
+      e.preventDefault();
+      openMenu(btn);
+    });
+    // Long-press for touch
+    var pressTimer = null;
+    btn.addEventListener('touchstart', function () {
+      pressTimer = setTimeout(function () { openMenu(btn); pressTimer = null; }, 550);
+    }, { passive: true });
+    var cancel = function () { if (pressTimer) { clearTimeout(pressTimer); pressTimer = null; } };
+    btn.addEventListener('touchend',    cancel);
+    btn.addEventListener('touchmove',   cancel);
+    btn.addEventListener('touchcancel', cancel);
+    // Tooltip hint
+    if (!btn.title) btn.title = 'Click to toggle hints · right-click or long-press for more options';
+  }
+
+  // Menu click delegation
+  document.addEventListener('click', function (e) {
+    if (e.target.closest('[data-kt-menu]')) {
+      var item = e.target.closest('[data-kt-menu]');
+      var k = item.dataset.ktMenu;
+      closeMenu();
+      if (k === 'replay') { startTour(); }
+      else if (k === 'hints') { toggleHints(); }
+      else if (k === 'reset') {
+        localStorage.removeItem(LS_TOUR);
+        kooperBriefMessage('Reset · launch strip will reappear on every page');
+        // Show launch strip on this page right now
+        setTimeout(showLaunchStrip, 200);
+      }
+      return;
+    }
+    // Close menu on outside click
+    if (menuEl && menuEl.classList.contains('on') && !e.target.closest('.kt-menu') && !e.target.closest('#kooperHintsBtn')) {
+      closeMenu();
+    }
+  });
+
+  // Brief inline message (toast-like, doesn't depend on host page's toast helper)
+  function kooperBriefMessage(msg) {
+    var t = document.createElement('div');
+    t.textContent = msg;
+    t.style.cssText = 'position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:#0A0A0A;color:#FFD400;padding:0.625rem 1rem;border-radius:8px;font-size:0.8125rem;font-weight:500;z-index:9997;font-family:Inter,sans-serif;box-shadow:0 10px 24px -8px rgba(0,0,0,0.4);';
+    document.body.appendChild(t);
+    setTimeout(function () { t.style.transition = 'opacity 0.3s ease'; t.style.opacity = '0'; }, 1700);
+    setTimeout(function () { t.remove(); }, 2100);
+  }
+
   // --- Public API + init -----------------------------------------
   window.kooperTour = {
     start: startTour,
     close: closeTour,
     toggleHints: toggleHints,
+    openMenu: function () { var btn = document.getElementById('kooperHintsBtn'); if (btn) openMenu(btn); },
     isHintsOn: function () { return state.hintsOn; }
   };
 
@@ -406,6 +513,7 @@
     try { state.config = JSON.parse(configEl.textContent.trim()); }
     catch (e) { console.warn('kooper-tour: invalid config JSON', e); return; }
     setHintsBtn();
+    attachHintsBtnHandlers();
     if (state.hintsOn) showHints();
     // Show launch strip if first visit (no completed/dismissed flag in storage)
     var seen = localStorage.getItem(LS_TOUR);
