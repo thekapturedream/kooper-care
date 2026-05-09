@@ -91,7 +91,7 @@
         <a href="kooper-care-landing.html#cta" class="nav-link">Contact</a>
       </div>
       <div class="flex items-center gap-2">
-        <a href="kooper-sign-in.html" class="hidden md:inline-flex btn-secondary-on-dark text-sm">Sign in</a>
+        <button id="kooperHintsBtn" type="button" aria-label="Toggle hints"><span class="kt-hint-dot-mini" aria-hidden="true"></span><span data-kt-label>Hints</span></button> <a href="kooper-sign-in.html" class="hidden md:inline-flex btn-secondary-on-dark text-sm">Sign in</a>
         <a href="kooper-care-landing.html#cta" class="btn-yellow text-sm">Book demo</a>
       </div>
     </div>
@@ -573,5 +573,45 @@
   </div>
 </section>
 
+
+<!-- ============================================================ -->
+<!-- GUIDED TOUR + HINTS                                            -->
+<!-- ============================================================ -->
+<script id="kooper-tour-config" type="application/json">
+{
+  "page": "apps",
+  "steps": [
+    {
+      "target": "#spine",
+      "placement": "bottom",
+      "title": "20 apps, 6 groups",
+      "body": "kooper \u00b7 hr is required. Everything else is opt-in per-team. Operators graduate from Single home \u2192 Group \u2192 NHS block contract."
+    },
+    {
+      "target": ".app-row.required",
+      "placement": "bottom",
+      "title": "Each row is the full spec",
+      "body": "Primary users \u00b7 what it replaces \u00b7 pricing \u00b7 try-the-demo link. Tap the row to read the deep dive \u2014 written in plain English, not vendor speak."
+    },
+    {
+      "target": "#kooperHintsBtn",
+      "placement": "bottom",
+      "title": "Hints stay on after the tour",
+      "body": "Toggle Hints in the header to keep yellow pulse dots near every key feature."
+    }
+  ],
+  "hints": [
+    {
+      "target": ".app-row.required",
+      "label": "Required spine \u00b7 kooper \u00b7 hr"
+    },
+    {
+      "target": "#stakeholder",
+      "label": "Stakeholder apps \u00b7 resident, family, inspector"
+    }
+  ]
+}
+</script>
+<script src="kooper-tour.js" defer></script>
 </body>
 </html>

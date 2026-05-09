@@ -130,7 +130,7 @@
         <a href="kooper-reports.html" class="nav-link">Reports</a>
       </div>
       <div class="flex items-center gap-2 shrink-0">
-        <button onclick="kooperToast('Cmd+K opens find')" class="hidden md:inline-flex items-center gap-2 px-3 py-1.5 bg-kapture-coal text-kapture-mist rounded-lg text-xs hover:bg-kapture-ash">
+        <button id="kooperHintsBtn" type="button" aria-label="Toggle hints"><span class="kt-hint-dot-mini" aria-hidden="true"></span><span data-kt-label>Hints</span></button> <button onclick="kooperToast('Cmd+K opens find')" class="hidden md:inline-flex items-center gap-2 px-3 py-1.5 bg-kapture-coal text-kapture-mist rounded-lg text-xs hover:bg-kapture-ash">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
           <span>Find</span>
           <span class="font-mono text-[0.6875rem] bg-kapture-ash px-1.5 py-0.5 rounded">⌘K</span>
@@ -539,5 +539,41 @@ function selectDoLS(){
   kooperToast('DoLS authorisation · renewal flow opens (5d)');
 }
 </script>
+
+<!-- ============================================================ -->
+<!-- GUIDED TOUR + HINTS                                            -->
+<!-- ============================================================ -->
+<script id="kooper-tour-config" type="application/json">
+{
+  "page": "clinical",
+  "steps": [
+    {
+      "target": ".tree-item.active",
+      "placement": "right",
+      "title": "SystmOne-pattern problem tree",
+      "body": "Major Active Problems with SNOMED codes. Tap any branch to drill in. Familiar to every clinical user already trained on TPP."
+    },
+    {
+      "target": "#problemDetail",
+      "placement": "left",
+      "title": "Full clinical workspace",
+      "body": "Pathology, NEWS2, MHA, DoLS, ECT, problem timeline. The redesigned residential-care take on the SystmOne workspace."
+    },
+    {
+      "target": "#kooperHintsBtn",
+      "placement": "bottom",
+      "title": "Hints stay on after the tour",
+      "body": "Toggle Hints in the header to keep yellow pulse dots near every key feature."
+    }
+  ],
+  "hints": [
+    {
+      "target": ".tree-item.active",
+      "label": "Active problem \u00b7 tap to switch"
+    }
+  ]
+}
+</script>
+<script src="kooper-tour.js" defer></script>
 </body>
 </html>

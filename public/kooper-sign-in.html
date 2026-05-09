@@ -27,11 +27,16 @@
   .btn-yellow { background: #FFD400; color: #0A0A0A; border: 1px solid #FFD400; padding: 0.5rem 0.875rem; border-radius: 10px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 0.375rem; font-size: 0.8125rem; transition: all 0.15s ease; }
   .btn-yellow:hover { background: #F5B400; }
 
-  .demo-card { background: #FFFFFF; border: 1px solid #ECEAE3; border-radius: 14px; padding: 1rem 1.125rem; cursor: pointer; transition: all 0.15s ease; display: flex; align-items: center; gap: 0.875rem; text-decoration: none; color: #0A0A0A; }
-  .demo-card:hover { border-color: #0A0A0A; background: #FFFFFF; }
+  .demo-card { background: #FFFFFF; border: 1px solid #ECEAE3; border-radius: 14px; padding: 1rem 1.125rem; cursor: pointer; transition: all 0.15s ease; display: flex; align-items: center; gap: 0.875rem; text-decoration: none; color: #0A0A0A; position: relative; }
+  .demo-card:hover { border-color: #0A0A0A; background: #FFFFFF; transform: translateY(-1px); box-shadow: 0 6px 14px -10px rgba(0,0,0,0.18); }
+  .demo-card:focus-visible { outline: 2px solid #FFD400; outline-offset: 2px; }
   .demo-card.featured { background: #0A0A0A; color: #FFFFFF; border-color: #0A0A0A; }
   .demo-card.featured:hover { background: #1A1A1A; }
   .demo-card.featured .role-chip { background: #FFD400; color: #0A0A0A; }
+  .demo-card .demo-arrow { color: #9A9A9A; font-size: 1rem; transition: transform 0.15s ease, color 0.15s ease; flex-shrink: 0; }
+  .demo-card:hover .demo-arrow { color: #0A0A0A; transform: translateX(3px); }
+  .demo-card.featured .demo-arrow { color: rgba(255,255,255,0.6); }
+  .demo-card.featured:hover .demo-arrow { color: #FFD400; }
 
   .avatar { width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-family: 'Space Grotesk'; font-weight: 700; font-size: 0.9375rem; }
 
@@ -62,7 +67,7 @@
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="24" height="24" fill="none" aria-label="kooper" role="img" class="text-white"><path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" d="M255.75 133.125c67.679 0 122.625 54.946 122.625 122.625S323.429 378.375 255.75 378.375 133.125 323.429 133.125 255.75s54.946-122.625 122.625-122.625m0-132.75c18.832 0 34.121 15.289 34.121 34.121s-15.289 34.121-34.121 34.121-34.121-15.289-34.121-34.121S236.918.375 255.75.375M75.173 75.173c13.316-13.316 34.938-13.316 48.254 0s13.316 34.938 0 48.254-34.938 13.316-48.254 0-13.316-34.938 0-48.254M511.125 255.75c0 18.832-15.289 34.121-34.121 34.121s-34.121-15.289-34.121-34.121 15.289-34.121 34.121-34.121 34.121 15.289 34.121 34.121M255.75 442.883c18.832 0 34.121 15.289 34.121 34.121s-15.289 34.121-34.121 34.121-34.121-15.289-34.121-34.121 15.289-34.121 34.121-34.121m132.323-54.81c13.316-13.316 34.938-13.316 48.254 0s13.316 34.938 0 48.254-34.938 13.316-48.254 0-13.316-34.938 0-48.254M68.617 255.75c0 18.832-15.289 34.121-34.121 34.121S.375 274.582.375 255.75s15.289-34.121 34.121-34.121 34.121 15.289 34.121 34.121m54.81 132.323c13.316 13.316 13.316 34.938 0 48.254s-34.938 13.316-48.254 0-13.316-34.938 0-48.254 34.938-13.316 48.254 0"/><path fill="#FFD400" fill-rule="evenodd" clip-rule="evenodd" d="M436.327 75.173c13.316 13.316 13.316 34.938 0 48.254s-34.938 13.316-48.254 0-13.316-34.938 0-48.254 34.938-13.316 48.254 0"/></svg>
       <span class="font-display lowercase tracking-wide text-sm"><span class="font-semibold">kooper</span><span class="text-white/40 mx-1">·</span><span class="font-medium">care</span></span>
     </a>
-    <a href="kooper-care-landing.html" class="text-xs text-white/70 hover:text-white">← Back to landing</a>
+    <button id="kooperHintsBtn" type="button" aria-label="Toggle hints" class="kt-light"><span class="kt-hint-dot-mini" aria-hidden="true"></span><span data-kt-label>Hints</span></button> <a href="kooper-care-landing.html" class="text-xs text-white/70 hover:text-white">← Back to landing</a>
   </div>
 </nav>
 
@@ -93,8 +98,8 @@
 
       <div class="mt-6 max-w-md">
         <div class="text-xs text-kapture-smoke">
-          By signing in you accept the <a href="#" class="underline-offset-4 hover:underline">terms</a> and the
-          <a href="#" class="underline-offset-4 hover:underline">privacy notice</a>. NHS DSPT certified · CQC SAF aligned.
+          By signing in you accept the <a href="#" data-toast="Terms · live in production" class="underline-offset-4 hover:underline">terms</a> and the
+          <a href="#" data-toast="Privacy notice · live in production" class="underline-offset-4 hover:underline">privacy notice</a>. NHS DSPT certified · CQC SAF aligned.
         </div>
       </div>
 
@@ -206,8 +211,8 @@
   <div class="max-w-6xl mx-auto px-5 flex flex-wrap items-center justify-between gap-3 text-xs text-kapture-smoke">
     <span class="font-mono">A Kapture product · kooper · care</span>
     <div class="flex items-center gap-4">
-      <a href="#" class="hover:text-kapture-black underline-offset-4 hover:underline">Status</a>
-      <a href="#" class="hover:text-kapture-black underline-offset-4 hover:underline">Help centre</a>
+      <a href="#" data-toast="All systems normal · 99.98% uptime this quarter" class="hover:text-kapture-black underline-offset-4 hover:underline">Status</a>
+      <a href="#" data-toast="Help centre · launching with the live build" class="hover:text-kapture-black underline-offset-4 hover:underline">Help centre</a>
       <a href="mailto:studio@thekapture.com" class="hover:text-kapture-black underline-offset-4 hover:underline">Contact</a>
     </div>
   </div>
@@ -230,6 +235,76 @@ function submitMagicLink(e){
   kooperToast('Magic link sent to ' + email + ' · check your inbox');
   return false;
 }
+
+// ============================================================
+// Inject hover arrow into every demo card so the affordance
+// is visible. Wire data-toast anchors so legal/footer links
+// don't dead-click.
+// ============================================================
+document.addEventListener('DOMContentLoaded', function () {
+  // Demo card arrow affordance — appended to each card so hover slides it
+  document.querySelectorAll('.demo-card').forEach(function (card) {
+    if (card.querySelector('.demo-arrow')) return;
+    var arrow = document.createElement('span');
+    arrow.className = 'demo-arrow ml-1';
+    arrow.setAttribute('aria-hidden', 'true');
+    arrow.textContent = '→';
+    card.appendChild(arrow);
+    // Toast on click so the user gets immediate confirmation before nav
+    card.addEventListener('click', function () {
+      var nameEl = card.querySelector('.font-semibold');
+      if (nameEl) kooperToast('Signing in as ' + nameEl.textContent.trim());
+    });
+  });
+
+  // Wire any anchor with data-toast — soft acknowledgement instead of hash jump
+  document.querySelectorAll('a[data-toast]').forEach(function (a) {
+    a.addEventListener('click', function (e) {
+      e.preventDefault();
+      kooperToast(a.getAttribute('data-toast'));
+    });
+  });
+});
 </script>
+
+<!-- ============================================================ -->
+<!-- GUIDED TOUR + HINTS                                            -->
+<!-- ============================================================ -->
+<script id="kooper-tour-config" type="application/json">
+{
+  "page": "sign-in",
+  "steps": [
+    {
+      "target": "#emailField",
+      "placement": "bottom",
+      "title": "Magic-link sign-in \u00b7 no password",
+      "body": "Enter your work email, we send a one-time link. Quicker, safer, no password manager required."
+    },
+    {
+      "target": ".demo-card.featured",
+      "placement": "left",
+      "title": "Or try a demo account \u00b7 no signup",
+      "body": "Tap any persona card to land in their workspace immediately. Sister Anne is recommended \u2014 she shows the clinical lead view first."
+    },
+    {
+      "target": "#kooperHintsBtn",
+      "placement": "bottom",
+      "title": "Hints stay on after the tour",
+      "body": "Toggle Hints in the header to keep yellow pulse dots near key features."
+    }
+  ],
+  "hints": [
+    {
+      "target": "#emailField",
+      "label": "Production sign-in \u00b7 magic link only"
+    },
+    {
+      "target": ".demo-card.featured",
+      "label": "Recommended demo \u00b7 Sister Anne (Nurse)"
+    }
+  ]
+}
+</script>
+<script src="kooper-tour.js" defer></script>
 </body>
 </html>

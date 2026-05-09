@@ -188,7 +188,7 @@
             <div class="text-kapture-mist">Nurse · Draycott</div>
           </div>
         </div>
-        <a href="kooper-sign-in.html" class="hidden md:inline-flex p-1.5 rounded text-kapture-mist hover:text-white hover:bg-kapture-coal transition" title="Sign out" aria-label="Sign out">
+        <button id="kooperHintsBtn" type="button" aria-label="Toggle hints"><span class="kt-hint-dot-mini" aria-hidden="true"></span><span data-kt-label>Hints</span></button> <a href="kooper-sign-in.html" class="hidden md:inline-flex p-1.5 rounded text-kapture-mist hover:text-white hover:bg-kapture-coal transition" title="Sign out" aria-label="Sign out">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
         </a>
       </div>
@@ -1144,5 +1144,51 @@
   });
 </script>
 
+
+<!-- ============================================================ -->
+<!-- GUIDED TOUR + HINTS                                            -->
+<!-- ============================================================ -->
+<script id="kooper-tour-config" type="application/json">
+{
+  "page": "care-plans",
+  "steps": [
+    {
+      "target": "#centerCategoryTitle",
+      "placement": "bottom",
+      "title": "Editorial reading layout",
+      "body": "Care plans read like long-form journalism, not a form. Calm typography, breath lines, an inspector can scan it in 90 seconds."
+    },
+    {
+      "target": ".category-item.active",
+      "placement": "right",
+      "title": "62 clinical domains, 5 categories",
+      "body": "Mental Health, Physical, Social, End of Life, plus extras. Tap a category to swap the reading view."
+    },
+    {
+      "target": ".ed-icon-btn",
+      "placement": "left",
+      "title": "History + Edit on every domain",
+      "body": "Tap the clock to see every prior version. Tap the pencil to inline-edit with reason capture \u2014 every change audit-logged immutably."
+    },
+    {
+      "target": "#kooperHintsBtn",
+      "placement": "bottom",
+      "title": "Hints stay on after the tour",
+      "body": "Toggle Hints in the header to keep yellow pulse dots near every key feature."
+    }
+  ],
+  "hints": [
+    {
+      "target": ".category-item.active",
+      "label": "Active category \u00b7 tap others to switch"
+    },
+    {
+      "target": ".ed-icon-btn",
+      "label": "History + edit \u00b7 every change tracked"
+    }
+  ]
+}
+</script>
+<script src="kooper-tour.js" defer></script>
 </body>
 </html>

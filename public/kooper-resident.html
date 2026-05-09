@@ -294,7 +294,7 @@
       <span class="tab-label">Help me</span>
     </button>
   </div>
-</nav>
+<button id="kooperHintsBtn" type="button" aria-label="Toggle hints" class="kt-light"><span class="kt-hint-dot-mini" aria-hidden="true"></span><span data-kt-label>Hints</span></button> </nav>
 
 <div id="toast" class="toast">Saved</div>
 
@@ -346,5 +346,35 @@ document.querySelectorAll('.bottom-tab').forEach(t => {
   document.getElementById('dateChip').textContent = days[d.getDay()] + ' ' + d.getDate() + ' ' + months[d.getMonth()];
 })();
 </script>
+
+<!-- ============================================================ -->
+<!-- GUIDED TOUR + HINTS                                            -->
+<!-- ============================================================ -->
+<script id="kooper-tour-config" type="application/json">
+{
+  "page": "resident",
+  "steps": [
+    {
+      "target": ".pictogram-tile",
+      "placement": "bottom",
+      "title": "Pictogram-led, mobile-first",
+      "body": "Big touch targets, no jargon, designed for the resident themselves to express needs and choices."
+    },
+    {
+      "target": "#kooperHintsBtn",
+      "placement": "bottom",
+      "title": "Hints stay on after the tour",
+      "body": "Toggle Hints to keep yellow pulse dots near every key feature."
+    }
+  ],
+  "hints": [
+    {
+      "target": ".pictogram-tile",
+      "label": "Tap a pictogram \u00b7 the resident expresses a need"
+    }
+  ]
+}
+</script>
+<script src="kooper-tour.js" defer></script>
 </body>
 </html>

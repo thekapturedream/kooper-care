@@ -188,7 +188,7 @@
         <a href="kooper-reports.html" class="nav-link">Reports</a>
       </div>
       <div class="flex items-center gap-2">
-        <a href="kooper-sign-in.html" class="text-white/70 hover:text-white p-1.5 rounded" title="Sign out">
+        <button id="kooperHintsBtn" type="button" aria-label="Toggle hints"><span class="kt-hint-dot-mini" aria-hidden="true"></span><span data-kt-label>Hints</span></button> <a href="kooper-sign-in.html" class="text-white/70 hover:text-white p-1.5 rounded" title="Sign out">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
         </a>
       </div>
@@ -2415,5 +2415,41 @@ document.querySelectorAll('.acct-card').forEach(function(c){
   });
 })();
 </script>
+
+<!-- ============================================================ -->
+<!-- GUIDED TOUR + HINTS                                            -->
+<!-- ============================================================ -->
+<script id="kooper-tour-config" type="application/json">
+{
+  "page": "hr",
+  "steps": [
+    {
+      "target": ".tab",
+      "placement": "bottom",
+      "title": "Account types \u00b7 tabs \u00b7 workers",
+      "body": "HR is the spine. Workers, rota, accounts, training currency, RTW + DBS evidence \u2014 every other app pulls identity and permissions from here."
+    },
+    {
+      "target": "#adminTools",
+      "placement": "top",
+      "title": "Live rota with WTR conflict detection",
+      "body": "Drag-drop shifts, instant conflict flags (consecutive nights, missing breaks, &gt;48h week), live cost calculation per shift."
+    },
+    {
+      "target": "#kooperHintsBtn",
+      "placement": "bottom",
+      "title": "Hints stay on after the tour",
+      "body": "Toggle Hints in the header to keep yellow pulse dots near every key feature."
+    }
+  ],
+  "hints": [
+    {
+      "target": ".tab",
+      "label": "HR sub-tabs \u00b7 workers / rota / accounts / training"
+    }
+  ]
+}
+</script>
+<script src="kooper-tour.js" defer></script>
 </body>
 </html>

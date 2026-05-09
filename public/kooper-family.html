@@ -96,7 +96,7 @@
       </button>
     </div>
   </div>
-</nav>
+<button id="kooperHintsBtn" type="button" aria-label="Toggle hints"><span class="kt-hint-dot-mini" aria-hidden="true"></span><span data-kt-label>Hints</span></button> </nav>
 
 <!-- ============================================== -->
 <!-- HERO — who you are seeing                        -->
@@ -393,5 +393,35 @@ function openCustomRequest(){
   }
 }
 </script>
+
+<!-- ============================================================ -->
+<!-- GUIDED TOUR + HINTS                                            -->
+<!-- ============================================================ -->
+<script id="kooper-tour-config" type="application/json">
+{
+  "page": "family",
+  "steps": [
+    {
+      "target": ".bottom-tab",
+      "placement": "top",
+      "title": "Family-only PWA experience",
+      "body": "Today, mood, photos, messages, visits. Plain English. No clinical detail leaks \u2014 privacy boundary enforced."
+    },
+    {
+      "target": "#kooperHintsBtn",
+      "placement": "bottom",
+      "title": "Hints stay on after the tour",
+      "body": "Toggle Hints in the header to keep yellow pulse dots near key features."
+    }
+  ],
+  "hints": [
+    {
+      "target": ".bottom-tab",
+      "label": "Family bottom-nav \u00b7 tap to switch view"
+    }
+  ]
+}
+</script>
+<script src="kooper-tour.js" defer></script>
 </body>
 </html>
