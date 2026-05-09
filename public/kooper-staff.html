@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Your kooper · the apps you need, ready to go</title>
-<meta name="description" content="Personalized staff launcher. Every staff member lands here after sign-in — only the apps they need, the next shift, hours, earnings, training in one tap." />
+<title>Your kooper · personalized staff dashboard</title>
+<meta name="description" content="Personalized staff dashboard. Overview, app tabs, and one-tap entry into the tools you actually use." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&display=swap" rel="stylesheet" />
@@ -26,10 +26,10 @@
   /* Buttons */
   .btn-primary { background: #0A0A0A; color: #FFFFFF; border: 1px solid #0A0A0A; padding: 0.5rem 0.875rem; border-radius: 10px; font-weight: 500; transition: all 0.15s ease; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.8125rem; white-space: nowrap; font-family: inherit; }
   .btn-primary:hover { background: transparent; color: #0A0A0A; }
-  .btn-yellow { background: #FFD400; color: #0A0A0A; border: 1px solid #FFD400; padding: 0.5rem 0.875rem; border-radius: 10px; font-weight: 600; transition: all 0.15s ease; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.8125rem; white-space: nowrap; font-family: inherit; }
+  .btn-yellow { background: #FFD400; color: #0A0A0A; border: 1px solid #FFD400; padding: 0.5rem 0.875rem; border-radius: 10px; font-weight: 600; transition: all 0.15s ease; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.8125rem; white-space: nowrap; font-family: inherit; text-decoration: none; }
   .btn-yellow:hover { background: #F5B400; }
-  .btn-secondary-on-dark { background: transparent; color: #FFFFFF; border: 1px solid rgba(255,255,255,0.4); padding: 0.5rem 0.875rem; border-radius: 10px; font-weight: 500; transition: all 0.15s ease; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.8125rem; white-space: nowrap; font-family: inherit; }
-  .btn-secondary-on-dark:hover { background: rgba(255,255,255,0.1); }
+  .btn-secondary { background: transparent; color: #0A0A0A; border: 1px solid #D4D4D4; padding: 0.5rem 0.875rem; border-radius: 10px; font-weight: 500; transition: all 0.15s ease; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.8125rem; white-space: nowrap; font-family: inherit; text-decoration: none; }
+  .btn-secondary:hover { border-color: #0A0A0A; }
 
   /* Chips */
   .chip { display: inline-flex; align-items: center; gap: 0.375rem; padding: 0.25rem 0.625rem; border-radius: 999px; font-size: 0.75rem; font-weight: 500; line-height: 1; background: #FFFFFF; color: #2A2A2A; border: 1px solid #ECEAE3; }
@@ -47,49 +47,86 @@
   .pulse-dot::after { content: ''; position: absolute; inset: -4px; border-radius: 999px; background: #10B981; opacity: 0.4; animation: pulse-out 1.6s ease-out infinite; }
   @keyframes pulse-out { 0% { transform: scale(0.6); opacity: 0.6; } 100% { transform: scale(1.8); opacity: 0; } }
 
-  /* App tile */
-  .app-tile { background: #FFFFFF; border: 1px solid #ECEAE3; border-radius: 16px; padding: 1.125rem 1.25rem; transition: all 0.18s ease; cursor: pointer; text-decoration: none; color: #0A0A0A; display: block; position: relative; }
-  .app-tile:hover { border-color: #0A0A0A; transform: translateY(-2px); box-shadow: 0 14px 32px -16px rgba(0,0,0,0.18); }
-  .app-tile.featured { background: linear-gradient(180deg, #0A0A0A 0%, #1A1A1A 100%); color: #FFFFFF; border-color: #0A0A0A; }
-  .app-tile.featured:hover { box-shadow: 0 14px 32px -10px rgba(255,212,0,0.28); }
-  .app-tile.featured .app-name { color: #FFFFFF; }
-  .app-tile.featured .app-desc { color: rgba(212,212,212,0.85); }
-  .app-tile .app-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; line-height: 1; margin-bottom: 0.875rem; }
-  .app-tile .app-name { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 1.0625rem; line-height: 1.15; margin-bottom: 0.25rem; letter-spacing: -0.01em; }
-  .app-tile .app-desc { font-size: 0.75rem; line-height: 1.45; color: #6B7280; }
-  .app-tile .app-arrow { position: absolute; top: 1.125rem; right: 1.25rem; color: #9A9A9A; font-size: 1rem; transition: transform 0.15s ease; }
-  .app-tile:hover .app-arrow { color: #0A0A0A; transform: translateX(3px); }
-  .app-tile.featured .app-arrow { color: rgba(255,212,0,0.6); }
-  .app-tile.featured:hover .app-arrow { color: #FFD400; }
-  .app-tile .app-pill { display: inline-flex; align-items: center; padding: 0.0625rem 0.375rem; border-radius: 999px; font-family: 'JetBrains Mono', monospace; font-size: 0.625rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; margin-left: 0.375rem; }
-  .app-tile .app-pill.attention { background: rgba(229,72,77,0.12); color: #B42318; }
-  .app-tile .app-pill.due { background: #FFD400; color: #0A0A0A; }
-  .app-tile .app-pill.new { background: rgba(16,185,129,0.15); color: #047857; }
+  .ed-kicker { font-family: 'JetBrains Mono', monospace; font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #876300; display: inline-flex; align-items: center; gap: 0.5rem; }
+  .ed-kicker::before { content: ''; width: 18px; height: 2px; background: #FFD400; display: inline-block; }
 
-  /* Live tile (next shift) */
-  .live-card { background: #0A0A0A; color: #FFFFFF; border-radius: 18px; padding: 1.25rem 1.5rem; position: relative; overflow: hidden; }
-  .live-card::before { content: ''; position: absolute; right: -60px; top: -60px; width: 220px; height: 220px; border-radius: 50%; background: rgba(255,212,0,0.15); filter: blur(40px); pointer-events: none; }
+  /* Identity bar (compact, white) */
+  .id-bar { background: #FFFFFF; border-bottom: 1px solid #ECEAE3; }
+  .id-avatar { width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 1.125rem; flex-shrink: 0; }
+
+  /* Overview cards */
+  .ov-card { background: #FFFFFF; border: 1px solid #ECEAE3; border-radius: 14px; padding: 1rem 1.125rem; transition: border-color 0.12s ease; }
+  .ov-card:hover { border-color: #0A0A0A; }
+  .ov-label { font-family: 'JetBrains Mono', monospace; font-size: 0.625rem; text-transform: uppercase; letter-spacing: 0.1em; color: #6B7280; }
+  .ov-num { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 1.625rem; line-height: 1.05; letter-spacing: -0.012em; color: #0A0A0A; margin-top: 0.25rem; }
+  .ov-sub { font-size: 0.6875rem; color: #6B7280; margin-top: 0.125rem; line-height: 1.4; }
+  .ov-card.dark { background: linear-gradient(180deg, #0A0A0A 0%, #1A1A1A 100%); color: #FFFFFF; border-color: #0A0A0A; }
+  .ov-card.dark .ov-label { color: #FFD400; }
+  .ov-card.dark .ov-num { color: #FFFFFF; }
+  .ov-card.dark .ov-sub { color: rgba(255,255,255,0.65); }
+
+  /* Tabs strip */
+  .tabs-strip { display: flex; gap: 0.375rem; overflow-x: auto; padding-bottom: 0.5rem; scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; }
+  .tabs-strip::-webkit-scrollbar { height: 4px; }
+  .tabs-strip::-webkit-scrollbar-thumb { background: #D4D4D4; border-radius: 2px; }
+  .tab-pill { display: inline-flex; align-items: center; gap: 0.4375rem; padding: 0.5rem 0.875rem; border-radius: 10px; font-size: 0.8125rem; font-weight: 500; border: 1px solid #ECEAE3; background: #FFFFFF; color: #2A2A2A; cursor: pointer; transition: all 0.12s ease; white-space: nowrap; flex-shrink: 0; font-family: inherit; scroll-snap-align: start; text-decoration: none; }
+  .tab-pill:hover { border-color: #0A0A0A; }
+  .tab-pill.active { background: #0A0A0A; color: #FFFFFF; border-color: #0A0A0A; }
+  .tab-pill .tp-ico { font-size: 0.9375rem; line-height: 1; }
+  .tab-pill .tp-count { font-family: 'JetBrains Mono', monospace; font-size: 0.625rem; padding: 0.0625rem 0.375rem; border-radius: 999px; background: #F5F5F5; color: #6B7280; font-weight: 700; }
+  .tab-pill.active .tp-count { background: #FFD400; color: #0A0A0A; }
+  .tab-pill .tp-count.alert { background: #E5484D; color: #FFFFFF; }
+
+  /* Tab panel — content for active tab */
+  .tab-panel { display: none; }
+  .tab-panel.is-active { display: block; }
+
+  /* Surface card used inside tab panels */
+  .surface-card { background: #FFFFFF; border: 1px solid #ECEAE3; border-radius: 16px; }
+  .panel-header { padding: 1.125rem 1.25rem 0; }
+  .panel-body { padding: 0 1.25rem 1.25rem; }
+  .panel-foot { padding: 0.875rem 1.25rem; border-top: 1px solid #ECEAE3; background: #FAFAF7; display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; flex-wrap: wrap; }
+
+  /* Mini list rows used inside panels */
+  .row { display: flex; align-items: center; gap: 0.75rem; padding: 0.625rem 0; border-bottom: 1px solid #ECEAE3; }
+  .row:last-child { border-bottom: 0; }
+  .row .row-ico { width: 32px; height: 32px; border-radius: 8px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 1rem; }
+  .row .row-text { flex: 1; min-width: 0; font-size: 0.8125rem; line-height: 1.35; }
+  .row .row-text strong { color: #0A0A0A; font-weight: 600; }
+  .row .row-meta { font-size: 0.6875rem; color: #6B7280; margin-top: 0.125rem; }
+  .row .row-arrow { color: #9A9A9A; flex-shrink: 0; }
+
+  /* Mini week strip — for rota tab */
+  .week-strip { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.375rem; }
+  .day-cell { background: #FAFAF7; border-radius: 10px; padding: 0.5rem; text-align: center; font-size: 0.6875rem; }
+  .day-cell.has-shift { background: #FFFBEB; border: 1px solid rgba(255,212,0,0.5); }
+  .day-cell.is-today { background: #0A0A0A; color: #FFFFFF; }
+  .day-cell.is-today .dc-shift { color: #FFD400; }
+  .day-cell .dc-day { font-family: 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: 0.06em; color: #6B7280; }
+  .day-cell.is-today .dc-day { color: rgba(255,255,255,0.65); }
+  .day-cell .dc-num { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 1rem; margin-top: 0.0625rem; line-height: 1; }
+  .day-cell .dc-shift { font-family: 'JetBrains Mono', monospace; font-size: 0.5625rem; margin-top: 0.25rem; color: #876300; line-height: 1.2; }
+
+  /* CTA tile (the big primary entry into an app) */
+  .cta-tile { background: linear-gradient(180deg, #0A0A0A 0%, #1A1A1A 100%); color: #FFFFFF; border-radius: 16px; padding: 1.25rem 1.5rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; text-decoration: none; transition: box-shadow 0.18s ease, transform 0.18s ease; }
+  .cta-tile:hover { box-shadow: 0 18px 40px -16px rgba(255,212,0,0.32); transform: translateY(-1px); }
+  .cta-tile .cta-ico { width: 44px; height: 44px; border-radius: 12px; background: #FFD400; color: #0A0A0A; display: flex; align-items: center; justify-content: center; font-size: 1.25rem; flex-shrink: 0; }
+  .cta-tile .cta-title { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 1.125rem; line-height: 1.15; letter-spacing: -0.01em; }
+  .cta-tile .cta-sub { font-size: 0.8125rem; color: rgba(212,212,212,0.85); margin-top: 0.125rem; }
+  .cta-tile .cta-arrow { color: #FFD400; font-size: 1.125rem; }
 
   /* Toast */
   .toast { position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%); background: #0A0A0A; color: #FFD400; padding: 0.75rem 1.125rem; border-radius: 10px; font-size: 0.8125rem; font-weight: 500; box-shadow: 0 12px 30px -8px rgba(0,0,0,0.3); z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.2s ease; max-width: 90vw; text-align: center; }
   .toast.on { opacity: 1; }
 
-  /* Quick action button */
-  .qa-btn { background: #FFFFFF; border: 1px solid #ECEAE3; border-radius: 14px; padding: 0.875rem 1rem; cursor: pointer; transition: all 0.15s ease; display: flex; align-items: center; gap: 0.625rem; text-align: left; font-family: inherit; width: 100%; }
-  .qa-btn:hover { border-color: #0A0A0A; transform: translateY(-1px); box-shadow: 0 6px 14px -8px rgba(0,0,0,0.16); }
-  .qa-btn .qa-ico { width: 32px; height: 32px; border-radius: 8px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 1rem; }
-  .qa-btn .qa-label { font-weight: 600; font-size: 0.8125rem; color: #0A0A0A; line-height: 1.15; }
-  .qa-btn .qa-sub { font-size: 0.6875rem; color: #6B7280; margin-top: 0.0625rem; line-height: 1.3; }
-
-  .ed-kicker { font-family: 'JetBrains Mono', monospace; font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #876300; display: inline-flex; align-items: center; gap: 0.5rem; }
-  .ed-kicker::before { content: ''; width: 18px; height: 2px; background: #FFD400; display: inline-block; }
-  .ed-kicker.on-dark { color: #FFD400; }
+  /* Helpful text utility */
+  .muted { color: #6B7280; }
 </style>
 </head>
 <body>
 
 <!-- ============================================== -->
-<!-- TOP NAV — minimal · this is the staff dashboard -->
+<!-- TOP NAV                                          -->
 <!-- ============================================== -->
 <nav class="bg-kapture-black text-white sticky top-0 z-40">
   <div class="container-r">
@@ -102,7 +139,8 @@
       </a>
       <div class="hidden lg:flex items-center gap-1">
         <a href="kooper-care-landing.html" class="nav-link">Home</a>
-        <a href="kooper-staff.html" class="nav-link" id="myDashLink">My dashboard</a>
+        <a href="kooper-rota.html" class="nav-link">Rota</a>
+        <a href="kooper-recording-demo.html" class="nav-link">Reporting</a>
         <a href="kooper-ai.html" class="nav-link">ai</a>
       </div>
       <div class="flex items-center gap-2">
@@ -118,112 +156,58 @@
 </nav>
 
 <!-- ============================================== -->
-<!-- HEADER · greeting + identity                     -->
+<!-- IDENTITY BAR · clean, compact                    -->
 <!-- ============================================== -->
-<section class="bg-kapture-black text-white relative overflow-hidden">
-  <div class="absolute -right-40 -top-40 w-[500px] h-[500px] rounded-full bg-kapture-yellow/15 blur-3xl pointer-events-none"></div>
-  <div class="container-r relative py-10 lg:py-14">
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-      <div class="lg:col-span-7">
-        <div class="ed-kicker on-dark mb-3" id="kickerLabel">YOUR KOOPER</div>
-        <div class="flex items-center gap-4 mb-4">
-          <div id="staffAvatar" style="width:56px;height:56px;border-radius:50%;background:#1A1A1A;color:#FFD400;font-family:'Space Grotesk';font-weight:700;font-size:1.125rem;display:flex;align-items:center;justify-content:center;flex-shrink:0">SA</div>
-          <div>
-            <h1 class="font-display font-semibold text-2xl lg:text-3xl tracking-tight" id="greeting">Good afternoon, Sister Anne.</h1>
-            <p class="text-white/65 text-sm mt-0.5" id="staffSubline">Nurse · RGN · Draycott House · 34h scheduled this week</p>
-          </div>
-        </div>
-        <p class="text-white/75 text-sm lg:text-base font-serif italic max-w-2xl" id="staffLede">Your apps are right here. Tap one to start, tap another when you're done. Nothing extra to learn.</p>
-      </div>
-      <div class="lg:col-span-5">
-        <div class="live-card">
-          <div class="relative">
-            <div class="ed-kicker on-dark mb-2">NEXT SHIFT</div>
-            <div class="font-display font-semibold text-2xl lg:text-3xl tracking-tight" id="nextShiftTime">In 2h 18m · 14:00–22:00</div>
-            <div class="text-white/65 text-sm mt-1" id="nextShiftMeta">Day shift · Draycott · 8h with a 30-min break</div>
-            <div class="grid grid-cols-3 gap-2 mt-4 pt-4 border-t border-white/10 text-xs">
-              <div><div class="text-white/50 font-mono text-[0.6875rem]">This week</div><div class="font-mono font-semibold mt-0.5" id="nsHours">34h</div></div>
-              <div><div class="text-white/50 font-mono text-[0.6875rem]">Earnings</div><div class="font-mono font-semibold mt-0.5" id="nsEarnings">£2,180</div></div>
-              <div><div class="text-white/50 font-mono text-[0.6875rem]">Training</div><div class="font-mono font-semibold mt-0.5" id="nsTraining">15/15</div></div>
-            </div>
-          </div>
-        </div>
-      </div>
+<section class="id-bar">
+  <div class="container-r py-5 flex items-center gap-4 flex-wrap">
+    <div id="staffAvatar" class="id-avatar" style="background:#1A1A1A;color:#FFD400">SA</div>
+    <div class="flex-1 min-w-0">
+      <div class="ed-kicker mb-1">YOUR DASHBOARD</div>
+      <h1 class="font-display font-semibold text-2xl tracking-tight" id="greeting">Good afternoon, Sister Anne.</h1>
+      <p class="text-sm muted mt-0.5" id="staffSubline">Nurse · RGN · Draycott House · 34h scheduled</p>
     </div>
   </div>
 </section>
 
 <!-- ============================================== -->
-<!-- QUICK ACTIONS · top of fold                      -->
+<!-- OVERVIEW · 4 stat cards                          -->
 <!-- ============================================== -->
-<section class="border-b border-kapture-fog py-6 bg-white">
-  <div class="container-r">
-    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3" id="quickActions">
-      <!-- populated by JS -->
+<section class="container-r py-5">
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+    <div class="ov-card">
+      <div class="ov-label">This week</div>
+      <div class="ov-num" id="ovHours">34h</div>
+      <div class="ov-sub" id="ovHoursSub">contracted 37.5h · WTR clean</div>
+    </div>
+    <div class="ov-card">
+      <div class="ov-label">Earnings</div>
+      <div class="ov-num" id="ovEarnings">£2,180</div>
+      <div class="ov-sub">period 27 Apr → 24 May</div>
+    </div>
+    <div class="ov-card">
+      <div class="ov-label">Training</div>
+      <div class="ov-num" id="ovTraining">15<span class="muted text-base font-normal">/15</span></div>
+      <div class="ov-sub" id="ovTrainingSub">all current · 0 expiring</div>
+    </div>
+    <div class="ov-card dark">
+      <div class="ov-label">Next shift</div>
+      <div class="ov-num" id="ovShift">In 2h 18m</div>
+      <div class="ov-sub" id="ovShiftSub">14:00–22:00 · Day · Draycott</div>
     </div>
   </div>
 </section>
 
 <!-- ============================================== -->
-<!-- APP LAUNCHER · the personalized stack            -->
+<!-- TABS · app strip                                 -->
 <!-- ============================================== -->
-<section class="py-10 lg:py-12">
-  <div class="container-r">
-    <div class="flex items-baseline justify-between flex-wrap gap-2 mb-5">
-      <div>
-        <div class="ed-kicker">YOUR APPS</div>
-        <h2 class="font-display text-2xl font-semibold mt-2"><span id="appsCount">7</span> apps tuned to <span id="appsRoleLabel">Nurse</span> work</h2>
-        <p class="text-sm text-kapture-smoke mt-1 font-serif italic">Tuned by your manager · ask if something's missing.</p>
-      </div>
-      <div class="flex items-center gap-2 flex-wrap">
-        <button onclick="kooperToast('Search across all apps · Cmd+K from anywhere')" class="chip">⌘K Search</button>
-        <a href="kooper-ai.html" class="btn-yellow text-xs">Ask kooper · ai</a>
-      </div>
-    </div>
-
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="appLauncher">
-      <!-- populated by JS -->
-    </div>
-  </div>
+<section class="container-r mt-2 mb-1 sticky top-16 bg-kapture-paper z-30 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8" style="background:#FAFAF7;border-bottom:1px solid #ECEAE3">
+  <div class="tabs-strip py-3" id="tabsStrip"></div>
 </section>
 
 <!-- ============================================== -->
-<!-- ATTENTION STRIP · things needing my attention   -->
+<!-- TAB CONTENT                                      -->
 <!-- ============================================== -->
-<section class="bg-kapture-paper border-y border-kapture-fog py-10 lg:py-12">
-  <div class="container-r">
-    <div class="flex items-baseline justify-between flex-wrap gap-2 mb-5">
-      <div>
-        <div class="ed-kicker">NEEDS YOU</div>
-        <h2 class="font-display text-2xl font-semibold mt-2">Quick decisions · 3 waiting</h2>
-      </div>
-      <a href="kooper-rota.html" class="text-xs text-kapture-smoke hover:text-kapture-black">See all →</a>
-    </div>
-
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-3" id="attentionList">
-      <!-- populated by JS -->
-    </div>
-  </div>
-</section>
-
-<!-- ============================================== -->
-<!-- FOOTER                                           -->
-<!-- ============================================== -->
-<footer class="bg-white border-t border-kapture-fog py-6 mt-2">
-  <div class="container-r flex flex-col md:flex-row md:items-center md:justify-between gap-3 text-xs text-kapture-smoke">
-    <div class="flex items-center gap-3">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="22" height="22" fill="none" aria-label="kooper" role="img" class="text-kapture-black"><path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" d="M255.75 133.125c67.679 0 122.625 54.946 122.625 122.625S323.429 378.375 255.75 378.375 133.125 323.429 133.125 255.75s54.946-122.625 122.625-122.625m0-132.75c18.832 0 34.121 15.289 34.121 34.121s-15.289 34.121-34.121 34.121-34.121-15.289-34.121-34.121S236.918.375 255.75.375M75.173 75.173c13.316-13.316 34.938-13.316 48.254 0s13.316 34.938 0 48.254-34.938 13.316-48.254 0-13.316-34.938 0-48.254M511.125 255.75c0 18.832-15.289 34.121-34.121 34.121s-34.121-15.289-34.121-34.121 15.289-34.121 34.121-34.121 34.121 15.289 34.121 34.121M255.75 442.883c18.832 0 34.121 15.289 34.121 34.121s-15.289 34.121-34.121 34.121-34.121-15.289-34.121-34.121 15.289-34.121 34.121-34.121m132.323-54.81c13.316-13.316 34.938-13.316 48.254 0s13.316 34.938 0 48.254-34.938 13.316-48.254 0-13.316-34.938 0-48.254M68.617 255.75c0 18.832-15.289 34.121-34.121 34.121S.375 274.582.375 255.75s15.289-34.121 34.121-34.121 34.121 15.289 34.121 34.121m54.81 132.323c13.316 13.316 13.316 34.938 0 48.254s-34.938 13.316-48.254 0-13.316-34.938 0-48.254 34.938-13.316 48.254 0"/><path fill="#FFD400" fill-rule="evenodd" clip-rule="evenodd" d="M436.327 75.173c13.316 13.316 13.316 34.938 0 48.254s-34.938 13.316-48.254 0-13.316-34.938 0-48.254 34.938-13.316 48.254 0"/></svg>
-      <div class="flex items-center gap-1.5 font-display lowercase tracking-wide text-sm text-kapture-black"><span class="font-semibold">kooper</span><span class="text-kapture-mist">·</span><span id="footRoleLabel" class="font-medium">staff</span></div>
-    </div>
-    <div class="flex items-center gap-3 flex-wrap">
-      <a href="kooper-sign-in.html" class="hover:text-kapture-black underline-offset-4 hover:underline">Switch user</a>
-      <span aria-hidden>·</span>
-      <a href="kooper-hr.html" class="hover:text-kapture-black underline-offset-4 hover:underline">HR launcher</a>
-      <span aria-hidden>·</span>
-      <span class="font-mono">Mock data · no PII</span>
-    </div>
-  </div>
-</footer>
+<section class="container-r py-6 pb-16" id="tabContent"></section>
 
 <div id="toast" class="toast">Saved</div>
 
@@ -231,193 +215,795 @@
 function kooperToast(msg){ var t=document.getElementById('toast'); t.textContent=msg||'Saved'; t.classList.add('on'); clearTimeout(window.__t); window.__t=setTimeout(()=>t.classList.remove('on'),1700); }
 
 // ============================================================
-// STAFF ROSTER — same shape as the HR personalized panel
-// Each staff member gets their own greeting, app set, and
-// quick actions tuned to their role.
+// STAFF DATA — every staff member lands here on sign-in
 // ============================================================
 const STAFF = {
-  sa: {
-    name:'Sister Anne Whitfield', first:'Sister Anne', role:'Nurse · RGN', site:'Draycott House',
-    contract:'Full-time · 37.5h/wk', init:'SA', avatarBg:'#1A1A1A', avatarFg:'#FFD400',
-    greet:'Good afternoon, Sister Anne.',
-    nextShift:'In 2h 18m · 14:00–22:00', nextShiftMeta:'Day shift · Draycott · 8h with a 30-min break',
-    weekHours:'34h scheduled', earnings:'£2,180 this period', training:'15/15 · all current',
-    primaryAction: { label:'Clock in', toast:'Clocked in · welcome Sister Anne · charts pre-loaded' },
-    onShift:true,
-    apps:['rota','clinical','mar','recording','reports','training','payslip','requests','ai'],
-    quickActions:['clock','recording','mar','swap','timeoff'],
-    attention:[
-      { ico:'💊', tone:'attention', title:'17:00 med round',     sub:'12 residents · 3 PRN flagged · 18m to start' },
-      { ico:'🩹', tone:'due',       title:'Mrs Cross dressing',  sub:'Sacrum Stage 2 · due 19:30 · log when done' },
-      { ico:'⚠',  tone:'attention', title:'Mr H NEWS2 watch',    sub:'Hourly checks until end of shift · escalate if 6+' }
-    ]
-  },
-  cm: {
-    name:'Craig Musara', first:'Craig', role:'Carer', site:'Draycott House',
-    contract:'Full-time · 37.5h/wk', init:'CM', avatarBg:'#FCD34D', avatarFg:'#0A0A0A',
-    greet:'Hi Craig — welcome to your shift.',
-    nextShift:'Now · 14:00–22:00', nextShiftMeta:'Day shift · 4 residents assigned · break 17:30',
-    weekHours:'32h scheduled', earnings:'£1,548 this period', training:'15/15 · all current',
-    primaryAction: { label:'Clock in', toast:'Clocked in · 4 residents loaded · ready to record' },
-    onShift:true,
-    apps:['rota','recording','training','payslip','requests','ai'],
-    quickActions:['clock','recording','swap','timeoff','training'],
-    attention:[
-      { ico:'🎙', tone:'due', title:'3 voice drafts ready', sub:'Confirm to lock · 14s avg' },
-      { ico:'📅', tone:'new', title:'Cover offer · Wed eve', sub:'8h shift available · pick up?' },
-      { ico:'🎓', tone:'new', title:'Manual handling refresher', sub:'Self-paced · 12 min · book a slot' }
-    ]
-  },
-  ra: {
-    name:'Rebecca Adesina', first:'Rebecca', role:'Senior Carer', site:'Draycott House',
-    contract:'Full-time · 37.5h/wk', init:'RA', avatarBg:'#0A0A0A', avatarFg:'#FFD400',
-    greet:'Hi Rebecca — shift lead today.',
-    nextShift:'Now · 14:00–22:00', nextShiftMeta:'Shift lead · oversees 3 carers · break 18:30',
-    weekHours:'36h scheduled', earnings:'£1,820 this period', training:'15/15 · all current',
-    primaryAction: { label:'Clock in', toast:'Clocked in · shift lead controls active' },
-    onShift:true,
-    apps:['rota','recording','clinical','reports','training','payslip','requests','ai'],
-    quickActions:['clock','handover','recording','swap','timeoff'],
-    attention:[
-      { ico:'📋', tone:'attention', title:'Handover from Sister Anne', sub:'14:00 · Mr H hourly · Mrs Cross 19:30 dressing' },
-      { ico:'🎙', tone:'due',       title:'2 carer voice drafts',     sub:'Awaiting your confirm · Craig + Bobby' },
-      { ico:'⚠',  tone:'attention', title:'Mr R sundowning',         sub:'Watch 16:30 · music + tea ready' }
-    ]
-  },
-  dk: {
-    name:'Daniel Kowalski', first:'Daniel', role:'Activities Coordinator', site:'Draycott House',
-    contract:'Part-time · 24h/wk', init:'DK', avatarBg:'#A5B4FC', avatarFg:'#0A0A0A',
-    greet:'Hi Daniel — full afternoon planned.',
-    nextShift:'Now · 09:00–17:00', nextShiftMeta:'Activities · 3 sessions today · ends in 25m',
-    weekHours:'24h scheduled', earnings:'£928 this period', training:'15/15 · all current',
-    primaryAction: { label:'Start session', toast:'Music & Memory session · 8 residents joined' },
-    onShift:true,
-    apps:['rota','activities','recording','training','payslip','requests','ai'],
-    quickActions:['session','recording','swap','timeoff','training'],
-    attention:[
-      { ico:'🎵', tone:'due',       title:'Music & Memory at 15:00', sub:'8 residents joined · jazz playlist queued' },
-      { ico:'🌳', tone:'new',       title:'Garden walk at 16:00',     sub:'5 residents signed up · weather permitting' },
-      { ico:'🎂', tone:'attention', title:'Mr R birthday tea 17:30',  sub:'Family invited · 3 RSVP yes · prep cake' }
-    ]
-  },
-  mc: {
-    name:'Mary Chen', first:'Mary', role:'Cook · Catering Lead', site:'Draycott House',
-    contract:'Part-time · 30h/wk', init:'MC', avatarBg:'#FDA4AF', avatarFg:'#0A0A0A',
-    greet:'Hi Mary — dinner service in 2h 15m.',
-    nextShift:'Now · 06:00–14:00', nextShiftMeta:'Kitchen · 28 residents · 3 special diets',
-    weekHours:'30h scheduled', earnings:'£1,140 this period', training:'15/15 · all current',
-    primaryAction: { label:'Open menu', toast:'Tonight\'s menu · cottage pie · 28 portions' },
-    onShift:true,
-    apps:['rota','nutrition','stock','training','payslip','requests','ai'],
-    quickActions:['menu','stock','swap','timeoff','training'],
-    attention:[
-      { ico:'🍽', tone:'attention', title:'3 special diets to confirm', sub:'Mrs C diabetic · Mr H high-protein · Yan vegetarian' },
-      { ico:'📦', tone:'attention', title:'Skimmed milk critical', sub:'Auto-reorder triggers Friday · 4L/day usage' },
-      { ico:'🥬', tone:'due',       title:'Tinned tomatoes low',  sub:'3 left · auto-reorder Fri' }
-    ]
-  },
-  tb: {
-    name:'Tomas Bauer', first:'Tomas', role:'Maintenance · Contractor', site:'Group · 3 sites',
-    contract:'Self-employed · UTR on file', init:'TB', avatarBg:'#FCD34D', avatarFg:'#0A0A0A',
-    greet:'Hi Tomas — 7 open tickets across the group.',
-    nextShift:'On call · group-wide', nextShiftMeta:'Self-scheduled · book your time on the rota',
-    weekHours:'Variable', earnings:'£740 invoiced this period', training:'N/A',
-    primaryAction: { label:'Open tickets', toast:'7 open · Lift fault urgent · bedroom heater today' },
-    onShift:false,
-    apps:['rota','estate','training','payslip','requests','ai'],
-    quickActions:['tickets','book','invoice','training'],
-    attention:[
-      { ico:'🔧', tone:'attention', title:'Lift fault · Marylebone',     sub:'Reported 14:20 · contractor en route · urgent' },
-      { ico:'🌡', tone:'due',       title:'Bedroom 7 heater · Draycott', sub:'Reported 09:15 by Craig · today' },
-      { ico:'🚪', tone:'new',       title:'Garden gate hinge · Camberwell', sub:'Reported Mon · this week' }
-    ]
-  },
-  jm: {
-    name:'Joy Munemo', first:'Joy', role:'Carer · Agency', site:'Hello Care Agency',
-    contract:'Agency · variable', init:'JM', avatarBg:'#FFE39A', avatarFg:'#0A0A0A',
-    greet:'Hi Joy — pick up an open shift?',
-    nextShift:'No shift today · 3 cover offers',
-    nextShiftMeta:'Agency carer · Hello Care · pick from open calls',
-    weekHours:'12h scheduled', earnings:'£420 last 7 days', training:'14/15 · DBS expires 28d',
-    primaryAction: { label:'Open calls', toast:'3 cover offers · Wed eve · Fri night · Sun day' },
-    onShift:false,
-    apps:['rota','recording','training','payslip','requests','ai'],
-    quickActions:['cover','recording','training','timeoff'],
-    attention:[
-      { ico:'📅', tone:'new',       title:'Wed evening cover · 8h',       sub:'Draycott · 14:00–22:00 · accept by 16:00' },
-      { ico:'🌙', tone:'new',       title:'Fri night cover · 9h',         sub:'Draycott · 22:00–07:00 · agency bonus' },
-      { ico:'⚠',  tone:'attention', title:'DBS renewal in 28 days',       sub:'Upload new certificate to keep working' }
-    ]
-  },
-  bp: {
-    name:'Ben Pearce', first:'Ben', role:'Volunteer Carer', site:'Draycott House',
-    contract:'Volunteer · 6h/wk', init:'BP', avatarBg:'#86EFAC', avatarFg:'#064E3B',
-    greet:'Hi Ben — thanks for volunteering.',
-    nextShift:'No shift today', nextShiftMeta:'Next session · Sat 10:30 · garden walk',
-    weekHours:'6h scheduled', earnings:'Volunteer · expenses only', training:'15/15 · all current',
-    primaryAction: { label:'My sessions', toast:'2 upcoming · Sat garden walk · Sun reading hour' },
-    onShift:false,
-    apps:['rota','activities','training','requests'],
-    quickActions:['sessions','recording','training','timeoff'],
-    attention:[
-      { ico:'🌳', tone:'due', title:'Sat garden walk · 10:30',    sub:'5 residents joining · weather permitting' },
-      { ico:'📖', tone:'new', title:'Sun reading hour · 14:00',    sub:'4 residents signed up · novel choice ready' },
-      { ico:'🎓', tone:'new', title:'Safeguarding update · short', sub:'Self-paced · 8 min · keeps your DBS valid' }
-    ]
+  sa: { name:'Sister Anne Whitfield', first:'Sister Anne', role:'Nurse · RGN', site:'Draycott House',
+        contract:'Full-time · 37.5h/wk', init:'SA', avatarBg:'#1A1A1A', avatarFg:'#FFD400',
+        nextShift:{ when:'In 2h 18m', meta:'14:00–22:00 · Day · Draycott' },
+        weekHours:'34h', earnings:'£2,180', training:'15/15', trainingSub:'all current · 0 expiring',
+        primaryAction:{ label:'Clock in', toast:'Clocked in · welcome Sister Anne · charts pre-loaded' },
+        onShift:true,
+        tabs:['today','rota','clinical','mar','recording','reports','training','payslip','requests','ai'] },
+  cm: { name:'Craig Musara', first:'Craig', role:'Carer', site:'Draycott House',
+        contract:'Full-time · 37.5h/wk', init:'CM', avatarBg:'#FCD34D', avatarFg:'#0A0A0A',
+        nextShift:{ when:'In 2h 18m', meta:'14:00–22:00 · Day · Draycott' },
+        weekHours:'32h', earnings:'£1,548', training:'15/15', trainingSub:'all current · 0 expiring',
+        primaryAction:{ label:'Clock in', toast:'Clocked in · 4 residents loaded · ready to record' },
+        onShift:true,
+        tabs:['today','rota','recording','training','payslip','requests','ai'] },
+  ra: { name:'Rebecca Adesina', first:'Rebecca', role:'Senior Carer · Shift Lead', site:'Draycott House',
+        contract:'Full-time · 37.5h/wk', init:'RA', avatarBg:'#0A0A0A', avatarFg:'#FFD400',
+        nextShift:{ when:'In 0m · on shift', meta:'14:00–22:00 · Shift Lead · break 18:30' },
+        weekHours:'36h', earnings:'£1,820', training:'15/15', trainingSub:'all current',
+        primaryAction:{ label:'Clock in', toast:'Clocked in · shift lead controls active' },
+        onShift:true,
+        tabs:['today','rota','recording','clinical','training','payslip','requests','ai'] },
+  dk: { name:'Daniel Kowalski', first:'Daniel', role:'Activities Coordinator', site:'Draycott House',
+        contract:'Part-time · 24h/wk', init:'DK', avatarBg:'#A5B4FC', avatarFg:'#0A0A0A',
+        nextShift:{ when:'In 0m · on shift', meta:'09:00–17:00 · Activities · ends in 25m' },
+        weekHours:'24h', earnings:'£928', training:'15/15', trainingSub:'all current',
+        primaryAction:{ label:'Start session', toast:'Music & Memory · 8 residents joined' },
+        onShift:true,
+        tabs:['today','rota','activities','recording','training','payslip','requests','ai'] },
+  mc: { name:'Mary Chen', first:'Mary', role:'Cook · Catering Lead', site:'Draycott House',
+        contract:'Part-time · 30h/wk', init:'MC', avatarBg:'#FDA4AF', avatarFg:'#0A0A0A',
+        nextShift:{ when:'In 0m · on shift', meta:'06:00–14:00 · Kitchen · break 11:00' },
+        weekHours:'30h', earnings:'£1,140', training:'15/15', trainingSub:'all current',
+        primaryAction:{ label:'Open menu', toast:'Tonight\'s menu · cottage pie · 28 portions' },
+        onShift:true,
+        tabs:['today','rota','nutrition','stock','training','payslip','requests','ai'] },
+  tb: { name:'Tomas Bauer', first:'Tomas', role:'Maintenance · Contractor', site:'Group · 3 sites',
+        contract:'Self-employed · UTR on file', init:'TB', avatarBg:'#FCD34D', avatarFg:'#0A0A0A',
+        nextShift:{ when:'On call', meta:'Self-scheduled · book your time on the rota' },
+        weekHours:'Variable', earnings:'£740', training:'N/A', trainingSub:'contractor · own CPD',
+        primaryAction:{ label:'Open tickets', toast:'7 open · Lift fault urgent · bedroom heater today' },
+        onShift:false,
+        tabs:['today','rota','estate','training','payslip','requests','ai'] },
+  jm: { name:'Joy Munemo', first:'Joy', role:'Carer · Agency', site:'Hello Care Agency',
+        contract:'Agency · variable', init:'JM', avatarBg:'#FFE39A', avatarFg:'#0A0A0A',
+        nextShift:{ when:'No shift today', meta:'3 cover offers available · pick from open calls' },
+        weekHours:'12h', earnings:'£420', training:'14/15', trainingSub:'DBS expires in 28 days',
+        primaryAction:{ label:'Open calls', toast:'3 cover offers · Wed eve · Fri night · Sun day' },
+        onShift:false,
+        tabs:['today','rota','recording','training','payslip','requests','ai'] },
+  bp: { name:'Ben Pearce', first:'Ben', role:'Volunteer Carer', site:'Draycott House',
+        contract:'Volunteer · 6h/wk', init:'BP', avatarBg:'#86EFAC', avatarFg:'#064E3B',
+        nextShift:{ when:'Sat 10:30', meta:'Garden walk session · 5 residents joining' },
+        weekHours:'6h', earnings:'Volunteer', training:'15/15', trainingSub:'all current · expenses-only',
+        primaryAction:{ label:'My sessions', toast:'2 upcoming · Sat garden walk · Sun reading hour' },
+        onShift:false,
+        tabs:['today','rota','activities','training','requests','ai'] }
+};
+
+// ============================================================
+// TABS — definition + per-tab content renderer
+// Each tab: id, label, icon, count?, ctaApp (the kooper-X.html page)
+// ============================================================
+const TAB_DEFS = {
+  today:      { label:'Today',         ico:'⚡', count:null },
+  rota:       { label:'Manage Rota',   ico:'📅', count:null,  app:'kooper-rota.html' },
+  recording:  { label:'Reporting',     ico:'🎙', count:null,  app:'kooper-recording-demo.html' },
+  clinical:   { label:'Clinical',      ico:'🩺', count:null,  app:'kooper-clinical.html' },
+  mar:        { label:'MAR',           ico:'💊', count:null,  app:'kooper-recording-demo.html' },
+  activities: { label:'Activities',    ico:'🎵', count:null,  app:'kooper-care-dashboards.html?as=activities' },
+  nutrition:  { label:'Nutrition',     ico:'🍽', count:null,  app:'kooper-care-dashboards.html?as=cook' },
+  stock:      { label:'Stock',         ico:'📦', count:null,  app:'kooper-care-dashboards.html?as=cook' },
+  estate:     { label:'Estate',        ico:'🔧', count:null,  app:'kooper-care-dashboards.html?as=maintenance' },
+  reports:    { label:'Reports',       ico:'📊', count:null,  app:'kooper-reports.html' },
+  training:   { label:'Training',      ico:'🎓', count:null,  app:'kooper-hr.html#training' },
+  payslip:    { label:'Payslip',       ico:'💷', count:null,  app:'kooper-hr.html#payslip' },
+  requests:   { label:'Requests',      ico:'📨', count:null,  app:'kooper-rota.html' },
+  ai:         { label:'kooper · ai',   ico:'⚡', count:null,  app:'kooper-ai.html' }
+};
+
+// Returns href with ?as=<id> if a session is active
+function sessionLink(href, id) {
+  if (!href) return href;
+  if (/[?&]as=/.test(href)) return href;
+  // fragments after a query already have ? — handle both
+  if (href.indexOf('#') >= 0 && href.indexOf('?') < 0) {
+    return href.split('#')[0] + '?as=' + id + '#' + href.split('#')[1];
   }
+  var sep = href.indexOf('?') >= 0 ? '&' : '?';
+  return href + sep + 'as=' + id;
+}
+
+// ============================================================
+// PER-STAFF TAB RENDERERS — each tab returns HTML for its panel.
+// Reuses the staff `s` object for context-specific content.
+// ============================================================
+function renderTodayTab(s, id) {
+  var attentionItems = ATTENTION_BY_ROLE[id] || ATTENTION_BY_ROLE.cm;
+  var quickActions = QA_BY_ROLE[id] || QA_BY_ROLE.cm;
+  return `
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <div class="lg:col-span-2 surface-card">
+        <div class="panel-header">
+          <div class="ed-kicker mb-2">QUICK ACTIONS</div>
+          <h2 class="font-display font-semibold text-lg">Pick up where you left off.</h2>
+        </div>
+        <div class="panel-body grid grid-cols-2 sm:grid-cols-3 gap-2 pt-2">
+          ${quickActions.map(qa => `
+            <a href="${qa.href ? sessionLink(qa.href, id) : '#'}" ${qa.onclick ? 'onclick="event.preventDefault(); ' + qa.onclick + '"' : ''} class="btn-secondary justify-start" style="padding:0.625rem 0.75rem;font-size:0.75rem;font-weight:500;text-decoration:none">
+              <span style="font-size:1rem">${qa.ico}</span>
+              <span class="text-left"><span style="display:block;color:#0A0A0A;font-weight:600">${qa.label}</span><span style="display:block;font-size:0.6875rem;color:#6B7280">${qa.sub}</span></span>
+            </a>
+          `).join('')}
+        </div>
+      </div>
+      <div class="surface-card">
+        <div class="panel-header">
+          <div class="ed-kicker mb-2">NEEDS YOU · ${attentionItems.length}</div>
+          <h2 class="font-display font-semibold text-lg">${attentionItems.length === 0 ? 'All clear.' : 'Quick decisions.'}</h2>
+        </div>
+        <div class="panel-body pt-2">
+          ${attentionItems.map(a => `
+            <div class="row">
+              <span class="row-ico" style="background:${a.tone === 'crit' ? '#FEE2E2' : a.tone === 'due' ? '#FFFBEB' : '#DCFCE7'};color:${a.tone === 'crit' ? '#B42318' : a.tone === 'due' ? '#876300' : '#047857'}">${a.ico}</span>
+              <div class="row-text"><strong>${a.title}</strong><div class="row-meta">${a.sub}</div></div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderRotaTab(s, id) {
+  // Sample week — Mon–Sun with this carer's pattern
+  var week = ROTA_BY_ROLE[id] || ROTA_BY_ROLE.cm;
+  return `
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
+      <a href="${sessionLink('kooper-rota.html', id)}" class="cta-tile lg:col-span-2">
+        <div class="flex items-center gap-3" style="flex:1;min-width:0">
+          <span class="cta-ico">📅</span>
+          <div style="min-width:0">
+            <div class="cta-title">Open kooper · rota</div>
+            <div class="cta-sub">Drag-drop your week · request swaps · time-off · payslip-friendly clock-in.</div>
+          </div>
+        </div>
+        <span class="cta-arrow">→</span>
+      </a>
+      <div class="surface-card p-5">
+        <div class="ed-kicker mb-2">THIS WEEK</div>
+        <div class="font-display font-semibold text-2xl mt-1">${s.weekHours} <span class="text-base muted font-normal">scheduled</span></div>
+        <div class="text-xs muted mt-0.5">Across ${week.filter(d => d.shift).length} shifts · WTR clean</div>
+      </div>
+    </div>
+    <div class="surface-card mb-4">
+      <div class="panel-header">
+        <div class="flex items-center justify-between flex-wrap gap-2">
+          <div>
+            <div class="ed-kicker mb-1">WEEK PREVIEW</div>
+            <h2 class="font-display font-semibold text-lg">Mon 4 May → Sun 10 May</h2>
+          </div>
+          <span class="text-xs muted">tap any day to jump straight in</span>
+        </div>
+      </div>
+      <div class="panel-body">
+        <div class="week-strip">
+          ${week.map(d => `
+            <a href="${sessionLink('kooper-rota.html', id)}" class="day-cell ${d.today ? 'is-today' : ''} ${d.shift ? 'has-shift' : ''}" style="text-decoration:none;color:inherit;display:block">
+              <div class="dc-day">${d.day}</div>
+              <div class="dc-num">${d.num}</div>
+              <div class="dc-shift">${d.shift || 'Off'}</div>
+            </a>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+      <a href="${sessionLink('kooper-rota.html', id)}" class="btn-secondary justify-center">Request a swap</a>
+      <a href="${sessionLink('kooper-rota.html', id)}" class="btn-secondary justify-center">Request time off</a>
+      <a href="${sessionLink('kooper-rota.html', id)}" class="btn-secondary justify-center">Cover offers · 3 open</a>
+    </div>
+  `;
+}
+
+function renderRecordingTab(s, id) {
+  return `
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
+      <a href="${sessionLink('kooper-recording-demo.html', id)}" class="cta-tile lg:col-span-2">
+        <div class="flex items-center gap-3" style="flex:1;min-width:0">
+          <span class="cta-ico">🎙</span>
+          <div style="min-width:0">
+            <div class="cta-title">Open kooper · reporting</div>
+            <div class="cta-sub">Tap a resident, three icons, AI writes the CQC-ready note. Confirm in 14 seconds.</div>
+          </div>
+        </div>
+        <span class="cta-arrow">→</span>
+      </a>
+      <div class="surface-card p-5">
+        <div class="ed-kicker mb-2">TODAY · CAPTURED</div>
+        <div class="font-display font-semibold text-2xl mt-1">8 <span class="text-base muted font-normal">events</span></div>
+        <div class="text-xs muted mt-0.5">Avg confirm · 14s · 0 edits</div>
+      </div>
+    </div>
+    <div class="surface-card">
+      <div class="panel-header">
+        <div class="ed-kicker mb-1">RECENT EVENTS</div>
+        <h2 class="font-display font-semibold text-lg">Last 4 captured</h2>
+      </div>
+      <div class="panel-body pt-1">
+        <div class="row"><span class="row-ico" style="background:#10B981;color:#FFF;font-family:'JetBrains Mono';font-size:0.625rem;font-weight:700">LOCK</span><div class="row-text"><strong>Personal care · Edward</strong><div class="row-meta">07:42 · 22 min · Assisted · Routine</div></div><span class="row-arrow">→</span></div>
+        <div class="row"><span class="row-ico" style="background:#FFFBEB;color:#876300;border:1px dashed #FFD400;font-family:'JetBrains Mono';font-size:0.625rem;font-weight:700">DRAFT</span><div class="row-text"><strong>Welfare check · Edward</strong><div class="row-meta">14:32 · awaiting your confirm · 0.96 confidence</div></div><span class="row-arrow">→</span></div>
+        <div class="row"><span class="row-ico" style="background:#10B981;color:#FFF;font-family:'JetBrains Mono';font-size:0.625rem;font-weight:700">LOCK</span><div class="row-text"><strong>Continence · Catherine</strong><div class="row-meta">08:14 · 8 min · Pad change · Routine</div></div><span class="row-arrow">→</span></div>
+        <div class="row"><span class="row-ico" style="background:#10B981;color:#FFF;font-family:'JetBrains Mono';font-size:0.625rem;font-weight:700">LOCK</span><div class="row-text"><strong>Tea round · all residents</strong><div class="row-meta">15:30 · 18 min · refreshments served</div></div><span class="row-arrow">→</span></div>
+      </div>
+      <div class="panel-foot">
+        <span class="text-xs muted">All audit-logged · auto-tagged to SAF</span>
+        <a href="${sessionLink('kooper-recording-demo.html', id)}" class="btn-yellow text-xs">+ New report</a>
+      </div>
+    </div>
+  `;
+}
+
+function renderClinicalTab(s, id) {
+  return `
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
+      <a href="${sessionLink('kooper-clinical.html', id)}" class="cta-tile lg:col-span-2">
+        <div class="flex items-center gap-3" style="flex:1;min-width:0">
+          <span class="cta-ico">🩺</span>
+          <div style="min-width:0">
+            <div class="cta-title">Open kooper · clinical</div>
+            <div class="cta-sub">Major Active Problems · NEWS2 · MHA · DoLS · pathology · ECT.</div>
+          </div>
+        </div>
+        <span class="cta-arrow">→</span>
+      </a>
+      <div class="surface-card p-5">
+        <div class="ed-kicker mb-2">NEWS2 WATCH</div>
+        <div class="font-display font-semibold text-2xl mt-1">2 <span class="text-base muted font-normal">residents</span></div>
+        <div class="text-xs muted mt-0.5">Mr H · 5 (escalated) · Mr Banda · 2</div>
+      </div>
+    </div>
+    <div class="surface-card">
+      <div class="panel-header">
+        <div class="ed-kicker mb-1">CLINICAL WATCH LIST</div>
+        <h2 class="font-display font-semibold text-lg">3 residents on watch</h2>
+      </div>
+      <div class="panel-body pt-1">
+        <div class="row"><span class="row-ico" style="background:#FEE2E2;color:#B42318;font-family:'JetBrains Mono';font-size:0.625rem;font-weight:700">5</span><div class="row-text"><strong>Mr H · Room 7</strong><div class="row-meta">NEWS2 5 · GP review pending · hourly checks until end of shift</div></div><span class="row-arrow">→</span></div>
+        <div class="row"><span class="row-ico" style="background:#FFFBEB;color:#876300;font-family:'JetBrains Mono';font-size:0.625rem;font-weight:700">W2</span><div class="row-text"><strong>Mrs Cross · Sacrum</strong><div class="row-meta">Stage 2 wound · last dressed 13:30 · next due 19:30</div></div><span class="row-arrow">→</span></div>
+        <div class="row"><span class="row-ico" style="background:#FEF3C7;color:#876300;font-family:'JetBrains Mono';font-size:0.625rem;font-weight:700">B</span><div class="row-text"><strong>Mr R · Room 4</strong><div class="row-meta">Sundowning pattern 16:00–19:00 · music + tea intervention</div></div><span class="row-arrow">→</span></div>
+      </div>
+      <div class="panel-foot">
+        <span class="text-xs muted">SystmOne-pattern workspace · NMC-grade audit</span>
+        <a href="${sessionLink('kooper-clinical.html', id)}" class="btn-yellow text-xs">Open clinical →</a>
+      </div>
+    </div>
+  `;
+}
+
+function renderMarTab(s, id) {
+  return `
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
+      <a href="${sessionLink('kooper-recording-demo.html', id)}" class="cta-tile lg:col-span-2">
+        <div class="flex items-center gap-3" style="flex:1;min-width:0">
+          <span class="cta-ico">💊</span>
+          <div style="min-width:0">
+            <div class="cta-title">Start the med round</div>
+            <div class="cta-sub">17:00 round · 12 residents · 3 PRN flagged · controlled drugs witness sign-off.</div>
+          </div>
+        </div>
+        <span class="cta-arrow">→</span>
+      </a>
+      <div class="surface-card p-5">
+        <div class="ed-kicker mb-2">ADHERENCE · 30D</div>
+        <div class="font-display font-semibold text-2xl mt-1">99.2%</div>
+        <div class="text-xs muted mt-0.5">3 PRN · 1 refusal · all logged</div>
+      </div>
+    </div>
+    <div class="surface-card">
+      <div class="panel-header">
+        <div class="ed-kicker mb-1">17:00 ROUND PREVIEW</div>
+        <h2 class="font-display font-semibold text-lg">12 residents · 3 PRN</h2>
+      </div>
+      <div class="panel-body pt-1">
+        <div class="row"><span class="row-ico" style="background:#FFD400;color:#0A0A0A;font-family:'Space Grotesk';font-weight:700;font-size:0.6875rem">EB</span><div class="row-text"><strong>Edward Banda</strong><div class="row-meta">Bisoprolol 5mg · Atorvastatin 20mg</div></div><span class="row-arrow">→</span></div>
+        <div class="row"><span class="row-ico" style="background:#FFFBEB;color:#876300;font-family:'JetBrains Mono';font-size:0.625rem;font-weight:700">PRN</span><div class="row-text"><strong>Catherine Okafor</strong><div class="row-meta">Levothyroxine 50mcg · PRN paracetamol flagged</div></div><span class="row-arrow">→</span></div>
+        <div class="row"><span class="row-ico" style="background:#FFD400;color:#0A0A0A;font-family:'Space Grotesk';font-weight:700;font-size:0.6875rem">YA</span><div class="row-text"><strong>Yanir Ashkenazi</strong><div class="row-meta">Olanzapine 10mg · Sodium Valproate 500mg</div></div><span class="row-arrow">→</span></div>
+      </div>
+      <div class="panel-foot">
+        <span class="text-xs muted">eMAR-ready · controlled drugs witness chain</span>
+        <a href="${sessionLink('kooper-recording-demo.html', id)}" class="btn-yellow text-xs">Start round →</a>
+      </div>
+    </div>
+  `;
+}
+
+function renderActivitiesTab(s, id) {
+  return `
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
+      <a href="${sessionLink('kooper-care-dashboards.html?as=activities', id)}" class="cta-tile lg:col-span-2">
+        <div class="flex items-center gap-3" style="flex:1;min-width:0">
+          <span class="cta-ico">🎵</span>
+          <div style="min-width:0">
+            <div class="cta-title">Open activities workspace</div>
+            <div class="cta-sub">Today's plan · engagement leaderboard · ABC chart · session log.</div>
+          </div>
+        </div>
+        <span class="cta-arrow">→</span>
+      </a>
+      <div class="surface-card p-5">
+        <div class="ed-kicker mb-2">TODAY</div>
+        <div class="font-display font-semibold text-2xl mt-1">3 <span class="text-base muted font-normal">sessions</span></div>
+        <div class="text-xs muted mt-0.5">Engagement +18% vs last week</div>
+      </div>
+    </div>
+    <div class="surface-card">
+      <div class="panel-header">
+        <div class="ed-kicker mb-1">TODAY'S PLAN</div>
+        <h2 class="font-display font-semibold text-lg">Music · Garden · Birthday tea</h2>
+      </div>
+      <div class="panel-body pt-1">
+        <div class="row"><span class="row-ico" style="background:#FFD400;color:#0A0A0A;font-family:'JetBrains Mono';font-size:0.625rem;font-weight:700">NOW</span><div class="row-text"><strong>15:00 · Music & Memory</strong><div class="row-meta">Lounge · 8 residents joined · jazz playlist queued</div></div><span class="row-arrow">→</span></div>
+        <div class="row"><span class="row-ico" style="background:#86EFAC;color:#064E3B;font-family:'JetBrains Mono';font-size:0.625rem;font-weight:700">NEXT</span><div class="row-text"><strong>16:00 · Garden walk</strong><div class="row-meta">5 residents signed up · weather permitting</div></div><span class="row-arrow">→</span></div>
+        <div class="row"><span class="row-ico" style="background:#FCE7F3;color:#9D174D;font-family:'JetBrains Mono';font-size:0.625rem;font-weight:700">CAKE</span><div class="row-text"><strong>17:30 · Mr R birthday tea</strong><div class="row-meta">Family invited · 3 RSVP yes</div></div><span class="row-arrow">→</span></div>
+      </div>
+      <div class="panel-foot">
+        <span class="text-xs muted">Engagement events flow into the family digest automatically</span>
+        <a href="${sessionLink('kooper-care-dashboards.html?as=activities', id)}" class="btn-yellow text-xs">Start session →</a>
+      </div>
+    </div>
+  `;
+}
+
+function renderNutritionTab(s, id) {
+  return `
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
+      <a href="${sessionLink('kooper-care-dashboards.html?as=cook', id)}" class="cta-tile lg:col-span-2">
+        <div class="flex items-center gap-3" style="flex:1;min-width:0">
+          <span class="cta-ico">🍽</span>
+          <div style="min-width:0">
+            <div class="cta-title">Open the kitchen workspace</div>
+            <div class="cta-sub">Tonight's menu · special diets · allergens · MUAC tracking · pureed counts.</div>
+          </div>
+        </div>
+        <span class="cta-arrow">→</span>
+      </a>
+      <div class="surface-card p-5">
+        <div class="ed-kicker mb-2">DINNER · 17:30</div>
+        <div class="font-display font-semibold text-2xl mt-1">28 <span class="text-base muted font-normal">portions</span></div>
+        <div class="text-xs muted mt-0.5">3 special diets active</div>
+      </div>
+    </div>
+    <div class="surface-card">
+      <div class="panel-header">
+        <div class="ed-kicker mb-1">SPECIAL DIETS · TONIGHT</div>
+        <h2 class="font-display font-semibold text-lg">3 plates need attention</h2>
+      </div>
+      <div class="panel-body pt-1">
+        <div class="row"><span class="row-ico" style="background:#FEE2E2;color:#B42318;font-family:'JetBrains Mono';font-size:0.625rem;font-weight:700">ALG</span><div class="row-text"><strong>Edward · Penicillin (med-only)</strong><div class="row-meta">No food restrictions · standard plate</div></div><span class="row-arrow">→</span></div>
+        <div class="row"><span class="row-ico" style="background:#FFFBEB;color:#876300;font-family:'JetBrains Mono';font-size:0.625rem;font-weight:700">DIA</span><div class="row-text"><strong>Mrs Cross · Diabetic + soft</strong><div class="row-meta">Sugar &lt;15g · pureed mains · tomato pasta variant</div></div><span class="row-arrow">→</span></div>
+        <div class="row"><span class="row-ico" style="background:#FFFBEB;color:#876300;font-family:'JetBrains Mono';font-size:0.625rem;font-weight:700">MUAC</span><div class="row-text"><strong>Mr H · &lt;22cm flagged</strong><div class="row-meta">High-protein · frequent small meals · butter on toast</div></div><span class="row-arrow">→</span></div>
+      </div>
+      <div class="panel-foot">
+        <span class="text-xs muted">Stock alerts · skimmed milk critical · auto-reorder Friday</span>
+        <a href="${sessionLink('kooper-care-dashboards.html?as=cook', id)}" class="btn-yellow text-xs">Open kitchen →</a>
+      </div>
+    </div>
+  `;
+}
+
+function renderStockTab(s, id) {
+  return `
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
+      <a href="${sessionLink('kooper-care-dashboards.html?as=cook', id)}" class="cta-tile lg:col-span-2">
+        <div class="flex items-center gap-3" style="flex:1;min-width:0">
+          <span class="cta-ico">📦</span>
+          <div style="min-width:0">
+            <div class="cta-title">Open stock & supply</div>
+            <div class="cta-sub">Inventory · auto-reorder thresholds · usage signals · supplier sign-off.</div>
+          </div>
+        </div>
+        <span class="cta-arrow">→</span>
+      </a>
+      <div class="surface-card p-5">
+        <div class="ed-kicker mb-2">ALERTS · NOW</div>
+        <div class="font-display font-semibold text-2xl mt-1">2 <span class="text-base muted font-normal">critical</span></div>
+        <div class="text-xs muted mt-0.5">+ 1 low · all auto-reorder</div>
+      </div>
+    </div>
+    <div class="surface-card">
+      <div class="panel-header">
+        <div class="ed-kicker mb-1">STOCK ALERTS</div>
+        <h2 class="font-display font-semibold text-lg">3 items need restock</h2>
+      </div>
+      <div class="panel-body pt-1">
+        <div class="row"><span class="row-ico" style="background:#FEE2E2;color:#B42318;font-family:'JetBrains Mono';font-size:0.625rem;font-weight:700">!</span><div class="row-text"><strong>Skimmed milk</strong><div class="row-meta">2L left · usage 4L/day · auto-reorder Fri</div></div><span class="row-arrow">→</span></div>
+        <div class="row"><span class="row-ico" style="background:#FFFBEB;color:#876300;font-family:'JetBrains Mono';font-size:0.625rem;font-weight:700">↓</span><div class="row-text"><strong>Tinned tomatoes</strong><div class="row-meta">3 left · auto-reorder Fri · 8/week usage</div></div><span class="row-arrow">→</span></div>
+        <div class="row"><span class="row-ico" style="background:#DCFCE7;color:#047857;font-family:'JetBrains Mono';font-size:0.625rem;font-weight:700">OK</span><div class="row-text"><strong>Ensure protein</strong><div class="row-meta">12 cans · 3 day supply · holding</div></div><span class="row-arrow">→</span></div>
+      </div>
+      <div class="panel-foot">
+        <span class="text-xs muted">£840 forecast cost on Fri auto-order</span>
+        <a href="${sessionLink('kooper-care-dashboards.html?as=cook', id)}" class="btn-yellow text-xs">Open stock →</a>
+      </div>
+    </div>
+  `;
+}
+
+function renderEstateTab(s, id) {
+  return `
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
+      <a href="${sessionLink('kooper-care-dashboards.html?as=maintenance', id)}" class="cta-tile lg:col-span-2">
+        <div class="flex items-center gap-3" style="flex:1;min-width:0">
+          <span class="cta-ico">🔧</span>
+          <div style="min-width:0">
+            <div class="cta-title">Open estate workspace</div>
+            <div class="cta-sub">Tickets · compliance dates · contractor scheduling · group-wide.</div>
+          </div>
+        </div>
+        <span class="cta-arrow">→</span>
+      </a>
+      <div class="surface-card p-5">
+        <div class="ed-kicker mb-2">OPEN TICKETS</div>
+        <div class="font-display font-semibold text-2xl mt-1">7</div>
+        <div class="text-xs muted mt-0.5">1 urgent · 3 today · 3 this week</div>
+      </div>
+    </div>
+    <div class="surface-card">
+      <div class="panel-header">
+        <div class="ed-kicker mb-1">PRIORITY TICKETS</div>
+      </div>
+      <div class="panel-body pt-1">
+        <div class="row"><span class="row-ico" style="background:#FEE2E2;color:#B42318;font-family:'JetBrains Mono';font-size:0.625rem;font-weight:700">URG</span><div class="row-text"><strong>Lift fault · Marylebone</strong><div class="row-meta">Reported 14:20 · contractor en route</div></div><span class="row-arrow">→</span></div>
+        <div class="row"><span class="row-ico" style="background:#FFFBEB;color:#876300;font-family:'JetBrains Mono';font-size:0.625rem;font-weight:700">DAY</span><div class="row-text"><strong>Bedroom 7 heater · Draycott</strong><div class="row-meta">Reported 09:15 by Craig</div></div><span class="row-arrow">→</span></div>
+        <div class="row"><span class="row-ico" style="background:#F5F5F5;color:#6B7280;font-family:'JetBrains Mono';font-size:0.625rem;font-weight:700">WK</span><div class="row-text"><strong>Garden gate hinge · Camberwell</strong><div class="row-meta">Reported Mon</div></div><span class="row-arrow">→</span></div>
+      </div>
+      <div class="panel-foot">
+        <span class="text-xs muted">Compliance · Fire alarm test in 4d · PAT 23 Jul</span>
+        <a href="${sessionLink('kooper-care-dashboards.html?as=maintenance', id)}" class="btn-yellow text-xs">Open tickets →</a>
+      </div>
+    </div>
+  `;
+}
+
+function renderReportsTab(s, id) {
+  return `
+    <a href="${sessionLink('kooper-reports.html', id)}" class="cta-tile mb-4">
+      <div class="flex items-center gap-3" style="flex:1;min-width:0">
+        <span class="cta-ico">📊</span>
+        <div style="min-width:0">
+          <div class="cta-title">Open kooper · reports</div>
+          <div class="cta-sub">CQC pack · ops · clinical · family · board · 22 reports ready · audit-hashed exports.</div>
+        </div>
+      </div>
+      <span class="cta-arrow">→</span>
+    </a>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div class="surface-card p-4 text-center"><div class="ov-label">SAF readiness</div><div class="font-display font-semibold text-2xl text-status-ok mt-1">99%</div></div>
+      <div class="surface-card p-4 text-center"><div class="ov-label">Falls · 30d</div><div class="font-display font-semibold text-2xl mt-1">3</div></div>
+      <div class="surface-card p-4 text-center"><div class="ov-label">Med adherence</div><div class="font-display font-semibold text-2xl text-status-ok mt-1">99.2%</div></div>
+      <div class="surface-card p-4 text-center"><div class="ov-label">Reviews due</div><div class="font-display font-semibold text-2xl text-status-warning mt-1">5</div></div>
+    </div>
+  `;
+}
+
+function renderTrainingTab(s, id) {
+  return `
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
+      <a href="${sessionLink('kooper-hr.html#training', id)}" class="cta-tile lg:col-span-2">
+        <div class="flex items-center gap-3" style="flex:1;min-width:0">
+          <span class="cta-ico">🎓</span>
+          <div style="min-width:0">
+            <div class="cta-title">Open training & CPD</div>
+            <div class="cta-sub">Mandatory currency · CPD record · expiring items · book a session.</div>
+          </div>
+        </div>
+        <span class="cta-arrow">→</span>
+      </a>
+      <div class="surface-card p-5">
+        <div class="ed-kicker mb-2">CURRENT</div>
+        <div class="font-display font-semibold text-2xl mt-1 text-status-ok">${s.training}</div>
+        <div class="text-xs muted mt-0.5">${s.trainingSub}</div>
+      </div>
+    </div>
+    <div class="surface-card">
+      <div class="panel-header">
+        <div class="ed-kicker mb-1">YOUR MANDATORY</div>
+      </div>
+      <div class="panel-body pt-1">
+        <div class="row"><span class="row-ico" style="background:#DCFCE7;color:#047857;font-size:1rem">✓</span><div class="row-text"><strong>Manual handling</strong><div class="row-meta">Last completed 14 Mar 2026 · valid 12 months</div></div><span class="row-arrow">→</span></div>
+        <div class="row"><span class="row-ico" style="background:#DCFCE7;color:#047857;font-size:1rem">✓</span><div class="row-text"><strong>Safeguarding adults</strong><div class="row-meta">Last completed 22 Feb 2026 · valid 12 months</div></div><span class="row-arrow">→</span></div>
+        <div class="row"><span class="row-ico" style="background:#DCFCE7;color:#047857;font-size:1rem">✓</span><div class="row-text"><strong>Fire safety</strong><div class="row-meta">Last completed 18 Apr 2026 · valid 12 months</div></div><span class="row-arrow">→</span></div>
+        <div class="row"><span class="row-ico" style="background:#DCFCE7;color:#047857;font-size:1rem">✓</span><div class="row-text"><strong>Infection control</strong><div class="row-meta">Last completed 9 Jan 2026 · valid 12 months</div></div><span class="row-arrow">→</span></div>
+      </div>
+      <div class="panel-foot">
+        <span class="text-xs muted">CQC currency rolled into the audit pack automatically</span>
+        <a href="${sessionLink('kooper-hr.html#training', id)}" class="btn-yellow text-xs">Open training →</a>
+      </div>
+    </div>
+  `;
+}
+
+function renderPayslipTab(s, id) {
+  return `
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
+      <a href="${sessionLink('kooper-hr.html#payslip', id)}" class="cta-tile lg:col-span-2">
+        <div class="flex items-center gap-3" style="flex:1;min-width:0">
+          <span class="cta-ico">💷</span>
+          <div style="min-width:0">
+            <div class="cta-title">Open payslips & timesheets</div>
+            <div class="cta-sub">Earnings · self-sign-off timesheets · tax summary · last 12 payslips.</div>
+          </div>
+        </div>
+        <span class="cta-arrow">→</span>
+      </a>
+      <div class="surface-card p-5">
+        <div class="ed-kicker mb-2">THIS PERIOD</div>
+        <div class="font-display font-semibold text-2xl mt-1">${s.earnings}</div>
+        <div class="text-xs muted mt-0.5">paid Fri 30 May</div>
+      </div>
+    </div>
+    <div class="surface-card">
+      <div class="panel-header">
+        <div class="ed-kicker mb-1">RECENT PAYSLIPS</div>
+      </div>
+      <div class="panel-body pt-1">
+        <div class="row"><span class="row-ico" style="background:#FFD400;color:#0A0A0A;font-family:'JetBrains Mono';font-size:0.625rem;font-weight:700">£</span><div class="row-text"><strong>Period 27 Apr → 24 May</strong><div class="row-meta">${s.earnings} · paid Fri 30 May · timesheet awaiting your sign-off</div></div><span class="row-arrow">→</span></div>
+        <div class="row"><span class="row-ico" style="background:#F5F5F5;color:#6B7280;font-family:'JetBrains Mono';font-size:0.625rem;font-weight:700">£</span><div class="row-text"><strong>Period 30 Mar → 26 Apr</strong><div class="row-meta">£1,498 · paid Fri 1 May · ✓ signed</div></div><span class="row-arrow">→</span></div>
+        <div class="row"><span class="row-ico" style="background:#F5F5F5;color:#6B7280;font-family:'JetBrains Mono';font-size:0.625rem;font-weight:700">£</span><div class="row-text"><strong>Period 2 Mar → 29 Mar</strong><div class="row-meta">£1,460 · paid Fri 3 Apr · ✓ signed</div></div><span class="row-arrow">→</span></div>
+      </div>
+      <div class="panel-foot">
+        <span class="text-xs muted">Auto-timesheet from rota · sign once, kooper sends to payroll</span>
+        <a href="${sessionLink('kooper-hr.html#payslip', id)}" class="btn-yellow text-xs">Sign timesheet →</a>
+      </div>
+    </div>
+  `;
+}
+
+function renderRequestsTab(s, id) {
+  return `
+    <a href="${sessionLink('kooper-rota.html', id)}" class="cta-tile mb-4">
+      <div class="flex items-center gap-3" style="flex:1;min-width:0">
+        <span class="cta-ico">📨</span>
+        <div style="min-width:0">
+          <div class="cta-title">Open requests · time-off · swaps</div>
+          <div class="cta-sub">Submit, track, and pick up cover offers in one place.</div>
+        </div>
+      </div>
+      <span class="cta-arrow">→</span>
+    </a>
+    <div class="surface-card">
+      <div class="panel-header">
+        <div class="ed-kicker mb-1">YOUR REQUESTS</div>
+      </div>
+      <div class="panel-body pt-1">
+        <div class="row"><span class="row-ico" style="background:#EDE9FE;color:#5B21B6;font-family:'JetBrains Mono';font-size:0.625rem;font-weight:700">SWAP</span><div class="row-text"><strong>Sat day ↔ Sun day with Rebecca</strong><div class="row-meta">submitted 14:18 · Rebecca accepted · awaiting Lola</div></div><span class="chip chip-warn text-[0.6875rem]">Pending</span></div>
+        <div class="row"><span class="row-ico" style="background:#FFFBEB;color:#876300;font-family:'JetBrains Mono';font-size:0.625rem;font-weight:700">OFF</span><div class="row-text"><strong>Time off 12–14 Jun</strong><div class="row-meta">submitted last week · cover assigned · auto-added to calendar</div></div><span class="chip chip-ok text-[0.6875rem]">Approved</span></div>
+        <div class="row"><span class="row-ico" style="background:#DCFCE7;color:#047857;font-family:'JetBrains Mono';font-size:0.625rem;font-weight:700">COV</span><div class="row-text"><strong>Wed evening cover · 8h</strong><div class="row-meta">posted 9 May · 3 takers · close at 16:00 today</div></div><a href="${sessionLink('kooper-rota.html', id)}" class="btn-yellow text-xs py-1.5">Pick up</a></div>
+      </div>
+    </div>
+  `;
+}
+
+function renderAiTab(s, id) {
+  return `
+    <a href="${sessionLink('kooper-ai.html', id)}" class="cta-tile mb-4">
+      <div class="flex items-center gap-3" style="flex:1;min-width:0">
+        <span class="cta-ico">⚡</span>
+        <div style="min-width:0">
+          <div class="cta-title">Open kooper · ai</div>
+          <div class="cta-sub">Conversational search across the workspace · drafts · pattern detection · risk prediction.</div>
+        </div>
+      </div>
+      <span class="cta-arrow">→</span>
+    </a>
+    <div class="surface-card">
+      <div class="panel-header">
+        <div class="ed-kicker mb-1">SUGGESTED QUERIES</div>
+        <h2 class="font-display font-semibold text-lg">Ask anything · Cmd+K from anywhere</h2>
+      </div>
+      <div class="panel-body pt-2 grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <a href="${sessionLink('kooper-ai.html', id)}" class="btn-secondary justify-start" style="font-size:0.75rem">⌘ Who's at risk tonight</a>
+        <a href="${sessionLink('kooper-ai.html', id)}" class="btn-secondary justify-start" style="font-size:0.75rem">⌘ Draft a family digest for Edward</a>
+        <a href="${sessionLink('kooper-ai.html', id)}" class="btn-secondary justify-start" style="font-size:0.75rem">⌘ Why is Mr R agitated</a>
+        <a href="${sessionLink('kooper-ai.html', id)}" class="btn-secondary justify-start" style="font-size:0.75rem">⌘ Falls in last 30 days</a>
+      </div>
+    </div>
+  `;
+}
+
+const TAB_RENDERERS = {
+  today: renderTodayTab,
+  rota: renderRotaTab,
+  recording: renderRecordingTab,
+  clinical: renderClinicalTab,
+  mar: renderMarTab,
+  activities: renderActivitiesTab,
+  nutrition: renderNutritionTab,
+  stock: renderStockTab,
+  estate: renderEstateTab,
+  reports: renderReportsTab,
+  training: renderTrainingTab,
+  payslip: renderPayslipTab,
+  requests: renderRequestsTab,
+  ai: renderAiTab
 };
 
 // ============================================================
-// APP LIBRARY — every app a staff member could possibly see.
-// Only the ones in their .apps array render.
+// PER-ROLE quick actions + attention items + rota week pattern
 // ============================================================
-const APPS = {
-  rota:       { label:'kooper · rota',       icon:'📅', desc:'Your week, swaps, time-off, payslip-friendly clock-in.', href:'kooper-rota.html',          accent:'yellow', featured:true },
-  recording:  { label:'kooper · reporting',  icon:'🎙', desc:'3-tap event capture · AI narrative · print-ready report.', href:'kooper-recording-demo.html', accent:'yellow' },
-  clinical:   { label:'kooper · clinical',   icon:'🩺', desc:'Major Active Problems · NEWS2 · MHA · DoLS · pathology.',  href:'kooper-clinical.html',       accent:'dark' },
-  mar:        { label:'kooper · mar',        icon:'💊', desc:'Drug rounds · PRN tracking · controlled drugs · refusals.',href:'kooper-recording-demo.html', accent:'dark' },
-  activities: { label:'kooper · activities', icon:'🎵', desc:'Sessions · engagement · ABC chart · resident leaderboard.',href:'kooper-care-dashboards.html?as=activities', accent:'blue' },
-  nutrition:  { label:'kooper · nutrition',  icon:'🍽', desc:'Menus · diets · allergens · MUAC tracking.',                href:'kooper-care-dashboards.html?as=cook', accent:'rose' },
-  stock:      { label:'kooper · stock',      icon:'📦', desc:'Inventory · auto-reorder · supply chain · usage signals.', href:'kooper-care-dashboards.html?as=cook', accent:'amber' },
-  estate:     { label:'kooper · estate',     icon:'🔧', desc:'Tickets · compliance dates · contractor scheduling.',      href:'kooper-care-dashboards.html?as=maintenance', accent:'amber' },
-  reports:    { label:'kooper · reports',    icon:'📊', desc:'CQC pack · ops · clinical · family · board.',              href:'kooper-reports.html',        accent:'dark' },
-  training:   { label:'kooper · training',   icon:'🎓', desc:'Mandatory currency · CPD · expiring items.',               href:'kooper-hr.html#training',    accent:'green' },
-  payslip:    { label:'kooper · payslip',    icon:'💷', desc:'Earnings · timesheets · self-sign-off · tax summary.',     href:'kooper-hr.html#payslip',     accent:'green' },
-  requests:   { label:'kooper · requests',   icon:'📨', desc:'Time-off · swaps · cover offers · status tracker.',         href:'kooper-rota.html',           accent:'purple' },
-  ai:         { label:'kooper · ai',         icon:'⚡', desc:'Cmd+K from anywhere · conversational search · drafts.',     href:'kooper-ai.html',             accent:'yellow' },
-  staff:      { label:'kooper · staff',      icon:'👥', desc:'Team list · roles · contracts · personalize their apps.', href:'kooper-hr.html#workers',     accent:'yellow' },
-  account:    { label:'kooper · account',    icon:'🏠', desc:'Account type · billing · upgrade path.',                   href:'kooper-hr.html#account',     accent:'dark' }
+const QA_BY_ROLE = {
+  sa: [
+    { ico:'🕒', label:'Clock in',     sub:'Start your shift',  onclick:"document.getElementById('primaryAction').click()" },
+    { ico:'💊', label:'Med round',    sub:'17:00 · 12 residents', href:'kooper-recording-demo.html' },
+    { ico:'🎙', label:'New report',   sub:'3-tap voice capture',  href:'kooper-recording-demo.html' },
+    { ico:'🔁', label:'Request swap', sub:'Trade a shift',         href:'kooper-rota.html' },
+    { ico:'🌴', label:'Time off',     sub:'Annual leave / sick',   href:'kooper-rota.html' },
+    { ico:'⚡', label:'Ask kooper · ai', sub:'Cmd+K anywhere',    href:'kooper-ai.html' }
+  ],
+  cm: [
+    { ico:'🕒', label:'Clock in',       sub:'Start your shift',     onclick:"document.getElementById('primaryAction').click()" },
+    { ico:'🎙', label:'New report',     sub:'3-tap voice capture',  href:'kooper-recording-demo.html' },
+    { ico:'🔁', label:'Request swap',   sub:'Trade a shift',         href:'kooper-rota.html' },
+    { ico:'🌴', label:'Time off',       sub:'Annual leave / sick',   href:'kooper-rota.html' },
+    { ico:'🎓', label:'My training',    sub:'Currency + CPD',        href:'kooper-hr.html#training' },
+    { ico:'⚡', label:'Ask kooper · ai',sub:'Cmd+K anywhere',        href:'kooper-ai.html' }
+  ],
+  ra: [
+    { ico:'🕒', label:'Clock in',       sub:'Shift lead controls',   onclick:"document.getElementById('primaryAction').click()" },
+    { ico:'📋', label:'Handover',       sub:'Hand off to next shift',href:'kooper-rota.html' },
+    { ico:'🎙', label:'New report',     sub:'3-tap voice capture',   href:'kooper-recording-demo.html' },
+    { ico:'🔁', label:'Request swap',   sub:'Trade a shift',         href:'kooper-rota.html' },
+    { ico:'🌴', label:'Time off',       sub:'Annual leave / sick',   href:'kooper-rota.html' },
+    { ico:'⚡', label:'Ask kooper · ai',sub:'Cmd+K anywhere',         href:'kooper-ai.html' }
+  ],
+  dk: [
+    { ico:'🎵', label:'Start session', sub:'Activity · log live',    href:'kooper-care-dashboards.html?as=activities' },
+    { ico:'🎙', label:'Log activity',  sub:'Engagement · ABC',       href:'kooper-recording-demo.html' },
+    { ico:'🔁', label:'Request swap',  sub:'Trade a shift',           href:'kooper-rota.html' },
+    { ico:'🌴', label:'Time off',      sub:'Annual leave / sick',     href:'kooper-rota.html' },
+    { ico:'🎓', label:'My training',   sub:'Currency + CPD',          href:'kooper-hr.html#training' },
+    { ico:'⚡', label:'Ask kooper · ai',sub:'Cmd+K anywhere',         href:'kooper-ai.html' }
+  ],
+  mc: [
+    { ico:'🍽', label:'Tonight\'s menu', sub:'28 portions · 3 special', href:'kooper-care-dashboards.html?as=cook' },
+    { ico:'📦', label:'Stock alerts',    sub:'2 critical · 1 low',     href:'kooper-care-dashboards.html?as=cook' },
+    { ico:'🔁', label:'Request swap',    sub:'Trade a shift',           href:'kooper-rota.html' },
+    { ico:'🌴', label:'Time off',        sub:'Annual leave / sick',     href:'kooper-rota.html' },
+    { ico:'🎓', label:'My training',     sub:'Food safety · IPC',       href:'kooper-hr.html#training' },
+    { ico:'⚡', label:'Ask kooper · ai', sub:'Cmd+K anywhere',          href:'kooper-ai.html' }
+  ],
+  tb: [
+    { ico:'🔧', label:'Open tickets',  sub:'7 open · 1 urgent',    href:'kooper-care-dashboards.html?as=maintenance' },
+    { ico:'📅', label:'Book my time',  sub:'Self-schedule on rota', href:'kooper-rota.html' },
+    { ico:'💷', label:'Submit invoice',sub:'Contractor billing',    href:'kooper-hr.html#payslip' },
+    { ico:'🎓', label:'My training',   sub:'PAT · electrical',     href:'kooper-hr.html#training' },
+    { ico:'⚡', label:'Ask kooper · ai',sub:'Cmd+K anywhere',       href:'kooper-ai.html' }
+  ],
+  jm: [
+    { ico:'📅', label:'Cover offers', sub:'3 open · pick to claim', href:'kooper-rota.html' },
+    { ico:'🎙', label:'New report',   sub:'3-tap voice capture',     href:'kooper-recording-demo.html' },
+    { ico:'🎓', label:'My training',  sub:'DBS expiring 28d',         href:'kooper-hr.html#training' },
+    { ico:'🌴', label:'Time off',     sub:'Annual leave / sick',      href:'kooper-rota.html' },
+    { ico:'⚡', label:'Ask kooper · ai',sub:'Cmd+K anywhere',         href:'kooper-ai.html' }
+  ],
+  bp: [
+    { ico:'🌳', label:'My sessions',  sub:'2 upcoming this week',  href:'kooper-care-dashboards.html?as=activities' },
+    { ico:'🎙', label:'Log activity', sub:'Engagement · ABC',       href:'kooper-recording-demo.html' },
+    { ico:'🎓', label:'My training',  sub:'Safeguarding refresher', href:'kooper-hr.html#training' },
+    { ico:'🌴', label:'Time off',     sub:'Let manager know',        href:'kooper-rota.html' }
+  ]
 };
 
-const ACCENT_BG = {
-  yellow: 'background:#FFD400;color:#0A0A0A',
-  dark:   'background:#0A0A0A;color:#FFD400',
-  green:  'background:#DCFCE7;color:#047857',
-  purple: 'background:#EDE9FE;color:#5B21B6',
-  blue:   'background:#DBEAFE;color:#1E40AF',
-  rose:   'background:#FCE7F3;color:#9D174D',
-  amber:  'background:#FEF3C7;color:#876300'
+const ATTENTION_BY_ROLE = {
+  sa: [
+    { ico:'💊', tone:'due',  title:'17:00 med round', sub:'12 residents · 3 PRN flagged' },
+    { ico:'🩹', tone:'due',  title:'Mrs Cross dressing', sub:'Sacrum Stage 2 · due 19:30' },
+    { ico:'⚠',  tone:'crit', title:'Mr H NEWS2 watch',  sub:'Hourly checks until end of shift' }
+  ],
+  cm: [
+    { ico:'🎙', tone:'due',  title:'3 voice drafts ready', sub:'Confirm to lock · 14s avg' },
+    { ico:'📅', tone:'new',  title:'Cover offer · Wed eve', sub:'8h shift available' },
+    { ico:'🎓', tone:'new',  title:'Manual handling refresher', sub:'Self-paced · 12 min' }
+  ],
+  ra: [
+    { ico:'📋', tone:'due',  title:'Handover from Sister Anne', sub:'14:00 · Mr H hourly' },
+    { ico:'🎙', tone:'due',  title:'2 carer voice drafts',     sub:'Awaiting your confirm' },
+    { ico:'⚠',  tone:'crit', title:'Mr R sundowning',          sub:'Watch 16:30 · music + tea' }
+  ],
+  dk: [
+    { ico:'🎵', tone:'due',  title:'Music & Memory at 15:00', sub:'8 residents joined' },
+    { ico:'🌳', tone:'new',  title:'Garden walk at 16:00',     sub:'5 residents signed up' },
+    { ico:'🎂', tone:'due',  title:'Mr R birthday tea 17:30',  sub:'Family invited · 3 RSVP yes' }
+  ],
+  mc: [
+    { ico:'🍽', tone:'due',  title:'3 special diets to confirm', sub:'Mrs C diabetic · Mr H high-protein · Yan vegetarian' },
+    { ico:'📦', tone:'crit', title:'Skimmed milk critical',     sub:'Auto-reorder triggers Friday' },
+    { ico:'🥬', tone:'new',  title:'Tinned tomatoes low',       sub:'3 left · auto-reorder Fri' }
+  ],
+  tb: [
+    { ico:'🔧', tone:'crit', title:'Lift fault · Marylebone',     sub:'14:20 · contractor en route' },
+    { ico:'🌡', tone:'due',  title:'Bedroom 7 heater · Draycott', sub:'Reported 09:15 by Craig' },
+    { ico:'🚪', tone:'new',  title:'Garden gate hinge · Camberwell', sub:'Reported Mon · this week' }
+  ],
+  jm: [
+    { ico:'📅', tone:'new',  title:'Wed evening cover · 8h', sub:'Draycott · accept by 16:00' },
+    { ico:'🌙', tone:'new',  title:'Fri night cover · 9h',   sub:'Draycott · agency bonus' },
+    { ico:'⚠',  tone:'crit', title:'DBS renewal in 28 days', sub:'Upload new certificate' }
+  ],
+  bp: [
+    { ico:'🌳', tone:'due',  title:'Sat garden walk · 10:30',    sub:'5 residents joining' },
+    { ico:'📖', tone:'new',  title:'Sun reading hour · 14:00',    sub:'4 residents signed up' }
+  ]
 };
 
-// ============================================================
-// QUICK ACTIONS — short labels for the top-of-fold strip
-// ============================================================
-const QA_LIBRARY = {
-  clock:     { ico:'🕒', label:'Clock in',          sub:'Start your shift',           run:()=>kooperToast('Clocked in · welcome') },
-  recording: { ico:'🎙', label:'New report',        sub:'3-tap voice capture',         href:'kooper-recording-demo.html' },
-  mar:       { ico:'💊', label:'Med round',         sub:'17:00 · 12 residents',        href:'kooper-recording-demo.html' },
-  handover:  { ico:'📋', label:'Handover',          sub:'Hand off to next shift',      href:'kooper-rota.html' },
-  swap:      { ico:'🔁', label:'Request swap',      sub:'Trade a shift',               href:'kooper-rota.html' },
-  timeoff:   { ico:'🌴', label:'Request time off',  sub:'Annual leave / sick',         href:'kooper-rota.html' },
-  training:  { ico:'🎓', label:'My training',       sub:'Currency + CPD',              href:'kooper-hr.html#training' },
-  session:   { ico:'🎵', label:'Start session',     sub:'Activity · log live',         href:'kooper-care-dashboards.html?as=activities' },
-  menu:      { ico:'🍽', label:'Tonight\'s menu',   sub:'28 portions · 3 special',     href:'kooper-care-dashboards.html?as=cook' },
-  stock:     { ico:'📦', label:'Stock alerts',      sub:'2 critical · 1 low',          href:'kooper-care-dashboards.html?as=cook' },
-  tickets:   { ico:'🔧', label:'Open tickets',      sub:'7 open · 1 urgent',           href:'kooper-care-dashboards.html?as=maintenance' },
-  book:      { ico:'📅', label:'Book my time',      sub:'Self-schedule on rota',       href:'kooper-rota.html' },
-  invoice:   { ico:'💷', label:'Submit invoice',    sub:'Contractor billing',          href:'kooper-hr.html#payslip' },
-  cover:     { ico:'📅', label:'Cover offers',      sub:'3 open · pick to claim',      href:'kooper-rota.html' },
-  sessions:  { ico:'🌳', label:'My sessions',       sub:'2 upcoming',                  href:'kooper-care-dashboards.html?as=activities' }
+const ROTA_BY_ROLE = {
+  sa: [
+    { day:'Mon', num:'4', shift:'Day · 12–22' },
+    { day:'Tue', num:'5', shift:'Day · 12–22' },
+    { day:'Wed', num:'6', shift:'Day · 12–22', today:true },
+    { day:'Thu', num:'7', shift:'Day · 12–22' },
+    { day:'Fri', num:'8', shift:'' },
+    { day:'Sat', num:'9', shift:'' },
+    { day:'Sun', num:'10', shift:'' }
+  ],
+  cm: [
+    { day:'Mon', num:'4', shift:'' },
+    { day:'Tue', num:'5', shift:'' },
+    { day:'Wed', num:'6', shift:'Day · 14–22', today:true },
+    { day:'Thu', num:'7', shift:'Day · 14–22' },
+    { day:'Fri', num:'8', shift:'Day · 14–22' },
+    { day:'Sat', num:'9', shift:'Day · 07–15' },
+    { day:'Sun', num:'10', shift:'' }
+  ],
+  ra: [
+    { day:'Mon', num:'4', shift:'Day · 14–22' },
+    { day:'Tue', num:'5', shift:'' },
+    { day:'Wed', num:'6', shift:'Day · 14–22', today:true },
+    { day:'Thu', num:'7', shift:'Day · 14–22' },
+    { day:'Fri', num:'8', shift:'Day · 14–22' },
+    { day:'Sat', num:'9', shift:'Day · 07–15' },
+    { day:'Sun', num:'10', shift:'' }
+  ],
+  dk: [
+    { day:'Mon', num:'4', shift:'09–17' },
+    { day:'Tue', num:'5', shift:'09–17' },
+    { day:'Wed', num:'6', shift:'09–17', today:true },
+    { day:'Thu', num:'7', shift:'09–17' },
+    { day:'Fri', num:'8', shift:'09–17' },
+    { day:'Sat', num:'9', shift:'' },
+    { day:'Sun', num:'10', shift:'' }
+  ],
+  mc: [
+    { day:'Mon', num:'4', shift:'06–14' },
+    { day:'Tue', num:'5', shift:'06–14' },
+    { day:'Wed', num:'6', shift:'06–14', today:true },
+    { day:'Thu', num:'7', shift:'06–14' },
+    { day:'Fri', num:'8', shift:'' },
+    { day:'Sat', num:'9', shift:'' },
+    { day:'Sun', num:'10', shift:'06–14' }
+  ],
+  tb: [
+    { day:'Mon', num:'4', shift:'On call' },
+    { day:'Tue', num:'5', shift:'On call' },
+    { day:'Wed', num:'6', shift:'On call', today:true },
+    { day:'Thu', num:'7', shift:'On call' },
+    { day:'Fri', num:'8', shift:'On call' },
+    { day:'Sat', num:'9', shift:'On call' },
+    { day:'Sun', num:'10', shift:'On call' }
+  ],
+  jm: [
+    { day:'Mon', num:'4', shift:'' },
+    { day:'Tue', num:'5', shift:'' },
+    { day:'Wed', num:'6', shift:'', today:true },
+    { day:'Thu', num:'7', shift:'12h cover' },
+    { day:'Fri', num:'8', shift:'' },
+    { day:'Sat', num:'9', shift:'' },
+    { day:'Sun', num:'10', shift:'' }
+  ],
+  bp: [
+    { day:'Mon', num:'4', shift:'' },
+    { day:'Tue', num:'5', shift:'' },
+    { day:'Wed', num:'6', shift:'', today:true },
+    { day:'Thu', num:'7', shift:'' },
+    { day:'Fri', num:'8', shift:'' },
+    { day:'Sat', num:'9', shift:'10:30 walk' },
+    { day:'Sun', num:'10', shift:'14:00 reading' }
+  ]
 };
 
 // ============================================================
@@ -426,11 +1012,12 @@ const QA_LIBRARY = {
 function readStaffId() {
   const params = new URLSearchParams(window.location.search);
   const k = params.get('as');
-  return STAFF[k] ? k : 'sa'; // default to Sister Anne
+  return STAFF[k] ? k : 'sa';
 }
 
-function loadCustomApps(id) {
-  // If a manager has tuned this staff member's apps in HR, those win.
+function loadCustomTabs(id) {
+  // Manager-tuned app set from HR (localStorage). When present, restrict
+  // which tabs render to the customized list (plus 'today' always).
   try {
     const raw = localStorage.getItem('kooper:staff:apps:' + id);
     if (raw) {
@@ -441,103 +1028,89 @@ function loadCustomApps(id) {
   return null;
 }
 
+function activeTabFromHash(validTabs) {
+  const h = (window.location.hash || '').replace('#','').trim();
+  return validTabs.indexOf(h) >= 0 ? h : 'today';
+}
+
+function setActiveTab(tabId, push) {
+  document.querySelectorAll('.tab-pill').forEach(p => p.classList.toggle('active', p.dataset.tab === tabId));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('is-active', p.dataset.tab === tabId));
+  if (push !== false) {
+    try { history.replaceState(null, '', '#' + tabId); } catch (e) {}
+  }
+  // Focus tab pill into view
+  const pill = document.querySelector('.tab-pill[data-tab="' + tabId + '"]');
+  if (pill) pill.scrollIntoView({ behavior:'smooth', inline:'center', block:'nearest' });
+}
+
 function render() {
   const id = readStaffId();
   const s = STAFF[id]; if (!s) return;
-  document.title = 'Your kooper · ' + s.first + ' · ' + s.role.split(' · ')[0];
+  document.title = s.first + ' · kooper · ' + s.role.split(' · ')[0];
 
-  // Nav + footer role labels
-  const roleSlug = s.role.split(' · ')[0].toLowerCase();
-  document.getElementById('navRoleLabel').textContent = roleSlug;
-  document.getElementById('footRoleLabel').textContent = roleSlug;
-  // Live status
+  // Avatar + greeting
+  const av = document.getElementById('staffAvatar');
+  av.style.background = s.avatarBg; av.style.color = s.avatarFg; av.textContent = s.init;
+  const hr = new Date().getHours();
+  const tod = hr < 12 ? 'Good morning' : (hr < 18 ? 'Good afternoon' : 'Good evening');
+  document.getElementById('greeting').textContent = tod + ', ' + s.first + '.';
+  document.getElementById('staffSubline').textContent = s.role + ' · ' + s.site + ' · ' + s.contract;
+  document.getElementById('navRoleLabel').textContent = s.role.split(' · ')[0].toLowerCase().replace(' ','-');
+
+  // On-shift indicator
   const live = document.getElementById('liveStatus');
   if (live) live.style.display = s.onShift ? '' : 'none';
 
-  // Header greeting
-  const av = document.getElementById('staffAvatar');
-  av.style.background = s.avatarBg; av.style.color = s.avatarFg; av.textContent = s.init;
-  document.getElementById('greeting').textContent = s.greet;
-  document.getElementById('staffSubline').textContent = s.role + ' · ' + s.site + ' · ' + s.weekHours;
-  document.getElementById('staffLede').textContent = ledeFor(roleSlug);
-  document.getElementById('kickerLabel').textContent = 'YOUR KOOPER · ' + roleSlug.toUpperCase();
+  // Overview cards
+  document.getElementById('ovHours').textContent = s.weekHours;
+  document.getElementById('ovEarnings').textContent = s.earnings;
+  document.getElementById('ovTraining').innerHTML = s.training === 'N/A' ? 'N/A' : s.training.split('/')[0] + '<span class="muted text-base font-normal">/' + (s.training.split('/')[1] || '15') + '</span>';
+  document.getElementById('ovTrainingSub').textContent = s.trainingSub;
+  document.getElementById('ovShift').textContent = s.nextShift.when;
+  document.getElementById('ovShiftSub').textContent = s.nextShift.meta;
 
-  // Next shift card
-  document.getElementById('nextShiftTime').textContent = s.nextShift;
-  document.getElementById('nextShiftMeta').textContent = s.nextShiftMeta;
-  document.getElementById('nsHours').textContent = s.weekHours.replace(' scheduled','');
-  document.getElementById('nsEarnings').textContent = s.earnings.split(' ')[0];
-  document.getElementById('nsTraining').textContent = (s.training.split(' · ')[0] || s.training);
-
-  // Primary action button
+  // Primary action button (top right of nav)
   const pa = document.getElementById('primaryAction');
   if (pa && s.primaryAction) {
     pa.textContent = s.primaryAction.label;
     pa.onclick = () => kooperToast(s.primaryAction.toast);
   }
 
-  // App launcher — manager-tuned list wins, otherwise role default
-  const liveApps = loadCustomApps(id) || s.apps;
-  document.getElementById('appsCount').textContent = liveApps.length;
-  document.getElementById('appsRoleLabel').textContent = roleSlug;
-  const launcher = document.getElementById('appLauncher');
-  launcher.innerHTML = liveApps.map((k, i) => {
-    const a = APPS[k]; if (!a) return '';
-    const isFeatured = i === 0; // first app is the showcase tile (always rota for staff)
-    const accent = ACCENT_BG[a.accent] || ACCENT_BG.yellow;
-    return `
-      <a href="${a.href}" class="app-tile ${isFeatured ? 'featured' : ''}">
-        <span class="app-arrow">→</span>
-        <div class="app-icon" style="${isFeatured ? 'background:#FFD400;color:#0A0A0A' : accent}">${a.icon}</div>
-        <div class="app-name">${a.label}</div>
-        <div class="app-desc">${a.desc}</div>
-      </a>
-    `;
+  // Determine tabs — manager-tuned wins, fallback to role default
+  let tabs = ['today'];
+  const customApps = loadCustomTabs(id);
+  if (customApps) {
+    customApps.forEach(k => { if (TAB_DEFS[k] && tabs.indexOf(k) < 0) tabs.push(k); });
+  } else {
+    s.tabs.forEach(k => { if (TAB_DEFS[k] && tabs.indexOf(k) < 0) tabs.push(k); });
+  }
+
+  // Render tab strip
+  const strip = document.getElementById('tabsStrip');
+  strip.innerHTML = tabs.map(k => {
+    const def = TAB_DEFS[k];
+    return `<button class="tab-pill" data-tab="${k}" onclick="setActiveTab('${k}')"><span class="tp-ico">${def.ico}</span><span>${def.label}</span></button>`;
   }).join('');
 
-  // Quick actions
-  const qa = document.getElementById('quickActions');
-  qa.innerHTML = s.quickActions.map(k => {
-    const q = QA_LIBRARY[k]; if (!q) return '';
-    if (q.href) {
-      return `<a href="${q.href}" class="qa-btn"><span class="qa-ico">${q.ico}</span><span><span class="qa-label">${q.label}</span><br><span class="qa-sub">${q.sub}</span></span></a>`;
-    }
-    return `<button class="qa-btn" onclick="(${q.run})()"><span class="qa-ico">${q.ico}</span><span><span class="qa-label">${q.label}</span><br><span class="qa-sub">${q.sub}</span></span></button>`;
+  // Render tab panels (only those in this staff's tab set)
+  const content = document.getElementById('tabContent');
+  content.innerHTML = tabs.map(k => {
+    const renderer = TAB_RENDERERS[k]; if (!renderer) return '';
+    return `<div class="tab-panel" data-tab="${k}">${renderer(s, id)}</div>`;
   }).join('');
 
-  // Attention strip
-  const att = document.getElementById('attentionList');
-  const toneBg = { attention:'background:rgba(229,72,77,0.08);border-color:rgba(229,72,77,0.2)', due:'background:#FFFBEB;border-color:rgba(255,212,0,0.5)', new:'background:rgba(16,185,129,0.06);border-color:rgba(16,185,129,0.25)' };
-  const toneTone = { attention:'#B42318', due:'#876300', new:'#047857' };
-  att.innerHTML = s.attention.map(a => `
-    <div class="rounded-2xl p-4 border" style="${toneBg[a.tone]||toneBg.due}">
-      <div class="flex items-start gap-3">
-        <div style="width:34px;height:34px;border-radius:8px;background:rgba(255,255,255,0.7);display:flex;align-items:center;justify-content:center;font-size:1.125rem;flex-shrink:0">${a.ico}</div>
-        <div style="min-width:0;flex:1">
-          <div class="font-medium text-sm" style="color:${toneTone[a.tone]||'#876300'}">${a.title}</div>
-          <div class="text-xs text-kapture-smoke mt-0.5 leading-relaxed">${a.sub}</div>
-        </div>
-      </div>
-    </div>
-  `).join('');
+  // Activate the tab from URL hash, or 'today' default
+  setActiveTab(activeTabFromHash(tabs), false);
 }
 
-function ledeFor(role) {
-  const ledes = {
-    nurse:    'The clinical workspace, the med round, the recording flow — your apps know what nurses do at 14:00.',
-    carer:    'Three taps. Note done. Onto the next resident. Everything you need is one tap away.',
-    'senior carer':'Lead the shift, confirm voice drafts, run the handover. Your team\'s tools, ranked by what\'s next.',
-    activities:   'Sessions, engagement, the residents who lit up last time. Your day, planned in pictures.',
-    cook:         'Tonight\'s service, the special diets, the stock that\'s low. The kitchen on a screen.',
-    maintenance:  'Tickets, compliance dates, the contractors who can fix what you can\'t. Group-wide visibility.',
-    'agency carer': 'Pick up cover offers, log your shifts, get paid. Agency essentials in one launcher.',
-    volunteer:    'Your sessions, the residents you\'re visiting, the training that keeps you valid.',
-    nurse:        'The clinical workspace, the med round, the recording flow — your apps know what nurses do at 14:00.'
-  };
-  return ledes[role] || 'Your apps are right here. Tap one to start, tap another when you\'re done.';
-}
+window.addEventListener('hashchange', () => {
+  const id = readStaffId();
+  const s = STAFF[id]; if (!s) return;
+  const tabs = ['today'].concat(loadCustomTabs(id) || s.tabs);
+  setActiveTab(activeTabFromHash(tabs), false);
+});
 
-// Init
 document.addEventListener('DOMContentLoaded', render);
 </script>
 
@@ -551,26 +1124,20 @@ document.addEventListener('DOMContentLoaded', render);
     {
       "target": "#staffAvatar",
       "placement": "bottom",
-      "title": "Personalized to you",
-      "body": "Every staff member lands here after sign-in. Your apps, your shift, your earnings, your training. Nothing extra to hunt for."
+      "title": "Your dashboard, your apps",
+      "body": "Every staff member lands here after sign-in. Identity, hours, earnings, training — and the apps you actually use, as tabs."
     },
     {
-      "target": ".live-card",
-      "placement": "left",
-      "title": "Your next shift, always visible",
-      "body": "Time, location, hours, earnings, training currency. Tap the primary action top-right when you're ready to start."
-    },
-    {
-      "target": "#quickActions",
+      "target": "#tabsStrip",
       "placement": "bottom",
-      "title": "Quick actions — top of fold",
-      "body": "5 buttons tuned to your role · clock in, new report, swap, time off, training. Different per persona — what a carer sees a nurse won't."
+      "title": "Tabs are your apps",
+      "body": "Tap a tab to preview that app's most-relevant data. Hit the big yellow CTA inside to enter the full app — your session rides through."
     },
     {
-      "target": "#appLauncher",
+      "target": "#tabContent",
       "placement": "top",
-      "title": "Your app launcher",
-      "body": "Only the apps you actually use. Manager can tune this — add or remove tiles for any staff member. The first tile is always the most-used app for your role."
+      "title": "Each tab · one screen of value",
+      "body": "Quick stats, the rows that matter today, and a primary action. No deep menus — open the app when you need the full surface."
     },
     {
       "target": "#kooperHintsBtn",
@@ -580,9 +1147,9 @@ document.addEventListener('DOMContentLoaded', render);
     }
   ],
   "hints": [
-    { "target": "#staffAvatar", "label": "Your identity · role-tuned launcher" },
-    { "target": "#quickActions", "label": "Quick actions · 5 buttons for your role" },
-    { "target": "#appLauncher", "label": "App launcher · only what you need" }
+    { "target": "#staffAvatar", "label": "Personalized to you · greeting · role · contract" },
+    { "target": "#tabsStrip", "label": "Tabs · your apps · tuned to your role" },
+    { "target": "#tabContent", "label": "Tab content · preview + Open app CTA" }
   ]
 }
 </script>
