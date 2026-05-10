@@ -135,7 +135,7 @@
       <!-- Operator-side demo accounts -->
       <div class="text-[0.6875rem] uppercase tracking-[0.12em] text-kapture-smoke font-mono mt-5 mb-2">Operator side</div>
       <div class="space-y-2">
-        <a href="kooper-hr.html" class="demo-card">
+        <a href="kooper-hr.html?as=lo" class="demo-card">
           <div class="avatar" style="background:#0A0A0A;color:#FFD400">RO</div>
           <div class="flex-1">
             <div class="font-semibold text-sm">Rae Okonkwo · Registered Manager</div>
@@ -267,7 +267,15 @@ document.addEventListener('DOMContentLoaded', function () {
     arrow.textContent = '→';
     card.appendChild(arrow);
     // Toast on click so the user gets immediate confirmation before nav
+    // AND clear any stale session so the new ?as= in the link wins on every device.
     card.addEventListener('click', function () {
+      try {
+        // Clear the back-pill session keys — kooper-session.js will re-seed from the URL
+        localStorage.removeItem('kooper:session:as');
+        // Reset care-plans + reporting per-user context too so the new persona starts fresh
+        localStorage.removeItem('kooper:carePlans:currentUser');
+        localStorage.removeItem('kooper:reporting:resident');
+      } catch (e) {}
       var nameEl = card.querySelector('.font-semibold');
       if (nameEl) kooperToast('Signing in as ' + nameEl.textContent.trim());
     });
