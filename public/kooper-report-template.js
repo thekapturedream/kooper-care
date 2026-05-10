@@ -134,12 +134,50 @@
       type: 'review',
       patientId: meta.patientId || null,
       section: 'Report shared · ' + meta.title,
-      by: meta.sender,
+      by: (meta.sender && meta.sender.name) ? meta.sender.name : 'kooper · ai',
       at: meta.sentAt,
       seen: false,
       reportId: meta.id
     });
     save('kooper:carePlans:notif', notif.slice(0, 60));
+
+    // Auto-create a chat thread tied to this shared report so the
+    // team has a place to discuss / acknowledge / question it.
+    spawnReportThread(meta);
+  }
+
+  function spawnReportThread(meta) {
+    try {
+      var threads = load('kooper:chat:threads', []);
+      var threadId = 'thr_rep_' + (meta.id || uid('rep'));
+      var existing = threads.find(function(t){ return t.kind === 'report' && t.reportId === meta.id; });
+      if (existing) return;
+      var thread = {
+        id: threadId,
+        kind: 'report',
+        subject: meta.title,
+        residentId: meta.patientId || null,
+        reportId: meta.id,
+        members: ['*'],
+        createdAt: meta.sentAt,
+        updatedAt: meta.sentAt,
+        lastBy: 'kooper · ai',
+        lastMsg: 'Report shared with all staff. Ack queue open.'
+      };
+      threads.unshift(thread);
+      save('kooper:chat:threads', threads);
+
+      // Seed the thread with a system + AI opener
+      var msgs = [
+        { id: uid('m'), by: 'system', kind:'system',
+          body: 'Report ' + (meta.id || '') + ' published by ' + ((meta.sender && meta.sender.name) || 'kooper · ai') + '.',
+          at: meta.sentAt },
+        { id: uid('m'), by: 'ai', kind:'ai',
+          body: 'Report shared with all staff. Acknowledge below or open the report from the toolbar.',
+          at: meta.sentAt }
+      ];
+      try { localStorage.setItem('kooper:chat:msgs:' + threadId, JSON.stringify(msgs)); } catch(e){}
+    } catch(e) { /* chat thread spawning is non-critical */ }
   }
 
   // ============================================================
@@ -225,10 +263,27 @@ footerHTML() +
 '        reportId: REPORT.id\n' +
 '      });\n' +
 '      localStorage.setItem(nkey, JSON.stringify(notif.slice(0,60)));\n' +
+'      // Auto-create chat thread for this report so the team can\n' +
+'      // discuss / acknowledge / ask clarifying questions.\n' +
+'      try {\n' +
+'        var ckey = "kooper:chat:threads";\n' +
+'        var ct = JSON.parse(localStorage.getItem(ckey) || "[]");\n' +
+'        var threadId = "thr_rep_" + REPORT.id;\n' +
+'        if (!ct.find(function(x){return x.id===threadId;})) {\n' +
+'          ct.unshift({ id:threadId, kind:"report", subject:REPORT.title, residentId:REPORT.patientId, reportId:REPORT.id, members:["*"], createdAt:REPORT.sentAt, updatedAt:REPORT.sentAt, lastBy:"kooper · ai", lastMsg:"Report shared with all staff. Ack queue open." });\n' +
+'          localStorage.setItem(ckey, JSON.stringify(ct));\n' +
+'          var mkey = "kooper:chat:msgs:" + threadId;\n' +
+'          var seed = [\n' +
+'            { id:"m_"+Date.now().toString(36), by:"system", kind:"system", body:"Report " + REPORT.id + " published by " + (REPORT.sender && REPORT.sender.name || "kooper · ai") + ".", at:REPORT.sentAt },\n' +
+'            { id:"m_"+(Date.now()+1).toString(36), by:"ai", kind:"ai", body:"Report shared with all staff. Acknowledge below or open the report from the toolbar.", at:REPORT.sentAt }\n' +
+'          ];\n' +
+'          localStorage.setItem(mkey, JSON.stringify(seed));\n' +
+'        }\n' +
+'      } catch(_){}\n' +
 '      var btn = document.getElementById("repSendBtn");\n' +
 '      if (btn) { btn.textContent = "✓ Sent to all staff"; btn.disabled = true; btn.classList.add("sent"); }\n' +
 '      var t = document.getElementById("repToast");\n' +
-'      if (t) { t.textContent = "Report shared with all staff · they will see it on their dashboard"; t.classList.add("on"); setTimeout(function(){ t.classList.remove("on"); }, 3000); }\n' +
+'      if (t) { t.textContent = "Report shared with all staff · they will see it on their dashboard and chat"; t.classList.add("on"); setTimeout(function(){ t.classList.remove("on"); }, 3000); }\n' +
 '    } catch(e){ alert("Could not share — storage error: " + e.message); }\n' +
 '  };\n' +
 '})();<' + '/script>\n' +
@@ -366,11 +421,13 @@ footerHTML() +
   ].join('\n');
 
   function toolbarHTML(sendable, docId, opts) {
+    var threadHref = 'kooper-chat.html?thread=thr_rep_' + encodeURIComponent(docId);
     return '<div class="rep-toolbar">' +
       '<div class="left"><strong>Doc</strong> ' + esc(docId) + ' · scope ' + esc(opts.scope || 'report') + ' · sender ' + esc((opts.sender || getSender()).name) + '</div>' +
       '<div class="right">' +
         '<button class="rep-btn primary" onclick="window.__rep_print()">Print / Save as PDF</button>' +
         (sendable ? '<button id="repSendBtn" class="rep-btn send" onclick="window.__rep_send()">Send to all staff</button>' : '') +
+        '<a class="rep-btn" href="' + threadHref + '" target="_blank" rel="noopener" title="Open the chat thread for this report">Discuss in chat</a>' +
         '<button class="rep-btn" onclick="window.__rep_close()">Close</button>' +
       '</div>' +
     '</div>';

@@ -173,6 +173,7 @@
         <span class="chip chip-outline-light text-[0.6875rem]">Plan v4 · current</span>
         <button onclick="exportClinicalPDF()" class="btn-yellow text-xs py-1.5" title="Open editorial PDF in a new tab">Export PDF</button>
         <button onclick="shareClinicalToStaff()" class="btn-secondary text-xs py-1.5" style="background:transparent;color:#fff;border-color:rgba(255,255,255,0.3)" title="Send this clinical summary to every staff member">Send to all staff</button>
+        <a id="clinicalChatBtn" href="kooper-chat.html" class="btn-secondary text-xs py-1.5" style="background:transparent;color:#fff;border-color:rgba(255,255,255,0.3);text-decoration:none" title="Open the team chat thread for this resident">Discuss with team</a>
         <button onclick="kooperToast('Switch resident — opens picker')" class="btn-yellow text-xs py-1.5" style="background:transparent;color:#FFD400;border-color:rgba(255,212,0,0.5)">Switch resident</button>
       </div>
     </div>
@@ -588,6 +589,15 @@ function getClinicalResidentId() {
     return p.get('resident') || 'eb';
   } catch(e) { return 'eb'; }
 }
+// Wire the chat thread button to the active resident
+(function () {
+  function wire() {
+    var btn = document.getElementById('clinicalChatBtn');
+    if (btn) btn.setAttribute('href', 'kooper-chat.html?resident=' + getClinicalResidentId());
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', wire);
+  else wire();
+})();
 window.exportClinicalPDF = function () {
   if (!window.KooperReport || !window.KooperReport.openClinical) {
     kooperToast('Report engine still loading · try again in a moment'); return;

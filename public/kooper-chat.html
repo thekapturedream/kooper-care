@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>kooper · chat — talk to your team</title>
+<meta name="description" content="The team chat. Three lanes — residents, direct messages, reports. Persistent across every staff dashboard. AI suggestions tuned to the conversation." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = { theme: { extend: { colors: { kapture: { black:'#0A0A0A', ink:'#111111', coal:'#1A1A1A', ash:'#2A2A2A', smoke:'#3A3A3A', mist:'#9A9A9A', fog:'#D4D4D4', paper:'#F5F5F5', white:'#FFFFFF', yellow:'#FFD400', amber:'#F5B400' }, status:{ critical:'#E5484D', warning:'#FFD400', ok:'#10B981', neutral:'#D4D4D4' } }, fontFamily:{ display:['Space Grotesk','sans-serif'], sans:['Inter','sans-serif'], mono:['JetBrains Mono','monospace'] } } } };
+</script>
+<style>
+  html, body { height: 100%; }
+  body { font-family: 'Inter', sans-serif; background: #F5F5F5; color: #0A0A0A; -webkit-font-smoothing: antialiased; margin: 0; }
+  .font-display { font-family: 'Space Grotesk', sans-serif; }
+  .font-mono { font-family: 'JetBrains Mono', monospace; }
+  .container-c { max-width: 1480px; margin-left: auto; margin-right: auto; padding-left: 1rem; padding-right: 1rem; }
+  @media (min-width: 640px) { .container-c { padding-left: 1.5rem; padding-right: 1.5rem; } }
+  @media (min-width: 1024px) { .container-c { padding-left: 2rem; padding-right: 2rem; } }
+
+  .ed-kicker { font-family: 'JetBrains Mono', monospace; font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #876300; display: inline-flex; align-items: center; gap: 0.5rem; }
+  .ed-kicker::before { content: ''; width: 24px; height: 2px; background: #FFD400; display: inline-block; }
+
+  .surface { background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 14px; }
+
+  .nav-link { padding: 0.5rem 0.75rem; font-size: 0.875rem; font-weight: 500; color: #FFFFFF; opacity: 0.75; border-radius: 8px; transition: all 0.15s ease; text-decoration: none; }
+  .nav-link:hover { opacity: 1; background: #1A1A1A; }
+  .nav-link-active { opacity: 1; background: #1A1A1A; color: #FFD400; }
+
+  .btn-yellow { background:#FFD400; color:#0A0A0A; border:1px solid #FFD400; padding:0.5rem 0.875rem; border-radius:10px; font-weight:600; transition:all 0.15s ease; cursor:pointer; display:inline-flex; align-items:center; gap:0.5rem; font-size:0.8125rem; text-decoration:none; line-height:1; }
+  .btn-yellow:hover { background:#F5B400; }
+  .btn-secondary { background:transparent; color:#0A0A0A; border:1px solid #0A0A0A; padding:0.5rem 0.875rem; border-radius:10px; font-weight:500; transition:all 0.15s ease; cursor:pointer; display:inline-flex; align-items:center; gap:0.5rem; font-size:0.8125rem; line-height:1; }
+  .btn-secondary:hover { background:#0A0A0A; color:#FFFFFF; }
+  .btn-sm { padding:0.375rem 0.625rem; font-size:0.75rem; }
+
+  /* CHAT LAYOUT */
+  .chat-shell { display:grid; grid-template-columns: 22rem 1fr; gap:1rem; height: calc(100vh - 8rem); min-height: 32rem; }
+  @media (max-width: 900px) {
+    .chat-shell { grid-template-columns: 1fr; height: auto; }
+    .chat-shell.thread-open .chat-rail { display:none; }
+    .chat-shell:not(.thread-open) .chat-thread { display:none; }
+  }
+  .chat-rail { background:#fff; border:1px solid #E5E7EB; border-radius:14px; display:flex; flex-direction:column; overflow:hidden; }
+  .chat-thread { background:#fff; border:1px solid #E5E7EB; border-radius:14px; display:flex; flex-direction:column; overflow:hidden; }
+
+  /* RAIL — thread list */
+  .rail-head { padding:0.875rem 1rem; border-bottom:1px solid #ECEAE3; }
+  .rail-tabs { display:flex; gap:0.25rem; padding:0 1rem 0.75rem; border-bottom:1px solid #ECEAE3; background:#fff; }
+  .rail-tab { padding:0.5rem 0.75rem; font-size:0.75rem; font-weight:500; color:#6B7280; border:none; background:transparent; cursor:pointer; border-radius:8px 8px 0 0; border-bottom:2px solid transparent; transition:all 0.15s ease; }
+  .rail-tab:hover { color:#0A0A0A; background:#FAFAF7; }
+  .rail-tab.active { color:#0A0A0A; border-bottom-color:#FFD400; font-weight:600; background:#FAFAF7; }
+  .rail-tab .count { display:inline-block; margin-left:0.375rem; font-family:JetBrains Mono, monospace; font-size:0.625rem; padding:0.0625rem 0.375rem; border-radius:999px; background:#FFD400; color:#0A0A0A; font-weight:700; }
+  .rail-list { flex:1; overflow-y:auto; padding:0.5rem; }
+  .rail-row { padding:0.75rem 0.875rem; border-radius:10px; cursor:pointer; transition:all 0.15s ease; display:flex; gap:0.625rem; align-items:flex-start; border:1px solid transparent; }
+  .rail-row:hover { background:#FAFAF7; }
+  .rail-row.active { background:#FFFBEB; border-color:#FCD34D; }
+  .rail-row .av { width:36px; height:36px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-family:Space Grotesk, sans-serif; font-weight:700; font-size:0.75rem; }
+  .rail-row .meta { flex:1; min-width:0; }
+  .rail-row .meta .top { display:flex; justify-content:space-between; align-items:center; gap:0.5rem; }
+  .rail-row .meta .name { font-weight:600; font-size:0.8125rem; color:#0A0A0A; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .rail-row .meta .when { font-family:JetBrains Mono, monospace; font-size:0.625rem; color:#9A9A9A; flex-shrink:0; }
+  .rail-row .meta .preview { font-size:0.75rem; color:#6B7280; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:0.125rem; }
+  .rail-row .unread { background:#0A0A0A; color:#FFD400; font-family:JetBrains Mono, monospace; font-size:0.625rem; font-weight:700; padding:0.0625rem 0.375rem; border-radius:999px; margin-left:0.375rem; flex-shrink:0; }
+  .rail-row.kind-resident .av { background:#FFD400; color:#0A0A0A; }
+  .rail-row.kind-dm .av       { background:#0A0A0A; color:#FFD400; }
+  .rail-row.kind-report .av   { background:#1F4E53; color:#FFD400; }
+  .scope-tag { display:inline-flex; align-items:center; padding:0.0625rem 0.4rem; border-radius:999px; font-family:JetBrains Mono, monospace; font-size:0.5625rem; font-weight:700; letter-spacing:0.06em; color:#FFD400; }
+  .scope-tag.s-resident { background:#0A0A0A; }
+  .scope-tag.s-dm       { background:#3A3A3A; }
+  .scope-tag.s-report   { background:#1F4E53; }
+
+  /* THREAD — header */
+  .thread-head { padding:1rem 1.25rem; border-bottom:1px solid #ECEAE3; display:flex; align-items:center; justify-content:space-between; gap:0.75rem; flex-wrap:wrap; }
+  .thread-head .left { display:flex; gap:0.75rem; align-items:center; min-width:0; flex:1; }
+  .thread-head .av { width:42px; height:42px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-family:Space Grotesk, sans-serif; font-weight:700; font-size:0.875rem; background:#FFD400; color:#0A0A0A; }
+  .thread-head h2 { margin:0; font-family:Space Grotesk, sans-serif; font-weight:600; font-size:1.0625rem; color:#0A0A0A; }
+  .thread-head .sub { font-size:0.75rem; color:#6B7280; margin-top:0.125rem; display:flex; gap:0.625rem; flex-wrap:wrap; align-items:center; }
+
+  /* THREAD — messages */
+  .thread-stream { flex:1; overflow-y:auto; padding:1.25rem 1.5rem; background:#FAFAF7; display:flex; flex-direction:column; gap:0.875rem; }
+  .msg { display:flex; gap:0.625rem; max-width: 78%; }
+  .msg.me { align-self:flex-end; flex-direction:row-reverse; }
+  .msg .av { width:30px; height:30px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-family:Space Grotesk, sans-serif; font-weight:700; font-size:0.6875rem; background:#0A0A0A; color:#FFD400; }
+  .msg.me .av { background:#FFD400; color:#0A0A0A; }
+  .msg .body { background:#fff; border:1px solid #ECEAE3; border-radius:14px; padding:0.625rem 0.875rem; font-size:0.875rem; line-height:1.5; color:#0A0A0A; }
+  .msg.me .body { background:#0A0A0A; color:#fff; border-color:#0A0A0A; }
+  .msg .meta { font-family:JetBrains Mono, monospace; font-size:0.625rem; color:#9A9A9A; margin-bottom:0.25rem; display:flex; gap:0.5rem; }
+  .msg.me .meta { justify-content:flex-end; }
+  .msg .meta strong { color:#0A0A0A; font-weight:600; }
+  .msg.me .meta strong { color:#0A0A0A; }
+  .msg.system { align-self:center; max-width:none; }
+  .msg.system .body { background:transparent; border:1px dashed #D4D4D4; color:#6B7280; font-family:JetBrains Mono, monospace; font-size:0.6875rem; padding:0.5rem 0.875rem; text-align:center; }
+  .msg.ai .body { background:#FFFBEB; border-color:#FCD34D; }
+  .msg.ai .av  { background:#FFD400; color:#0A0A0A; }
+
+  /* AI suggestions */
+  .ai-row { padding:0.75rem 1.25rem; border-top:1px solid #ECEAE3; background:#FAFAF7; }
+  .ai-row .label { font-family:JetBrains Mono, monospace; font-size:0.625rem; color:#876300; letter-spacing:0.08em; text-transform:uppercase; margin-bottom:0.5rem; }
+  .ai-chips { display:flex; gap:0.5rem; flex-wrap:wrap; }
+  .ai-chip { background:#fff; border:1px solid #FCD34D; color:#0A0A0A; padding:0.4rem 0.75rem; border-radius:999px; font-size:0.75rem; cursor:pointer; transition:all 0.15s ease; }
+  .ai-chip:hover { background:#FFD400; border-color:#FFD400; }
+
+  /* Composer */
+  .composer { padding:0.875rem 1rem; border-top:1px solid #ECEAE3; background:#fff; display:flex; gap:0.625rem; align-items:flex-end; }
+  .composer textarea { flex:1; resize:none; border:1px solid #E5E7EB; border-radius:12px; padding:0.625rem 0.875rem; font-family:Inter, sans-serif; font-size:0.875rem; line-height:1.5; max-height:8rem; min-height:2.5rem; outline:none; transition:border-color 0.15s ease; }
+  .composer textarea:focus { border-color:#0A0A0A; }
+  .composer .send { background:#FFD400; color:#0A0A0A; border:0; padding:0.625rem 1rem; border-radius:12px; font-weight:600; cursor:pointer; font-size:0.875rem; transition:all 0.15s ease; }
+  .composer .send:hover { background:#F5B400; }
+  .composer .send:disabled { background:#E5E7EB; color:#9A9A9A; cursor:not-allowed; }
+
+  /* Empty state */
+  .empty { display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; padding:3rem 2rem; text-align:center; color:#6B7280; }
+  .empty .ic { width:48px; height:48px; border-radius:50%; background:#FFD400; color:#0A0A0A; display:flex; align-items:center; justify-content:center; font-size:1.5rem; font-weight:700; margin-bottom:0.875rem; }
+  .empty h3 { margin:0 0 0.375rem; font-family:Space Grotesk, sans-serif; font-weight:600; color:#0A0A0A; }
+  .empty p { margin:0 0 1rem; font-size:0.875rem; max-width:32ch; }
+
+  /* New thread modal */
+  .scrim { position:fixed; inset:0; background:rgba(10,10,10,0.5); z-index:80; opacity:0; pointer-events:none; transition:opacity 0.15s ease; }
+  .scrim.on { opacity:1; pointer-events:auto; }
+  .modal { position:fixed; left:50%; top:50%; transform:translate(-50%,-50%); background:#fff; border-radius:18px; border:1px solid #E5E7EB; padding:1.5rem; z-index:90; width:min(90vw, 28rem); opacity:0; pointer-events:none; transition:opacity 0.15s ease; }
+  .modal.on { opacity:1; pointer-events:auto; }
+  .modal h3 { margin:0 0 1rem; font-family:Space Grotesk, sans-serif; font-weight:600; color:#0A0A0A; font-size:1.125rem; }
+  .modal label { display:block; font-family:JetBrains Mono, monospace; font-size:0.6875rem; letter-spacing:0.08em; text-transform:uppercase; color:#6B7280; margin:0.875rem 0 0.375rem; font-weight:600; }
+  .modal select, .modal input { width:100%; border:1px solid #E5E7EB; border-radius:10px; padding:0.5rem 0.75rem; font-size:0.875rem; font-family:Inter, sans-serif; background:#fff; outline:none; transition:border-color 0.15s ease; }
+  .modal select:focus, .modal input:focus { border-color:#0A0A0A; }
+  .modal .actions { margin-top:1.25rem; display:flex; justify-content:flex-end; gap:0.5rem; }
+
+  /* Toast */
+  .toast { position:fixed; bottom:1.5rem; left:50%; transform:translateX(-50%); background:#0A0A0A; color:#FFD400; padding:0.75rem 1.25rem; border-radius:10px; font-size:0.875rem; font-weight:500; box-shadow:0 12px 30px -8px rgba(0,0,0,0.3); z-index:100; opacity:0; transition:opacity 0.2s ease; pointer-events:none; }
+  .toast.on { opacity:1; }
+</style>
+</head>
+<body>
+
+<!-- ============================================== -->
+<!-- TOP NAV                                          -->
+<!-- ============================================== -->
+<nav class="bg-kapture-black text-white sticky top-0 z-50">
+  <div class="container-c">
+    <div class="flex items-center justify-between h-16 gap-4">
+      <a href="kooper-care-landing.html" class="flex items-center gap-3 shrink-0" title="Back to landing">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="28" height="28" fill="none" aria-label="kooper" role="img" class="text-white"><path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" d="M255.75 133.125c67.679 0 122.625 54.946 122.625 122.625S323.429 378.375 255.75 378.375 133.125 323.429 133.125 255.75s54.946-122.625 122.625-122.625m0-132.75c18.832 0 34.121 15.289 34.121 34.121s-15.289 34.121-34.121 34.121-34.121-15.289-34.121-34.121S236.918.375 255.75.375M75.173 75.173c13.316-13.316 34.938-13.316 48.254 0s13.316 34.938 0 48.254-34.938 13.316-48.254 0-13.316-34.938 0-48.254M511.125 255.75c0 18.832-15.289 34.121-34.121 34.121s-34.121-15.289-34.121-34.121 15.289-34.121 34.121-34.121 34.121 15.289 34.121 34.121M255.75 442.883c18.832 0 34.121 15.289 34.121 34.121s-15.289 34.121-34.121 34.121-34.121-15.289-34.121-34.121 15.289-34.121 34.121-34.121m132.323-54.81c13.316-13.316 34.938-13.316 48.254 0s13.316 34.938 0 48.254-34.938 13.316-48.254 0-13.316-34.938 0-48.254M68.617 255.75c0 18.832-15.289 34.121-34.121 34.121S.375 274.582.375 255.75s15.289-34.121 34.121-34.121 34.121 15.289 34.121 34.121m54.81 132.323c13.316 13.316 13.316 34.938 0 48.254s-34.938 13.316-48.254 0-13.316-34.938 0-48.254 34.938-13.316 48.254 0"/><path fill="#FFD400" fill-rule="evenodd" clip-rule="evenodd" d="M436.327 75.173c13.316 13.316 13.316 34.938 0 48.254s-34.938 13.316-48.254 0-13.316-34.938 0-48.254 34.938-13.316 48.254 0"/></svg>
+        <span class="hidden sm:flex items-center gap-2 font-display lowercase tracking-wide text-base">
+          <span class="font-semibold">kooper</span>
+          <span class="text-white/40">·</span>
+          <span class="font-medium">chat</span>
+        </span>
+      </a>
+      <div class="hidden lg:flex items-center gap-1">
+        <a href="kooper-care-landing.html" class="nav-link">Home</a>
+        <a href="kooper-care-dashboards.html" class="nav-link">Dashboard</a>
+        <a href="kooper-care-plans.html" class="nav-link">Care plans</a>
+        <a href="kooper-clinical.html" class="nav-link">Clinical</a>
+        <a href="kooper-recording-demo.html" class="nav-link">Reporting</a>
+        <a href="kooper-chat.html" class="nav-link nav-link-active">Chat</a>
+      </div>
+      <div class="flex items-center gap-2 shrink-0">
+        <button id="kooperHintsBtn" type="button" aria-label="Toggle hints" class="hidden md:inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs text-white/70 hover:text-white">
+          <span>Hints</span>
+        </button>
+        <button onclick="cwOpenNewModal()" class="btn-yellow text-xs">+ New thread</button>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ============================================== -->
+<!-- IDENTITY STRIP                                   -->
+<!-- ============================================== -->
+<div class="bg-kapture-coal text-white py-3">
+  <div class="container-c flex items-center justify-between gap-3 flex-wrap">
+    <div class="flex items-center gap-3 flex-wrap">
+      <div id="cwSelfAvatar" class="w-9 h-9 rounded-full flex items-center justify-center font-display font-bold text-xs">SA</div>
+      <div>
+        <div class="ed-kicker" style="color:#FFD400">YOUR INBOX</div>
+        <div id="cwSelfName" class="font-display text-sm font-semibold mt-0.5">Sister Anne · Nurse · Draycott</div>
+      </div>
+    </div>
+    <div class="text-xs text-white/60 font-mono">Persistent across every staff dashboard · localStorage backed · audit-logged</div>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- CHAT SHELL                                       -->
+<!-- ============================================== -->
+<main class="container-c py-5 pb-12">
+  <div id="cwShell" class="chat-shell">
+
+    <!-- LEFT — Thread rail -->
+    <aside class="chat-rail">
+      <div class="rail-head">
+        <div class="ed-kicker">CONVERSATIONS</div>
+        <div class="font-display font-semibold text-base mt-1" id="cwRailHeading">All threads</div>
+      </div>
+      <div class="rail-tabs" id="cwTabs">
+        <button class="rail-tab active" data-cw-tab="all">All <span class="count" id="cwCountAll">0</span></button>
+        <button class="rail-tab" data-cw-tab="resident">Residents <span class="count" id="cwCountRes">0</span></button>
+        <button class="rail-tab" data-cw-tab="dm">DMs <span class="count" id="cwCountDM">0</span></button>
+        <button class="rail-tab" data-cw-tab="report">Reports <span class="count" id="cwCountRep">0</span></button>
+      </div>
+      <div class="rail-list" id="cwRail"></div>
+    </aside>
+
+    <!-- RIGHT — Active thread -->
+    <section class="chat-thread" id="cwThread">
+      <div class="empty">
+        <div class="ic">·</div>
+        <h3>Pick a conversation</h3>
+        <p>Tap a resident, DM, or report thread on the left. Or start a new one — every message is audit-logged and persists across every staff dashboard.</p>
+        <button onclick="cwOpenNewModal()" class="btn-yellow text-sm">+ New thread</button>
+      </div>
+    </section>
+  </div>
+</main>
+
+<!-- ============================================== -->
+<!-- NEW THREAD MODAL                                 -->
+<!-- ============================================== -->
+<div id="cwScrim" class="scrim" onclick="cwCloseNewModal()"></div>
+<div id="cwModal" class="modal">
+  <h3>New conversation</h3>
+
+  <label>Type</label>
+  <select id="cwModalType" onchange="cwModalRender()">
+    <option value="resident">Resident-tagged thread</option>
+    <option value="dm">Direct message</option>
+  </select>
+
+  <div id="cwModalResidentRow">
+    <label>Resident</label>
+    <select id="cwModalResident"></select>
+  </div>
+
+  <div id="cwModalDMRow" style="display:none">
+    <label>To</label>
+    <select id="cwModalDM"></select>
+  </div>
+
+  <label>First message</label>
+  <input id="cwModalMsg" type="text" placeholder="Type your message…" />
+
+  <div class="actions">
+    <button onclick="cwCloseNewModal()" class="btn-secondary btn-sm">Cancel</button>
+    <button onclick="cwCreateThread()" class="btn-yellow btn-sm">Start thread</button>
+  </div>
+</div>
+
+<div id="cwToast" class="toast"></div>
+
+<!-- ============================================== -->
+<!-- ENGINE                                           -->
+<!-- ============================================== -->
+<script>
+(function () {
+  'use strict';
+
+  // ---------- Roster (matches kooper-session.js) ----------
+  var STAFF = {
+    sa: { id:'sa', name:'Sister Anne Whitfield', first:'Sister Anne', role:'Nurse',         init:'SA', avatarBg:'#1A1A1A', avatarFg:'#FFD400' },
+    cm: { id:'cm', name:'Craig Musara',          first:'Craig',       role:'Carer',         init:'CM', avatarBg:'#FCD34D', avatarFg:'#0A0A0A' },
+    ra: { id:'ra', name:'Rebecca Adesina',       first:'Rebecca',     role:'Senior Carer',  init:'RA', avatarBg:'#0A0A0A', avatarFg:'#FFD400' },
+    dk: { id:'dk', name:'Daniel Kowalski',       first:'Daniel',      role:'Activities',    init:'DK', avatarBg:'#A5B4FC', avatarFg:'#0A0A0A' },
+    mc: { id:'mc', name:'Mary Chen',             first:'Mary',        role:'Cook',          init:'MC', avatarBg:'#FDA4AF', avatarFg:'#0A0A0A' },
+    tb: { id:'tb', name:'Tomas Bauer',           first:'Tomas',       role:'Maintenance',   init:'TB', avatarBg:'#FCD34D', avatarFg:'#0A0A0A' },
+    jm: { id:'jm', name:'Joy Munemo',            first:'Joy',         role:'Carer · Agency',init:'JM', avatarBg:'#FFE39A', avatarFg:'#0A0A0A' },
+    bp: { id:'bp', name:'Ben Pearce',            first:'Ben',         role:'Volunteer',     init:'BP', avatarBg:'#86EFAC', avatarFg:'#064E3B' },
+    lo: { id:'lo', name:'Rae Okonkwo',           first:'Rae',         role:'Manager',       init:'RO', avatarBg:'#0A0A0A', avatarFg:'#FFD400' }
+  };
+
+  // ---------- Patient roster ----------
+  var DEFAULT_PATIENTS = [
+    { id:'eb', name:'Mr Edward Banda',     pref:'Eddie',  age:78, room:'12', condition:'Mixed anxiety & depression' },
+    { id:'cc', name:'Mrs Catherine Cross', pref:'Cathy',  age:84, room:'07', condition:'End-of-life care' },
+    { id:'mh', name:'Mr Hubert Robinson',  pref:'Mr H',   age:81, room:'15', condition:'Frailty + nutrition' },
+    { id:'mr', name:'Mr Reginald Asare',   pref:'Mr R',   age:73, room:'04', condition:'Post-stroke rehab' },
+    { id:'jl', name:'Mrs Joyce Lambert',   pref:'Joyce',  age:88, room:'19', condition:'Late-stage dementia' },
+    { id:'sn', name:'Ms Sophia Nakamura',  pref:'Sophia', age:69, room:'21', condition:'MS · respite' },
+    { id:'pc', name:'Mr Paul Cosgrove',    pref:'Paul',   age:76, room:'09', condition:'New admission' },
+    { id:'av', name:'Mrs Anika Verma',     pref:'Anika',  age:91, room:'02', condition:'Frailty + arrhythmia' }
+  ];
+
+  // ---------- Session (read ?as= from URL or localStorage) ----------
+  function readAsId() {
+    try {
+      var p = new URLSearchParams(window.location.search);
+      var fromUrl = p.get('as');
+      if (fromUrl && STAFF[fromUrl]) {
+        try { localStorage.setItem('kooper:session:as', fromUrl); } catch(e){}
+        return fromUrl;
+      }
+      var fromStorage = localStorage.getItem('kooper:session:as');
+      if (fromStorage && STAFF[fromStorage]) return fromStorage;
+    } catch(e){}
+    return 'sa';
+  }
+  var SELF_ID = readAsId();
+  var SELF = STAFF[SELF_ID];
+
+  // ---------- Storage helpers ----------
+  function load(k, fb) { try { var raw = localStorage.getItem(k); return raw ? JSON.parse(raw) : fb; } catch(e) { return fb; } }
+  function save(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch(e){} }
+  function nowISO() { return new Date().toISOString(); }
+  function uid(p) { return (p||'x') + '_' + Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+
+  function loadPatients() { return load('kooper:carePlans:patients', DEFAULT_PATIENTS); }
+  function patientById(id) { return loadPatients().find(function(x){return x.id===id;}) || null; }
+
+  // ---------- Seed conversations ----------
+  function seedThreads() {
+    var existing = load('kooper:chat:threads', null);
+    if (existing && existing.length) return existing;
+    var t = [];
+    function thread(id, kind, subject, members, opts) {
+      opts = opts || {};
+      t.push(Object.assign({
+        id: id, kind: kind, subject: subject, members: members,
+        residentId: opts.residentId || null,
+        reportId:   opts.reportId   || null,
+        createdAt:  opts.createdAt  || nowISO(),
+        updatedAt:  opts.updatedAt  || nowISO(),
+        lastBy:     opts.lastBy     || null,
+        lastMsg:    opts.lastMsg    || ''
+      }, opts));
+    }
+    var dayAgo = new Date(Date.now() - 86400000).toISOString();
+    var hAgo   = function(h){ return new Date(Date.now() - h*3600000).toISOString(); };
+    var mAgo   = function(m){ return new Date(Date.now() - m*60000).toISOString(); };
+
+    thread('thr_res_eb', 'resident', 'Mr Edward Banda · Eddie',  ['*'], { residentId:'eb', updatedAt:mAgo(24),  lastBy:'Rae Okonkwo',     lastMsg:'Music therapy slot extended to 18:00 — please cover.' });
+    thread('thr_res_cc', 'resident', 'Mrs Catherine Cross',      ['*'], { residentId:'cc', updatedAt:hAgo(3),   lastBy:'Sister Anne',     lastMsg:'Family arriving 14:00. ReSPECT printed and on the bedside table.' });
+    thread('thr_res_mh', 'resident', 'Mr Hubert Robinson · Mr H',['*'], { residentId:'mh', updatedAt:hAgo(7),   lastBy:'Rebecca Adesina', lastMsg:'MUAC 21cm again. Booked Mary for protein-rich brunch tomorrow.' });
+    thread('thr_res_mr', 'resident', 'Mr Reginald Asare · Mr R', ['*'], { residentId:'mr', updatedAt:hAgo(28),  lastBy:'Daniel Kowalski', lastMsg:'Mr R settled after sundowning · 4-day pattern continues.' });
+
+    thread('thr_dm_sa_lo','dm', 'Sister Anne ↔ Rae',     ['sa','lo'], { updatedAt:mAgo(8),   lastBy:'Rae Okonkwo',  lastMsg:'Approved the wound dressing change in the rota.' });
+    thread('thr_dm_cm_ra','dm', 'Craig ↔ Rebecca',       ['cm','ra'], { updatedAt:hAgo(12),  lastBy:'Craig Musara', lastMsg:'Can you cover 16:00? Mr R\'s afternoon needs eyes.' });
+
+    thread('thr_rep_eb_plan','report', "Eddie's care plan · v3", ['*'], { residentId:'eb', reportId:'KR-CPL-EB', updatedAt:mAgo(45), lastBy:'kooper · ai', lastMsg:'Report shared with all staff. Ack queue open.' });
+
+    save('kooper:chat:threads', t);
+    return t;
+  }
+
+  function seedMessagesIfEmpty() {
+    if (load('kooper:chat:msgs:thr_res_eb', null)) return;
+
+    function pack(threadId, msgs) { save('kooper:chat:msgs:'+threadId, msgs); }
+
+    var hAgo = function(h){ return new Date(Date.now() - h*3600000).toISOString(); };
+    var mAgo = function(m){ return new Date(Date.now() - m*60000).toISOString(); };
+
+    pack('thr_res_eb', [
+      { id:uid('m'), by:'cm',  body:'Eddie was bright this morning. Asked after Sister Anne. Hand-over-hand wash, no skin redness.', at:hAgo(8) },
+      { id:uid('m'), by:'sa',  body:'Lovely. The Sinatra playlist is doing real work. Let\'s keep it on at lunchtime too.', at:hAgo(7.5) },
+      { id:uid('m'), by:'dk',  body:'Music & Memory at 11. He sang along to Fly Me to the Moon. Calm and connected.', at:hAgo(5) },
+      { id:uid('m'), by:'lo',  body:'Music therapy slot extended to 18:00 — please cover.', at:mAgo(24) }
+    ]);
+
+    pack('thr_res_cc', [
+      { id:uid('m'), by:'sa',  body:'ReSPECT updated — CPR ceiling agreed with the family on Friday. Document on the bedside table for tonight\'s shift.', at:hAgo(6) },
+      { id:uid('m'), by:'ra',  body:'Mrs Cross asked for Patsy Cline this morning. Played Crazy. Settled.', at:hAgo(4) },
+      { id:uid('m'), by:'sa',  body:'Family arriving 14:00. ReSPECT printed and on the bedside table.', at:hAgo(3) }
+    ]);
+
+    pack('thr_res_mh', [
+      { id:uid('m'), by:'ra',  body:'MUAC reading 21cm. Below threshold for 5 days running.', at:hAgo(18) },
+      { id:uid('m'), by:'mc',  body:'Will plate up scrambled eggs + butter + cheese for breakfast. Fortified shake at 11.', at:hAgo(12) },
+      { id:uid('m'), by:'sa',  body:'Good. GP brief drafted — adding micronutrient panel to Wednesday\'s bloods.', at:hAgo(8) },
+      { id:uid('m'), by:'ra',  body:'MUAC 21cm again. Booked Mary for protein-rich brunch tomorrow.', at:hAgo(7) }
+    ]);
+
+    pack('thr_res_mr', [
+      { id:uid('m'), by:'dk',  body:'Sundowning at 16:30. Music + tea, settled in 10. ABC chart updated.', at:hAgo(30) },
+      { id:uid('m'), by:'ra',  body:'4-day pattern. Recommend extending afternoon activity to bridge 16:00–18:00.', at:hAgo(29) },
+      { id:uid('m'), by:'lo',  body:'Approved. Daniel — let\'s lock the new slot in the rota tomorrow.', at:hAgo(28.5) },
+      { id:uid('m'), by:'dk',  body:'Mr R settled after sundowning · 4-day pattern continues.', at:hAgo(28) }
+    ]);
+
+    pack('thr_dm_sa_lo', [
+      { id:uid('m'), by:'sa', body:'Wound dressing change for Mrs Cross today — need cover at 13:30.', at:hAgo(0.4) },
+      { id:uid('m'), by:'lo', body:'Approved the wound dressing change in the rota.', at:mAgo(8) }
+    ]);
+
+    pack('thr_dm_cm_ra', [
+      { id:uid('m'), by:'cm', body:'Can you cover 16:00? Mr R\'s afternoon needs eyes.', at:hAgo(12) },
+      { id:uid('m'), by:'ra', body:'Got it. Bring the music + tea kit.', at:hAgo(11.5) }
+    ]);
+
+    pack('thr_rep_eb_plan', [
+      { id:uid('m'), by:'sa', body:'Plan v3 published. Sections 1–6 reflect the last quarterly review.', at:hAgo(1.2), kind:'system' },
+      { id:uid('m'), by:'ai', body:'Three things changed since v2 — wandering risk score (Rae), family communication note (Sister Anne), evening playlist preference (Daniel).', at:hAgo(1) },
+      { id:uid('m'), by:'ai', body:'Report shared with all staff. Ack queue open.', at:mAgo(45), kind:'ai' }
+    ]);
+  }
+
+  // ---------- Boot data ----------
+  var THREADS = seedThreads();
+  seedMessagesIfEmpty();
+  var ACTIVE_ID = null;
+  var ACTIVE_TAB = 'all';
+
+  // ---------- Read state per user ----------
+  function readReadKey() { return 'kooper:chat:read:' + SELF_ID; }
+  function getReadMap() { return load(readReadKey(), {}); }
+  function markRead(threadId) {
+    var rm = getReadMap();
+    rm[threadId] = nowISO();
+    save(readReadKey(), rm);
+  }
+  function unreadCount(thread) {
+    var rm = getReadMap();
+    var lastReadAt = rm[thread.id];
+    if (!lastReadAt) return thread.lastBy && thread.lastBy !== SELF.name ? 1 : 0;
+    return new Date(thread.updatedAt) > new Date(lastReadAt) && thread.lastBy !== SELF.name ? 1 : 0;
+  }
+
+  // ---------- Filtering ----------
+  function visibleThreads() {
+    return THREADS.filter(function (t) {
+      // DMs are only visible if user is a member
+      if (t.kind === 'dm') return (t.members || []).indexOf(SELF_ID) >= 0;
+      return true;
+    }).sort(function(a,b){
+      return new Date(b.updatedAt) - new Date(a.updatedAt);
+    });
+  }
+  function filteredByTab() {
+    var all = visibleThreads();
+    if (ACTIVE_TAB === 'all') return all;
+    return all.filter(function(t){ return t.kind === ACTIVE_TAB; });
+  }
+
+  // ---------- Render rail ----------
+  function fmtAgo(iso) {
+    if (!iso) return '—';
+    var d = Date.now() - new Date(iso).getTime();
+    var m = Math.round(d/60000); if (m < 1) return 'now';
+    if (m < 60) return m + 'm';
+    var h = Math.round(m/60); if (h < 24) return h + 'h';
+    var dd = Math.round(h/24); return dd + 'd';
+  }
+  function residentInitials(p) {
+    if (!p) return '··';
+    return (p.pref || p.name || '').split(' ').slice(-2).map(function(s){return s[0]||'';}).join('').slice(0,2).toUpperCase();
+  }
+  function renderRail() {
+    var rail = document.getElementById('cwRail');
+    var list = filteredByTab();
+    var counts = { all: visibleThreads().length, resident: 0, dm: 0, report: 0 };
+    visibleThreads().forEach(function(t){ counts[t.kind] = (counts[t.kind] || 0) + 1; });
+    document.getElementById('cwCountAll').textContent = counts.all;
+    document.getElementById('cwCountRes').textContent = counts.resident;
+    document.getElementById('cwCountDM').textContent  = counts.dm;
+    document.getElementById('cwCountRep').textContent = counts.report;
+
+    if (!list.length) {
+      rail.innerHTML = '<div style="padding:1.5rem;text-align:center;color:#6B7280;font-size:0.8125rem">No conversations yet · tap <strong>+ New thread</strong> above</div>';
+      return;
+    }
+    rail.innerHTML = list.map(function (t) {
+      var unread = unreadCount(t);
+      var av, scope;
+      if (t.kind === 'resident') {
+        var p = patientById(t.residentId);
+        av = '<div class="av" style="background:#FFD400;color:#0A0A0A">' + residentInitials(p) + '</div>';
+        scope = '<span class="scope-tag s-resident">RESIDENT</span>';
+      } else if (t.kind === 'dm') {
+        var other = (t.members || []).find(function(x){ return x !== SELF_ID; });
+        var ot = STAFF[other];
+        av = '<div class="av" style="background:' + (ot ? ot.avatarBg : '#0A0A0A') + ';color:' + (ot ? ot.avatarFg : '#FFD400') + '">' + (ot ? ot.init : '??') + '</div>';
+        scope = '<span class="scope-tag s-dm">DM</span>';
+      } else {
+        av = '<div class="av" style="background:#1F4E53;color:#FFD400">RP</div>';
+        scope = '<span class="scope-tag s-report">REPORT</span>';
+      }
+      return '<div class="rail-row kind-' + t.kind + (ACTIVE_ID === t.id ? ' active' : '') + '" onclick="cwOpenThread(\'' + t.id + '\')">' +
+        av +
+        '<div class="meta">' +
+          '<div class="top">' +
+            '<span class="name">' + t.subject + '</span>' +
+            '<span class="when">' + fmtAgo(t.updatedAt) + '</span>' +
+          '</div>' +
+          '<div class="preview">' + scope + ' &nbsp;<span style="color:#6B7280">' + (t.lastBy ? '<strong>' + t.lastBy + '</strong>: ' : '') + (t.lastMsg || '—') + '</span></div>' +
+        '</div>' +
+        (unread ? '<span class="unread">' + unread + '</span>' : '') +
+      '</div>';
+    }).join('');
+  }
+
+  // ---------- Render thread ----------
+  function loadMsgs(threadId) { return load('kooper:chat:msgs:'+threadId, []); }
+  function saveMsgs(threadId, list) { save('kooper:chat:msgs:'+threadId, list); }
+  function thById(id) { return THREADS.find(function(t){return t.id===id;}); }
+
+  function renderThread() {
+    var host = document.getElementById('cwThread');
+    if (!ACTIVE_ID) {
+      host.innerHTML =
+        '<div class="empty">' +
+          '<div class="ic">·</div>' +
+          '<h3>Pick a conversation</h3>' +
+          '<p>Tap a resident, DM, or report thread on the left. Or start a new one — every message is audit-logged and persists across every staff dashboard.</p>' +
+          '<button onclick="cwOpenNewModal()" class="btn-yellow text-sm">+ New thread</button>' +
+        '</div>';
+      return;
+    }
+    var t = thById(ACTIVE_ID);
+    if (!t) { ACTIVE_ID = null; renderThread(); return; }
+    var msgs = loadMsgs(ACTIVE_ID);
+
+    var avLetter, sub;
+    if (t.kind === 'resident') {
+      var p = patientById(t.residentId);
+      avLetter = residentInitials(p);
+      sub = (p ? (p.condition + ' · age ' + p.age + ' · room ' + p.room) : '—') + ' · everyone on shift sees this thread';
+    } else if (t.kind === 'dm') {
+      var other = (t.members || []).find(function(x){return x !== SELF_ID;});
+      var ot = STAFF[other];
+      avLetter = ot ? ot.init : '??';
+      sub = ot ? (ot.role + ' · private direct message') : 'private direct message';
+    } else {
+      avLetter = 'RP';
+      sub = 'Report thread · everyone who received this report can comment';
+    }
+
+    var msgsHTML = msgs.map(function(m) {
+      if (m.kind === 'system' || m.by === 'system') {
+        return '<div class="msg system"><div class="body">' + m.body + '</div></div>';
+      }
+      if (m.kind === 'ai' || m.by === 'ai') {
+        return '<div class="msg ai">' +
+          '<div class="av">AI</div>' +
+          '<div><div class="meta"><strong>kooper · ai</strong> · ' + fmtAgo(m.at) + '</div><div class="body">' + m.body + '</div></div>' +
+        '</div>';
+      }
+      var sender = STAFF[m.by] || { name:m.by||'unknown', init:'??', avatarBg:'#3A3A3A', avatarFg:'#fff' };
+      var isMe = m.by === SELF_ID;
+      return '<div class="msg' + (isMe ? ' me' : '') + '">' +
+        '<div class="av" style="background:' + sender.avatarBg + ';color:' + sender.avatarFg + '">' + sender.init + '</div>' +
+        '<div><div class="meta"><strong>' + (isMe ? 'You' : sender.name) + '</strong> · ' + fmtAgo(m.at) + '</div><div class="body">' + escapeHtml(m.body) + '</div></div>' +
+      '</div>';
+    }).join('');
+
+    if (!msgs.length) {
+      msgsHTML = '<div class="msg system"><div class="body">No messages yet — kick off the thread below.</div></div>';
+    }
+
+    host.innerHTML =
+      '<div class="thread-head">' +
+        '<div class="left">' +
+          '<div class="av">' + avLetter + '</div>' +
+          '<div style="min-width:0"><h2>' + t.subject + '</h2><div class="sub">' + sub + '</div></div>' +
+        '</div>' +
+        '<div style="display:flex;gap:0.4rem;flex-wrap:wrap">' +
+          (t.kind === 'resident' ? '<a href="kooper-care-plans.html?resident=' + t.residentId + '" class="btn-secondary btn-sm">Open care plan →</a>' : '') +
+          (t.kind === 'resident' ? '<a href="kooper-clinical.html?resident=' + t.residentId + '" class="btn-secondary btn-sm">Clinical →</a>' : '') +
+          '<button class="btn-secondary btn-sm" onclick="cwCloseThread()">Close</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="thread-stream" id="cwStream">' + msgsHTML + '</div>' +
+      '<div class="ai-row">' +
+        '<div class="label">AI · suggested replies</div>' +
+        '<div class="ai-chips" id="cwAIChips">' + aiSuggestions(t).map(function(s){
+          return '<button class="ai-chip" onclick="cwQuickReply(' + JSON.stringify(s).replace(/"/g,'&quot;') + ')">' + escapeHtml(s) + '</button>';
+        }).join('') + '</div>' +
+      '</div>' +
+      '<form class="composer" onsubmit="cwSend(event)">' +
+        '<textarea id="cwInput" rows="1" placeholder="Reply as ' + SELF.first + '… (Enter to send, Shift+Enter for new line)" oninput="cwAutogrow(this)" onkeydown="cwKey(event)"></textarea>' +
+        '<button type="submit" class="send" id="cwSendBtn">Send</button>' +
+      '</form>';
+
+    var stream = document.getElementById('cwStream');
+    if (stream) stream.scrollTop = stream.scrollHeight;
+
+    markRead(ACTIVE_ID);
+    renderRail();
+  }
+
+  function aiSuggestions(t) {
+    if (t.kind === 'dm') return ['Got it · thanks', 'On it · ETA 15 min', 'Can we tap this on a quick call?'];
+    if (t.kind === 'report') return ['Acknowledged · noted', 'Will read at handover', 'One question — adding to the thread'];
+    // Resident
+    var p = patientById(t.residentId);
+    var pref = p ? p.pref : 'them';
+    return [
+      'Acknowledged · I\'ll check in next round',
+      'Pattern noted · flagging in tomorrow\'s MDT',
+      'Will sit with ' + pref + ' for the next 15 min',
+      'Escalating to manager · standby'
+    ];
+  }
+
+  function escapeHtml(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+  // ---------- Actions ----------
+  window.cwOpenThread = function (id) {
+    ACTIVE_ID = id;
+    document.getElementById('cwShell').classList.add('thread-open');
+    renderThread();
+    renderRail();
+  };
+  window.cwCloseThread = function () {
+    ACTIVE_ID = null;
+    document.getElementById('cwShell').classList.remove('thread-open');
+    renderThread();
+    renderRail();
+  };
+
+  window.cwSend = function (ev) {
+    if (ev) ev.preventDefault();
+    var ta = document.getElementById('cwInput');
+    var body = (ta.value || '').trim();
+    if (!body || !ACTIVE_ID) return;
+    var t = thById(ACTIVE_ID); if (!t) return;
+    var msgs = loadMsgs(ACTIVE_ID);
+    var m = { id:uid('m'), by:SELF_ID, body:body, at:nowISO() };
+    msgs.push(m); saveMsgs(ACTIVE_ID, msgs);
+    t.updatedAt = m.at; t.lastBy = SELF.name; t.lastMsg = body;
+    save('kooper:chat:threads', THREADS);
+    ta.value = '';
+    cwAutogrow(ta);
+    renderThread();
+    // Light AI ack on resident threads after first user message — feels collaborative
+    setTimeout(function(){
+      if (Math.random() < 0.45 && t.kind !== 'dm') {
+        var aiBody = aiAck(t, body);
+        if (aiBody) {
+          var msgs2 = loadMsgs(ACTIVE_ID);
+          msgs2.push({ id:uid('m'), by:'ai', body:aiBody, at:nowISO(), kind:'ai' });
+          saveMsgs(ACTIVE_ID, msgs2);
+          t.updatedAt = nowISO(); t.lastBy = 'kooper · ai'; t.lastMsg = aiBody;
+          save('kooper:chat:threads', THREADS);
+          if (ACTIVE_ID === t.id) renderThread();
+          renderRail();
+        }
+      }
+    }, 1200);
+  };
+
+  function aiAck(t, body) {
+    var lc = body.toLowerCase();
+    if (/escalat/.test(lc)) return 'Escalation logged — manager and clinical lead notified. ETA acknowledgement under 15 min.';
+    if (/news2|score|vital/.test(lc)) return 'Linking to the latest NEWS2 readings. Last entry was ' + Math.round(Math.random()*4 + 1) + ' (low risk).';
+    if (/family|relative/.test(lc)) return 'Family contact thread updated. Privacy boundary verified — clinical detail withheld from family digest.';
+    if (/sundown|behaviou?r|agitat/.test(lc)) return 'ABC pattern updated. 4-day streak — recommend extending afternoon activity to bridge 16:00–18:00.';
+    if (/wound|dressing|skin/.test(lc)) return 'Wound chart updated. Photo capture due next dressing change.';
+    if (t.kind === 'resident') {
+      var p = patientById(t.residentId);
+      return 'Logged on ' + (p ? p.pref : 'resident') + '\'s timeline. Visible on the next handover brief.';
+    }
+    return null;
+  }
+
+  window.cwQuickReply = function (text) {
+    var ta = document.getElementById('cwInput');
+    if (!ta) return;
+    ta.value = text;
+    cwSend();
+  };
+
+  window.cwAutogrow = function (el) {
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 128) + 'px';
+  };
+  window.cwKey = function (ev) {
+    if (ev.key === 'Enter' && !ev.shiftKey) {
+      ev.preventDefault();
+      cwSend();
+    }
+  };
+
+  // Tabs
+  document.getElementById('cwTabs').addEventListener('click', function (ev) {
+    var btn = ev.target.closest('.rail-tab'); if (!btn) return;
+    document.querySelectorAll('.rail-tab').forEach(function(b){ b.classList.remove('active'); });
+    btn.classList.add('active');
+    ACTIVE_TAB = btn.getAttribute('data-cw-tab');
+    document.getElementById('cwRailHeading').textContent = ({
+      all:'All threads', resident:'Residents', dm:'Direct messages', report:'Report threads'
+    })[ACTIVE_TAB] || 'All threads';
+    renderRail();
+  });
+
+  // ---------- New thread modal ----------
+  window.cwOpenNewModal = function () {
+    var resSel = document.getElementById('cwModalResident');
+    var dmSel  = document.getElementById('cwModalDM');
+    var pats = loadPatients();
+    resSel.innerHTML = pats.map(function(p){
+      var existing = THREADS.find(function(t){return t.kind==='resident' && t.residentId===p.id;});
+      return '<option value="' + p.id + '"' + (existing ? ' data-existing="'+existing.id+'"' : '') + '>' + p.name + (existing ? ' — open existing' : '') + '</option>';
+    }).join('');
+    dmSel.innerHTML = Object.values(STAFF).filter(function(s){return s.id !== SELF_ID;}).map(function(s){
+      return '<option value="' + s.id + '">' + s.name + ' · ' + s.role + '</option>';
+    }).join('');
+    document.getElementById('cwModalMsg').value = '';
+    cwModalRender();
+    document.getElementById('cwScrim').classList.add('on');
+    document.getElementById('cwModal').classList.add('on');
+  };
+  window.cwCloseNewModal = function () {
+    document.getElementById('cwScrim').classList.remove('on');
+    document.getElementById('cwModal').classList.remove('on');
+  };
+  window.cwModalRender = function () {
+    var k = document.getElementById('cwModalType').value;
+    document.getElementById('cwModalResidentRow').style.display = (k === 'resident') ? '' : 'none';
+    document.getElementById('cwModalDMRow').style.display       = (k === 'dm')       ? '' : 'none';
+  };
+  window.cwCreateThread = function () {
+    var type = document.getElementById('cwModalType').value;
+    var msg  = (document.getElementById('cwModalMsg').value || '').trim();
+    if (!msg) { toast('Type a first message to start the thread'); return; }
+    var threadId, threadObj;
+    if (type === 'resident') {
+      var rid = document.getElementById('cwModalResident').value;
+      var existing = THREADS.find(function(t){return t.kind==='resident' && t.residentId===rid;});
+      if (existing) {
+        threadId = existing.id;
+      } else {
+        var p = patientById(rid);
+        threadId = 'thr_res_' + rid;
+        threadObj = { id:threadId, kind:'resident', subject:p ? p.name : ('Resident · '+rid), residentId:rid, members:['*'], createdAt:nowISO(), updatedAt:nowISO(), lastBy:SELF.name, lastMsg:msg };
+        THREADS.unshift(threadObj);
+      }
+    } else { // dm
+      var otherId = document.getElementById('cwModalDM').value;
+      var key = ['thr_dm', SELF_ID, otherId].sort().join('_');
+      var existingDM = THREADS.find(function(t){return t.id===key;});
+      if (existingDM) {
+        threadId = existingDM.id;
+      } else {
+        var ot = STAFF[otherId];
+        threadId = key;
+        threadObj = { id:threadId, kind:'dm', subject:SELF.first + ' ↔ ' + (ot ? ot.first : otherId), members:[SELF_ID, otherId], createdAt:nowISO(), updatedAt:nowISO(), lastBy:SELF.name, lastMsg:msg };
+        THREADS.unshift(threadObj);
+      }
+    }
+    save('kooper:chat:threads', THREADS);
+    var msgs = loadMsgs(threadId);
+    msgs.push({ id:uid('m'), by:SELF_ID, body:msg, at:nowISO() });
+    saveMsgs(threadId, msgs);
+    cwCloseNewModal();
+    cwOpenThread(threadId);
+    toast('Thread started · ' + (threadObj ? threadObj.subject : 'reopened'));
+  };
+
+  // ---------- Toast ----------
+  function toast(text) {
+    var t = document.getElementById('cwToast');
+    t.textContent = text;
+    t.classList.add('on');
+    setTimeout(function(){ t.classList.remove('on'); }, 2200);
+  }
+  window.kooperToast = toast;
+
+  // ---------- Identity strip ----------
+  function renderSelf() {
+    var av = document.getElementById('cwSelfAvatar');
+    av.style.background = SELF.avatarBg;
+    av.style.color      = SELF.avatarFg;
+    av.textContent      = SELF.init;
+    document.getElementById('cwSelfName').textContent = SELF.name + ' · ' + SELF.role + ' · Draycott';
+  }
+
+  // ---------- Deep link: ?thread=ID, ?resident=eb, ?to=cm, ?reportId=... ----------
+  function deepLink() {
+    try {
+      var p = new URLSearchParams(window.location.search);
+      var threadParam = p.get('thread');
+      var residentParam = p.get('resident');
+      var toParam = p.get('to');
+      var reportIdParam = p.get('reportId');
+
+      if (threadParam) {
+        var hit = THREADS.find(function(t){return t.id===threadParam;});
+        if (hit) { ACTIVE_ID = threadParam; return; }
+      }
+      if (residentParam) {
+        var resHit = THREADS.find(function(t){return t.kind==='resident' && t.residentId===residentParam;});
+        if (resHit) { ACTIVE_ID = resHit.id; return; }
+        // Auto-create if missing
+        var pt = patientById(residentParam);
+        if (pt) {
+          var newId = 'thr_res_' + residentParam;
+          THREADS.unshift({ id:newId, kind:'resident', subject:pt.name, residentId:residentParam, members:['*'], createdAt:nowISO(), updatedAt:nowISO(), lastBy:null, lastMsg:'' });
+          save('kooper:chat:threads', THREADS);
+          ACTIVE_ID = newId;
+          return;
+        }
+      }
+      if (toParam && STAFF[toParam] && toParam !== SELF_ID) {
+        var key = ['thr_dm', SELF_ID, toParam].sort().join('_');
+        var dmHit = THREADS.find(function(t){return t.id===key;});
+        if (dmHit) { ACTIVE_ID = dmHit.id; return; }
+        var ot = STAFF[toParam];
+        THREADS.unshift({ id:key, kind:'dm', subject:SELF.first + ' ↔ ' + ot.first, members:[SELF_ID, toParam], createdAt:nowISO(), updatedAt:nowISO(), lastBy:null, lastMsg:'' });
+        save('kooper:chat:threads', THREADS);
+        ACTIVE_ID = key;
+        return;
+      }
+      if (reportIdParam) {
+        var repHit = THREADS.find(function(t){return t.kind==='report' && t.reportId===reportIdParam;});
+        if (repHit) ACTIVE_ID = repHit.id;
+      }
+    } catch(e){}
+  }
+
+  // ---------- Cross-tab sync ----------
+  window.addEventListener('storage', function (ev) {
+    if (!ev.key) return;
+    if (ev.key === 'kooper:chat:threads') {
+      THREADS = load('kooper:chat:threads', []);
+      renderRail();
+      if (ACTIVE_ID) renderThread();
+    }
+    if (ev.key && ev.key.indexOf('kooper:chat:msgs:') === 0 && ACTIVE_ID && ev.key === 'kooper:chat:msgs:'+ACTIVE_ID) {
+      renderThread();
+    }
+  });
+
+  // ---------- Boot ----------
+  function boot() {
+    renderSelf();
+    deepLink();
+    if (ACTIVE_ID) document.getElementById('cwShell').classList.add('thread-open');
+    renderRail();
+    renderThread();
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
+})();
+</script>
+
+<script src="kooper-session.js" defer></script>
+</body>
+</html>
