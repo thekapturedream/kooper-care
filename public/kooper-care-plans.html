@@ -147,6 +147,45 @@
   /* override domain-card hover for editorial sections — keep reading clean */
   .ed-section.domain-card:hover { box-shadow: none; transform: none; border: none; }
   .ed-section.domain-card { box-shadow: none !important; }
+
+  /* Care Plans landing — Create / View CTAs + flows */
+  .cp-cta { position: relative; display: flex; flex-direction: column; gap: 0.625rem; padding: 1.5rem; background: #FFFFFF; border: 1px solid #ECEAE3; border-radius: 16px; cursor: pointer; transition: all 0.18s ease; text-decoration: none; color: #0A0A0A; }
+  .cp-cta:hover { border-color: #0A0A0A; transform: translateY(-2px); box-shadow: 0 14px 32px -16px rgba(0,0,0,0.18); }
+  .cp-cta-primary { background: linear-gradient(180deg, #0A0A0A 0%, #1A1A1A 100%); color: #FFFFFF; border-color: #0A0A0A; }
+  .cp-cta-primary .cp-cta-name { color: #FFFFFF; }
+  .cp-cta-primary .cp-cta-desc { color: rgba(255,255,255,0.72); }
+  .cp-cta-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 700; line-height: 1; }
+  .cp-cta-name { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 1.25rem; line-height: 1.2; letter-spacing: -0.01em; }
+  .cp-cta-desc { font-size: 0.8125rem; line-height: 1.45; color: #6B7280; }
+  .cp-cta-arrow { position: absolute; top: 1.5rem; right: 1.5rem; color: #9A9A9A; font-size: 1.125rem; }
+  .cp-cta:hover .cp-cta-arrow { color: #0A0A0A; }
+  .cp-cta-primary .cp-cta-arrow { color: rgba(255,212,0,0.6); }
+  .cp-cta-primary:hover .cp-cta-arrow { color: #FFD400; }
+
+  .cp-add-patient { display: flex; align-items: center; gap: 0.875rem; padding: 1rem 1.125rem; border: 1px dashed #FFD400; background: #FFFBEB; border-radius: 14px; color: #876300; cursor: pointer; transition: all 0.15s ease; font-family: inherit; }
+  .cp-add-patient:hover { background: #FFF8DB; border-style: solid; }
+  .cp-add-icon { width: 32px; height: 32px; border-radius: 50%; background: #FFD400; color: #0A0A0A; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1rem; flex-shrink: 0; }
+
+  .cp-tmpl { display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.875rem; border: 1px solid #ECEAE3; background: #FFFFFF; border-radius: 12px; cursor: pointer; text-align: left; transition: all 0.15s ease; font-family: inherit; }
+  .cp-tmpl:hover { border-color: #0A0A0A; background: #FAFAF7; }
+  .cp-tmpl-icon { width: 38px; height: 38px; border-radius: 10px; background: #FAFAF7; display: flex; align-items: center; justify-content: center; font-size: 1.125rem; flex-shrink: 0; }
+  .cp-tmpl-name { display: block; font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 0.875rem; line-height: 1.25; color: #0A0A0A; }
+  .cp-tmpl-desc { display: block; font-size: 0.6875rem; color: #6B7280; margin-top: 0.125rem; line-height: 1.35; }
+
+  /* Patient list rows */
+  .cp-patient-row { display: grid; grid-template-columns: auto 1fr auto auto; gap: 1rem; align-items: center; padding: 0.875rem 1.125rem; border-bottom: 1px solid #ECEAE3; cursor: pointer; transition: background 0.12s ease; text-decoration: none; color: inherit; }
+  .cp-patient-row:hover { background: #FAFAF7; }
+  .cp-patient-row:last-child { border-bottom: 0; }
+  @media (max-width: 640px) { .cp-patient-row { grid-template-columns: auto 1fr; row-gap: 0.5rem; } .cp-patient-row .cp-pr-status { grid-column: 2; justify-self: start; } .cp-patient-row .cp-pr-action { grid-column: 1 / 3; } }
+
+  /* Inline form helpers shared with onboarding — keep here in case kooper-hr.html isn't loaded */
+  .ob-field { display: flex; flex-direction: column; gap: 0.25rem; }
+  .ob-label { font-family: 'JetBrains Mono', monospace; font-size: 0.625rem; text-transform: uppercase; letter-spacing: 0.08em; color: #6B7280; font-weight: 500; }
+  .ob-input { display: block; width: 100%; padding: 0.5rem 0.625rem; border: 1px solid #ECEAE3; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 0.875rem; background: #FFFFFF; color: #0A0A0A; transition: border-color 0.12s ease; }
+  .ob-input:focus { outline: 0; border-color: #0A0A0A; }
+  .muted { color: #6B7280; }
+  .ed-kicker { font-family: 'JetBrains Mono', monospace; font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #876300; display: inline-flex; align-items: center; gap: 0.5rem; }
+  .ed-kicker::before { content: ''; width: 18px; height: 2px; background: #FFD400; display: inline-block; }
 </style>
 </head>
 <body class="min-h-screen">
@@ -195,6 +234,106 @@
     </div>
   </div>
 </nav>
+
+<!-- ============================================== -->
+<!-- CARE PLANS LANDING — Create / View entry        -->
+<!-- Shown by default; hidden when ?resident=<id>    -->
+<!-- is in the URL (deep workspace mode).            -->
+<!-- ============================================== -->
+<section id="cpLanding" class="bg-kapture-paper border-b border-kapture-fog">
+  <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-14">
+    <div class="text-center mb-8 lg:mb-10">
+      <span class="chip chip-yellow text-[0.625rem] font-mono uppercase tracking-widest">Care Plans · workspace</span>
+      <h1 class="font-display font-semibold text-3xl lg:text-4xl tracking-tight text-kapture-black mt-3">What do you need to do?</h1>
+      <p class="text-kapture-smoke text-sm mt-2 max-w-xl mx-auto">Build a new care plan or open an existing one. Every plan stays linked to clinical, recording, and family privacy.</p>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-3xl mx-auto">
+      <a href="?view=create" class="cp-cta cp-cta-primary group">
+        <div class="cp-cta-icon" style="background:#FFD400;color:#0A0A0A">+</div>
+        <div class="cp-cta-name">Create Care Plan</div>
+        <div class="cp-cta-desc">Pick a patient — or add a new one — and build their first plan in under 5 minutes. Templates per condition.</div>
+        <div class="cp-cta-arrow">→</div>
+      </a>
+      <a href="?view=list" class="cp-cta">
+        <div class="cp-cta-icon" style="background:#0A0A0A;color:#FFD400">📋</div>
+        <div class="cp-cta-name">View Care Plans</div>
+        <div class="cp-cta-desc"><span id="cpCountTotal">8</span> plans · <span id="cpCountReview">2</span> reviews due · open any to edit, sign off, or share with family.</div>
+        <div class="cp-cta-arrow">→</div>
+      </a>
+    </div>
+
+    <!-- ----- VIEW LIST · all patients with plan status ----- -->
+    <div id="cpListWrap" class="hidden mt-10 max-w-4xl mx-auto">
+      <div class="flex items-center justify-between mb-3 flex-wrap gap-2">
+        <div><div class="ed-kicker">PATIENT LIST · ALL PLANS</div><h2 class="font-display font-semibold text-lg mt-1">Tap any patient to open their plan</h2></div>
+        <div class="flex gap-2"><a href="?view=create" class="btn-primary text-xs">+ Create new plan</a><a href="kooper-care-plans.html" class="chip text-xs">← Back</a></div>
+      </div>
+      <div id="cpList" class="bg-white rounded-2xl border border-kapture-fog overflow-hidden"></div>
+    </div>
+
+    <!-- ----- VIEW CREATE · pick or add patient + start plan ----- -->
+    <div id="cpCreateWrap" class="hidden mt-10 max-w-3xl mx-auto">
+      <div class="flex items-center justify-between mb-3 flex-wrap gap-2">
+        <div><div class="ed-kicker">CREATE CARE PLAN · STEP 1 OF 3</div><h2 class="font-display font-semibold text-lg mt-1">Who is this plan for?</h2></div>
+        <a href="kooper-care-plans.html" class="chip text-xs">← Back</a>
+      </div>
+      <div class="bg-white rounded-2xl border border-kapture-fog p-5 space-y-4">
+        <label class="ob-field">
+          <span class="ob-label">Select existing patient *</span>
+          <select id="cpPatientPicker" class="ob-input" onchange="cpPickPatient(this.value)">
+            <option value="">— Choose a patient —</option>
+          </select>
+        </label>
+        <div class="text-center text-xs muted">— or —</div>
+        <button onclick="cpToggleAddPatient()" class="cp-add-patient w-full">
+          <span class="cp-add-icon">+</span>
+          <span class="text-left flex-1"><span class="block font-medium text-sm">Add new patient/client</span><span class="block text-[0.6875rem] muted">Opens the new-patient form. Once saved, you'll come straight back here to start their plan.</span></span>
+          <span class="text-kapture-mist">→</span>
+        </button>
+
+        <!-- Inline new-patient form -->
+        <div id="cpNewPatientForm" class="hidden border-t border-kapture-fog pt-4 mt-4 space-y-3">
+          <div class="ed-kicker">NEW PATIENT · QUICK ADD</div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <label class="ob-field"><span class="ob-label">Full name *</span><input id="cpNpName" class="ob-input" placeholder="Mr / Mrs / Ms · full legal"></label>
+            <label class="ob-field"><span class="ob-label">Preferred name</span><input id="cpNpPref" class="ob-input" placeholder="optional"></label>
+            <label class="ob-field"><span class="ob-label">Date of birth *</span><input id="cpNpDob" type="date" class="ob-input"></label>
+            <label class="ob-field"><span class="ob-label">NHS number</span><input id="cpNpNhs" class="ob-input" placeholder="123 456 7890"></label>
+            <label class="ob-field"><span class="ob-label">Room</span><input id="cpNpRoom" class="ob-input" placeholder="e.g. 14"></label>
+            <label class="ob-field"><span class="ob-label">Funding</span><select id="cpNpFunding" class="ob-input"><option>Self-funded</option><option>Local Authority</option><option>NHS Continuing Healthcare</option><option>Mixed</option></select></label>
+            <label class="ob-field md:col-span-2"><span class="ob-label">Primary condition / reason for admission</span><input id="cpNpCondition" class="ob-input" placeholder="e.g. dementia · post-stroke · frailty + falls"></label>
+            <label class="ob-field"><span class="ob-label">Next of kin name</span><input id="cpNpKinName" class="ob-input" placeholder="relationship in next field"></label>
+            <label class="ob-field"><span class="ob-label">Next of kin relationship + phone</span><input id="cpNpKinRel" class="ob-input" placeholder="e.g. Daughter · 07700 900123"></label>
+          </div>
+          <div class="flex gap-2 justify-end pt-2">
+            <button onclick="cpToggleAddPatient()" class="chip">Cancel</button>
+            <button onclick="cpSaveNewPatient()" class="btn-primary text-xs">Save patient → start plan</button>
+          </div>
+        </div>
+
+        <!-- Plan template picker (appears once a patient is chosen) -->
+        <div id="cpTemplatePicker" class="hidden border-t border-kapture-fog pt-4 mt-4 space-y-3">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <div><div class="ed-kicker">CREATE CARE PLAN · STEP 2 OF 3</div><h2 class="font-display font-semibold text-base mt-1">Pick a template for <span id="cpChosenName">…</span></h2></div>
+            <button onclick="cpClearPick()" class="chip text-xs">Switch patient</button>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+            <button onclick="cpStartPlan('blank')"     class="cp-tmpl"><span class="cp-tmpl-icon">📄</span><span><span class="cp-tmpl-name">Blank plan · build domain by domain</span><span class="cp-tmpl-desc">All 62 domains · start where you want.</span></span></button>
+            <button onclick="cpStartPlan('dementia')"  class="cp-tmpl"><span class="cp-tmpl-icon">🧠</span><span><span class="cp-tmpl-name">Dementia + cognition</span><span class="cp-tmpl-desc">Pre-fills mental health · personal care · safety.</span></span></button>
+            <button onclick="cpStartPlan('frailty')"   class="cp-tmpl"><span class="cp-tmpl-icon">🩹</span><span><span class="cp-tmpl-name">Frailty + falls</span><span class="cp-tmpl-desc">Mobility · MUAC · medication review built in.</span></span></button>
+            <button onclick="cpStartPlan('end-life')"  class="cp-tmpl"><span class="cp-tmpl-icon">🕊</span><span><span class="cp-tmpl-name">End of life</span><span class="cp-tmpl-desc">ReSPECT · advance decisions · family preferences.</span></span></button>
+            <button onclick="cpStartPlan('post-acute')"class="cp-tmpl"><span class="cp-tmpl-icon">🏥</span><span><span class="cp-tmpl-name">Post-acute · post-stroke / post-fall</span><span class="cp-tmpl-desc">Rehab goals · MDT review schedule.</span></span></button>
+            <button onclick="cpStartPlan('respite')"   class="cp-tmpl"><span class="cp-tmpl-icon">🛌</span><span><span class="cp-tmpl-name">Respite · short stay</span><span class="cp-tmpl-desc">Lighter plan · discharge summary auto-built.</span></span></button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =============== Existing deep workspace below — wrapped so we can hide on landing =============== -->
+<div id="cpWorkspace" class="hidden">
 
 <!-- ============================================== -->
 <!-- BUNDLE CONTEXT STRIP                             -->
@@ -847,6 +986,8 @@
 <!-- ============================================== -->
 <!-- FOOTER                                           -->
 <!-- ============================================== -->
+</div><!-- /cpWorkspace -->
+
 <footer class="bg-kapture-paper border-t border-kapture-fog py-6 mt-12">
   <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row md:items-center md:justify-between gap-3 text-xs text-kapture-smoke">
     <div class="flex items-center gap-3">
@@ -1142,6 +1283,170 @@
       b.addEventListener('click', function () { kooperToast('✓ ' + label); });
     });
   });
+</script>
+
+<!-- ============================================================ -->
+<!-- CARE PLANS LANDING ROUTING — Create / View / Patient picker  -->
+<!-- ============================================================ -->
+<script>
+(function(){
+  // ---------- Sample patient/client list ----------
+  // Persisted to localStorage so newly added patients survive a reload.
+  var SAMPLE = [
+    { id:'eb', name:'Mr Edward Banda',     pref:'Eddie',   age:78, room:'12', nhs:'485 777 3456', condition:'Vascular dementia · falls history',  funding:'NHS CHC',   plan:{ status:'active',    progress:61, lastReview:'2 May 2026', reviewsDue:2 } },
+    { id:'cc', name:'Mrs Catherine Cross', pref:'Cathy',   age:84, room:'07', nhs:'485 222 1180', condition:'End-of-life · diabetic + soft diet', funding:'Self-fund', plan:{ status:'active',    progress:78, lastReview:'29 Apr 2026', reviewsDue:0 } },
+    { id:'mh', name:'Mr Hubert Robinson',  pref:'Mr H',    age:81, room:'15', nhs:'485 909 4422', condition:'MUAC <22 · high-protein · frailty',  funding:'LA',        plan:{ status:'review',    progress:54, lastReview:'18 Apr 2026', reviewsDue:1 } },
+    { id:'mr', name:'Mr Reginald Asare',   pref:'Mr R',    age:73, room:'04', nhs:'485 113 9087', condition:'Post-stroke · rehab phase',          funding:'NHS CHC',   plan:{ status:'active',    progress:42, lastReview:'14 Apr 2026', reviewsDue:0 } },
+    { id:'jl', name:'Mrs Joyce Lambert',   pref:'Joyce',   age:88, room:'19', nhs:'485 660 2244', condition:'Late-stage dementia · BPSD',         funding:'LA',        plan:{ status:'active',    progress:71, lastReview:'30 Apr 2026', reviewsDue:0 } },
+    { id:'sn', name:'Ms Sophia Nakamura',  pref:'Sophia',  age:69, room:'21', nhs:'485 401 5588', condition:'Respite · 2 week stay · MS',          funding:'Self-fund', plan:{ status:'respite',   progress:30, lastReview:'5 May 2026',  reviewsDue:0 } },
+    { id:'pc', name:'Mr Paul Cosgrove',    pref:'Paul',    age:76, room:'09', nhs:'485 818 7711', condition:'New admission · awaiting plan',      funding:'LA',        plan:null },
+    { id:'av', name:'Mrs Anika Verma',     pref:'Anika',   age:91, room:'02', nhs:'485 232 0006', condition:'Frailty · falls · arrhythmia',       funding:'Mixed',     plan:{ status:'active',    progress:65, lastReview:'24 Apr 2026', reviewsDue:0 } }
+  ];
+  function loadPatients() {
+    try {
+      var raw = localStorage.getItem('kooper:carePlans:patients');
+      if (raw) return JSON.parse(raw);
+    } catch (e) {}
+    return SAMPLE;
+  }
+  function savePatients(list) {
+    try { localStorage.setItem('kooper:carePlans:patients', JSON.stringify(list)); } catch (e) {}
+  }
+  var PATIENTS = loadPatients();
+
+  // ---------- Routing ----------
+  function getParam(k) { var p = new URLSearchParams(window.location.search); return p.get(k); }
+  function activate() {
+    var landing  = document.getElementById('cpLanding');
+    var work     = document.getElementById('cpWorkspace');
+    var listWrap = document.getElementById('cpListWrap');
+    var createWrap = document.getElementById('cpCreateWrap');
+    var view = getParam('view');
+    var resident = getParam('resident');
+
+    // If a resident is in the URL, jump straight into the deep workspace
+    if (resident) {
+      landing.classList.add('hidden');
+      work.classList.remove('hidden');
+      // (Future: rebuild the deep workspace per resident. For now it loads Edward as the demo.)
+      return;
+    }
+    // Otherwise show the landing
+    work.classList.add('hidden');
+    landing.classList.remove('hidden');
+    listWrap.classList.toggle('hidden', view !== 'list');
+    createWrap.classList.toggle('hidden', view !== 'create');
+
+    if (view === 'list') renderList();
+    if (view === 'create') renderCreate();
+
+    // Update CTA counts
+    var total = PATIENTS.length;
+    var dueCount = PATIENTS.reduce(function (n, p) { return n + ((p.plan && p.plan.reviewsDue) || 0); }, 0);
+    var elT = document.getElementById('cpCountTotal'); if (elT) elT.textContent = total;
+    var elR = document.getElementById('cpCountReview'); if (elR) elR.textContent = dueCount;
+  }
+
+  // ---------- View · patient list ----------
+  function renderList() {
+    var host = document.getElementById('cpList');
+    if (!host) return;
+    host.innerHTML = PATIENTS.map(function (p) {
+      var status = p.plan ? p.plan.status : 'no-plan';
+      var statusChip = status === 'no-plan' ? '<span class="chip text-[0.625rem]" style="background:#FEE2E2;color:#B42318">No plan</span>'
+                     : status === 'review'  ? '<span class="chip text-[0.625rem]" style="background:#FFFBEB;color:#876300">Review due</span>'
+                     : status === 'respite' ? '<span class="chip text-[0.625rem]" style="background:#DBEAFE;color:#1E40AF">Respite</span>'
+                     :                        '<span class="chip text-[0.625rem]" style="background:#DCFCE7;color:#047857">Active · ' + (p.plan.progress || 0) + '%</span>';
+      var meta = p.plan
+        ? 'Last reviewed ' + p.plan.lastReview + (p.plan.reviewsDue ? ' · <strong style="color:#B42318">' + p.plan.reviewsDue + ' review(s) due</strong>' : '')
+        : '<strong style="color:#B42318">Awaiting first plan</strong> · admitted recently';
+      // Whole row is the link — no nested anchors (the action becomes a visual chevron, not a separate button)
+      var rowHref = p.plan ? ('?resident=' + p.id) : ('?view=create&patient=' + p.id);
+      var actionLabel = p.plan ? 'Open + edit' : 'Create plan';
+      return '<a href="' + rowHref + '" class="cp-patient-row">' +
+        '<div style="width:36px;height:36px;border-radius:50%;background:#0A0A0A;color:#FFD400;display:flex;align-items:center;justify-content:center;font-family:Space Grotesk,sans-serif;font-weight:700;font-size:0.75rem;flex-shrink:0">' +
+          (p.pref || p.name.split(' ')[1] || '?').slice(0,2).toUpperCase() +
+        '</div>' +
+        '<div class="min-w-0"><div class="font-medium text-sm">' + p.name + '<span class="muted text-[0.6875rem] ml-2">· ' + p.pref + ' · ' + p.age + ' · room ' + p.room + '</span></div><div class="text-xs muted truncate">' + p.condition + ' · ' + p.funding + ' · ' + meta + '</div></div>' +
+        '<div class="cp-pr-status">' + statusChip + '</div>' +
+        '<div class="cp-pr-action text-xs font-mono muted whitespace-nowrap">' + actionLabel + ' <span style="color:#0A0A0A;font-weight:600">→</span></div>' +
+      '</a>';
+    }).join('');
+  }
+
+  // ---------- View · create flow ----------
+  function renderCreate() {
+    var picker = document.getElementById('cpPatientPicker');
+    if (!picker) return;
+    picker.innerHTML = '<option value="">— Choose a patient —</option>' +
+      PATIENTS.map(function (p) {
+        var planLabel = p.plan ? ' (plan ' + p.plan.progress + '%)' : ' (no plan yet)';
+        return '<option value="' + p.id + '">' + p.name + planLabel + '</option>';
+      }).join('');
+    // If URL pre-selects a patient (?view=create&patient=XX), populate immediately
+    var pre = getParam('patient');
+    if (pre && PATIENTS.find(function (x) { return x.id === pre; })) {
+      picker.value = pre;
+      window.cpPickPatient(pre);
+    }
+  }
+
+  // ---------- Public API attached to window ----------
+  window.cpPickPatient = function (id) {
+    var p = PATIENTS.find(function (x) { return x.id === id; });
+    var picker = document.getElementById('cpTemplatePicker');
+    var name = document.getElementById('cpChosenName');
+    if (!p || !picker) { if (picker) picker.classList.add('hidden'); return; }
+    if (name) name.textContent = p.name;
+    picker.classList.remove('hidden');
+    setTimeout(function () { picker.scrollIntoView({ behavior:'smooth', block:'center' }); }, 60);
+  };
+  window.cpClearPick = function () {
+    var picker = document.getElementById('cpPatientPicker'); if (picker) picker.value = '';
+    var t = document.getElementById('cpTemplatePicker'); if (t) t.classList.add('hidden');
+  };
+  window.cpToggleAddPatient = function () {
+    var f = document.getElementById('cpNewPatientForm');
+    if (f) f.classList.toggle('hidden');
+  };
+  window.cpSaveNewPatient = function () {
+    var name = document.getElementById('cpNpName').value.trim();
+    if (!name) { kooperToast('Patient name is required'); return; }
+    var newP = {
+      id: 'p_' + Date.now(),
+      name: name,
+      pref: document.getElementById('cpNpPref').value.trim() || name.split(' ').slice(-1)[0],
+      age:  '?',
+      room: document.getElementById('cpNpRoom').value.trim() || '—',
+      nhs:  document.getElementById('cpNpNhs').value.trim()  || '—',
+      condition: document.getElementById('cpNpCondition').value.trim() || 'Newly admitted · awaiting full assessment',
+      funding: document.getElementById('cpNpFunding').value,
+      plan: null
+    };
+    PATIENTS.unshift(newP);
+    savePatients(PATIENTS);
+    kooperToast(newP.name + ' added · ready to start their plan');
+    // Hide the form, refresh the picker, auto-select the new patient, jump to template picker
+    document.getElementById('cpNewPatientForm').classList.add('hidden');
+    renderCreate();
+    document.getElementById('cpPatientPicker').value = newP.id;
+    window.cpPickPatient(newP.id);
+  };
+  window.cpStartPlan = function (template) {
+    var pickerVal = document.getElementById('cpPatientPicker').value;
+    var p = PATIENTS.find(function (x) { return x.id === pickerVal; });
+    if (!p) { kooperToast('Pick a patient first'); return; }
+    // Mark the patient as having a plan now (active, 5% progress for the template seed)
+    if (!p.plan) {
+      p.plan = { status:'active', progress:5, lastReview:'today', reviewsDue:0, template: template };
+      savePatients(PATIENTS);
+    }
+    kooperToast(p.name + ' · ' + template + ' template applied · opening workspace');
+    window.location.href = '?resident=' + p.id;
+  };
+
+  document.addEventListener('DOMContentLoaded', activate);
+})();
 </script>
 
 

@@ -67,6 +67,21 @@
   .toast.on { opacity: 1; }
 
   .muted { color: #6B7280; }
+
+  /* Onboarding form surface — used by renderOnboarding() */
+  .surface-card { background: #FFFFFF; border: 1px solid #ECEAE3; border-radius: 14px; }
+  .ob-field { display: flex; flex-direction: column; gap: 0.25rem; }
+  .ob-label { font-family: 'JetBrains Mono', monospace; font-size: 0.625rem; text-transform: uppercase; letter-spacing: 0.08em; color: #6B7280; font-weight: 500; }
+  .ob-input { display: block; width: 100%; padding: 0.5rem 0.625rem; border: 1px solid #ECEAE3; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 0.875rem; background: #FFFFFF; color: #0A0A0A; transition: border-color 0.12s ease; }
+  .ob-input:focus { outline: 0; border-color: #0A0A0A; }
+  .ob-input:hover { border-color: #9A9A9A; }
+  .ob-hint { font-size: 0.6875rem; color: #6B7280; line-height: 1.3; font-style: italic; }
+  .ob-conditional { padding: 0.875rem 1rem; border: 1px dashed #ECEAE3; border-radius: 10px; background: #FAFAF7; display: flex; flex-direction: column; gap: 0.625rem; }
+  .ob-cond-head { font-family: 'JetBrains Mono', monospace; font-size: 0.625rem; text-transform: uppercase; letter-spacing: 0.08em; color: #876300; font-weight: 600; }
+  .chip { display: inline-flex; align-items: center; gap: 0.375rem; padding: 0.1875rem 0.5rem; border-radius: 999px; font-size: 0.75rem; font-weight: 500; line-height: 1; background: #F5F5F5; color: #1A1A1A; border: 1px solid #ECEAE3; white-space: nowrap; }
+  .chip-ok { background: #DCFCE7; color: #047857; border-color: rgba(4,120,87,0.18); }
+  .ed-kicker.on-dark { color: #FFD400; }
+  .ed-kicker.on-dark::before { background: #FFD400; }
 </style>
 </head>
 <body>
@@ -144,11 +159,12 @@
   <div class="flex items-baseline justify-between flex-wrap gap-2 mb-5">
     <div>
       <div class="ed-kicker">YOUR APPS</div>
-      <h2 class="font-display font-semibold text-2xl mt-2">8 apps tuned to manager work</h2>
+      <h2 class="font-display font-semibold text-2xl mt-2">9 apps · the complete HR bundle</h2>
       <p class="text-sm muted mt-1">Tap any app to open it. Your session stays signed in.</p>
     </div>
     <a href="kooper-ai.html" class="btn-yellow">⚡ Ask kooper · ai</a>
   </div>
+  <!-- The HR bundle reads as a lifecycle: Recruit → Schedule → Run → Develop → Pay → Approve → Report → Admin -->
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
 
     <a href="kooper-rota.html" class="app-tile featured" aria-label="Open Manage Rota">
@@ -158,25 +174,18 @@
       <div class="app-desc">Drag-drop the week · WTR conflicts · cost tracking · approvals queue.</div>
     </a>
 
+    <a href="kooper-hr.html?view=onboarding" class="app-tile" aria-label="Open Onboarding">
+      <span class="app-arrow" aria-hidden="true">→</span>
+      <div class="app-icon" style="background:#DBEAFE;color:#1E40AF">📝</div>
+      <div class="app-name">Onboarding</div>
+      <div class="app-desc">Application forms · 4 staff-type pathways · DBS / NMC / right-to-work · auto-checks.</div>
+    </a>
+
     <a href="kooper-hr.html?view=staff" class="app-tile" aria-label="Open Staff">
       <span class="app-arrow" aria-hidden="true">→</span>
       <div class="app-icon" style="background:#FFD400;color:#0A0A0A">👥</div>
       <div class="app-name">Staff</div>
       <div class="app-desc">9 staff · roles · contracts · training currency · personalize their apps.</div>
-    </a>
-
-    <a href="kooper-rota.html?as=lo#approvals" class="app-tile" aria-label="Open Requests">
-      <span class="app-arrow" aria-hidden="true">→</span>
-      <div class="app-icon" style="background:#EDE9FE;color:#5B21B6">📨</div>
-      <div class="app-name">Requests</div>
-      <div class="app-desc">5 pending · time-off · swaps · cover offers · 1-tap approvals from rota.</div>
-    </a>
-
-    <a href="kooper-reports.html" class="app-tile" aria-label="Open Reports">
-      <span class="app-arrow" aria-hidden="true">→</span>
-      <div class="app-icon" style="background:#0A0A0A;color:#FFD400">📊</div>
-      <div class="app-name">Reports</div>
-      <div class="app-desc">CQC pack · ops · clinical · family · board · audit-hashed exports.</div>
     </a>
 
     <a href="kooper-hr.html?view=training" class="app-tile" aria-label="Open Training">
@@ -191,6 +200,20 @@
       <div class="app-icon" style="background:#DCFCE7;color:#047857">💷</div>
       <div class="app-name">Payroll</div>
       <div class="app-desc">£18,420 period total · 12/16 timesheets signed · pay Fri 30 May.</div>
+    </a>
+
+    <a href="kooper-rota.html?as=lo#approvals" class="app-tile" aria-label="Open Requests">
+      <span class="app-arrow" aria-hidden="true">→</span>
+      <div class="app-icon" style="background:#EDE9FE;color:#5B21B6">📨</div>
+      <div class="app-name">Requests</div>
+      <div class="app-desc">5 pending · time-off · swaps · cover offers · 1-tap approvals from rota.</div>
+    </a>
+
+    <a href="kooper-reports.html" class="app-tile" aria-label="Open Reports">
+      <span class="app-arrow" aria-hidden="true">→</span>
+      <div class="app-icon" style="background:#0A0A0A;color:#FFD400">📊</div>
+      <div class="app-name">Reports</div>
+      <div class="app-desc">CQC pack · ops · clinical · family · board · audit-hashed exports.</div>
     </a>
 
     <a href="kooper-hr.html?view=account" class="app-tile" aria-label="Open Account">
@@ -208,6 +231,10 @@
     </a>
 
   </div>
+
+  <p class="text-xs muted mt-4 text-center">
+    The HR bundle, end to end · <span class="font-mono">recruit → schedule → run → develop → pay → approve → report</span>
+  </p>
 </section>
 
 <!-- ============================================== -->
@@ -356,12 +383,288 @@ function renderAccount(host) {
     '</div>';
 }
 
+// ============================================================
+// ONBOARDING — application + first-day forms with conditional
+// logic for 4 staff types in a healthcare setting.
+// State lives in window.ONBOARD so re-renders preserve choices.
+// ============================================================
+window.ONBOARD = window.ONBOARD || { roleType: null, role: null, contract: null, fields: {}, docs: {} };
+
+const ONBOARD_ROLE_TYPES = [
+  { key:'perm-clinical',     label:'Permanent · clinical',     desc:'Nurse · Senior Carer · Carer · Nursing Assistant', accent:'#FEE2E2;color:#B42318', icon:'🩺' },
+  { key:'perm-non-clinical', label:'Permanent · non-clinical', desc:'Cook · Maintenance · Activities · Housekeeping',    accent:'#FFFBEB;color:#876300', icon:'🛠' },
+  { key:'agency-bank',       label:'Agency / bank',            desc:'Bank carer · agency nurse · per-shift framework',   accent:'#FFE39A;color:#5A4400', icon:'🤝' },
+  { key:'volunteer-student', label:'Volunteer / student',      desc:'Volunteer carer · student on placement · expenses-only · supervised', accent:'#86EFAC;color:#064E3B', icon:'🎒' }
+];
+const ONBOARD_ROLES = {
+  'perm-clinical':     ['Registered Nurse (RGN/RMN)','Senior Carer · Shift Lead','Carer','Nursing Assistant / HCA'],
+  'perm-non-clinical': ['Cook','Activities Coordinator','Maintenance Operative','Housekeeping','Driver'],
+  'agency-bank':       ['Bank Carer','Bank Nurse','Agency Nurse','Agency Carer'],
+  'volunteer-student': ['Volunteer Carer','Volunteer · Activities','Nursing Student (placement)','Social Work Student (placement)']
+};
+const ONBOARD_CONTRACTS = {
+  'perm-clinical':     ['Full-time · 37.5h','Part-time · 24h','Part-time · 16h','Fixed-term · 6 months','Fixed-term · 12 months'],
+  'perm-non-clinical': ['Full-time · 37.5h','Part-time · 30h','Part-time · 20h','Term-time only','Fixed-term · 12 months'],
+  'agency-bank':       ['Bank · zero-hour · ad-hoc','Agency framework (NHSP/Hays/etc)','Block booking · 12 weeks'],
+  'volunteer-student': ['Volunteer · 4-6h per week','Volunteer · once-a-month','Student placement · 6 weeks','Student placement · 12 weeks']
+};
+
+function renderOnboarding(host) {
+  var st = window.ONBOARD;
+  host.innerHTML =
+    '<div class="space-y-5">' +
+      // Step 1 — pick the staff type (drives all conditional logic)
+      '<div class="surface-card p-5">' +
+        '<div class="flex items-center justify-between flex-wrap gap-2 mb-3">' +
+          '<div><div class="ed-kicker">STEP 1 · STAFF TYPE</div><div class="font-display font-semibold text-lg mt-1">Who is being onboarded?</div></div>' +
+          '<span class="text-xs muted">Conditional fields below adapt to your choice.</span>' +
+        '</div>' +
+        '<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">' +
+          ONBOARD_ROLE_TYPES.map(function(rt){
+            var active = st.roleType === rt.key;
+            return '<button onclick="onboardSetRoleType(\'' + rt.key + '\')" class="text-left rounded-xl p-4 border ' + (active ? 'border-kapture-black bg-kapture-paper' : 'border-[#ECEAE3] hover:border-kapture-black bg-white') + ' transition" style="cursor:pointer;font-family:inherit">' +
+              '<div class="flex items-center gap-3 mb-1.5">' +
+                '<span style="width:36px;height:36px;border-radius:10px;background:' + rt.accent + ';display:inline-flex;align-items:center;justify-content:center;font-size:1rem">' + rt.icon + '</span>' +
+                '<span class="font-display font-semibold text-sm">' + rt.label + '</span>' +
+                (active ? '<span class="ml-auto chip chip-ok text-[0.625rem]">selected</span>' : '') +
+              '</div>' +
+              '<div class="text-xs muted leading-relaxed">' + rt.desc + '</div>' +
+            '</button>';
+          }).join('') +
+        '</div>' +
+      '</div>' +
+      // Step 2+ rendered conditionally below
+      (st.roleType ? renderOnboardingForm(st) : '<div class="text-xs muted text-center pt-2">Pick a staff type above to reveal the rest of the form.</div>') +
+    '</div>';
+}
+
+function renderOnboardingForm(st) {
+  var rt = st.roleType;
+  var clinical    = rt === 'perm-clinical';
+  var nonClinical = rt === 'perm-non-clinical';
+  var agency      = rt === 'agency-bank';
+  var volunteer   = rt === 'volunteer-student';
+  var permanent   = clinical || nonClinical;
+  var roles     = ONBOARD_ROLES[rt] || [];
+  var contracts = ONBOARD_CONTRACTS[rt] || [];
+
+  // Helper to build a labelled input
+  function field(id, label, type, opts) {
+    opts = opts || {};
+    var val = st.fields[id] || '';
+    var input = '';
+    if (type === 'select') {
+      input = '<select id="ob_' + id + '" onchange="onboardSetField(\'' + id + '\', this.value)" class="ob-input">' +
+        '<option value="">' + (opts.placeholder || 'Select…') + '</option>' +
+        (opts.options || []).map(function(o){ return '<option value="' + o + '"' + (o === val ? ' selected' : '') + '>' + o + '</option>'; }).join('') +
+      '</select>';
+    } else if (type === 'textarea') {
+      input = '<textarea id="ob_' + id + '" oninput="onboardSetField(\'' + id + '\', this.value)" rows="2" class="ob-input" placeholder="' + (opts.placeholder || '') + '">' + val + '</textarea>';
+    } else {
+      input = '<input id="ob_' + id + '" type="' + type + '" value="' + val + '" oninput="onboardSetField(\'' + id + '\', this.value)" class="ob-input" placeholder="' + (opts.placeholder || '') + '"' + (opts.max ? ' max="' + opts.max + '"' : '') + '>';
+    }
+    return '<label class="ob-field"><span class="ob-label">' + label + (opts.required ? ' <span style="color:#B42318">*</span>' : '') + '</span>' + input + (opts.hint ? '<span class="ob-hint">' + opts.hint + '</span>' : '') + '</label>';
+  }
+
+  // -------- DOCUMENTS CHECKLIST per role-type --------
+  var docs = [];
+  // Always
+  docs.push({ key:'photoId',     label:'Photo ID (driving licence / passport)',                                         req:true });
+  docs.push({ key:'rtw',         label:'Right-to-work proof (BRP / passport / share code)',                              req:true });
+  if (clinical || volunteer) docs.push({ key:'dbsEnh', label:'Enhanced DBS (incl. adults barred list)', req:true });
+  else if (nonClinical)      docs.push({ key:'dbsStd', label:'Standard DBS · Activities role needs Enhanced', req:true });
+  else if (agency)           docs.push({ key:'dbsAgcy', label:'Agency-supplied DBS or own Enhanced cert', req:true });
+  if (clinical && /Nurse/i.test(st.fields.role || '')) docs.push({ key:'nmcPin', label:'NMC PIN screenshot + revalidation date', req:true });
+  if (nonClinical && /Cook/i.test(st.fields.role || '')) docs.push({ key:'food', label:'Food Hygiene L2 certificate', req:true });
+  if (nonClinical && /Maintenance/i.test(st.fields.role || '')) docs.push({ key:'gas', label:'Gas Safe / NICEIC / trade qualifications (if applicable)', req:false });
+  if (permanent) docs.push({ key:'bank', label:'Bank account details (sort code + account no.)', req:true });
+  if (clinical) docs.push({ key:'occHealth', label:'Occupational Health questionnaire', req:true });
+  if (volunteer && /Student/i.test(st.fields.role || '')) docs.push({ key:'placement', label:'Education provider letter + placement supervisor', req:true });
+  if (clinical || nonClinical) docs.push({ key:'ref1', label:'Reference 1 (most recent employer)', req:true });
+  if (clinical || (nonClinical && /Activities/i.test(st.fields.role || ''))) docs.push({ key:'ref2', label:'Reference 2 (any other)', req:true });
+  if (volunteer) docs.push({ key:'safegTraining', label:'Safeguarding Adults — completed before first shift', req:true });
+
+  return '' +
+    // Step 2 — position basics
+    '<div class="surface-card p-5">' +
+      '<div class="ed-kicker mb-3">STEP 2 · POSITION + CONTRACT</div>' +
+      '<div class="grid grid-cols-1 md:grid-cols-2 gap-3">' +
+        field('role',     'Position applied for', 'select', { options: roles, required:true }) +
+        field('contract', 'Contract type',        'select', { options: contracts, required:true }) +
+        field('site',     'Site',                 'select', { options:['Draycott House','Marylebone Court','Camberwell Lodge'], required:true }) +
+        field('startDate','Start date',           'date',   { required:true }) +
+        field('hours',    'Hours per week',       'number', { placeholder: agency ? 'variable' : '37.5' }) +
+        field('rate',     (volunteer ? 'Expense rate (£/h, 0 if unpaid)' : 'Hourly rate (£)'), 'number', { placeholder: volunteer ? '0' : '13' }) +
+      '</div>' +
+    '</div>' +
+
+    // Step 3 — applicant basics
+    '<div class="surface-card p-5">' +
+      '<div class="ed-kicker mb-3">STEP 3 · APPLICANT</div>' +
+      '<div class="grid grid-cols-1 md:grid-cols-2 gap-3">' +
+        field('fullName',  'Full legal name',     'text', { required:true, placeholder:'as on passport' }) +
+        field('preferred', 'Preferred name',      'text', { placeholder:'optional' }) +
+        field('dob',       'Date of birth',       'date', { required:true }) +
+        field('phone',     'Mobile',              'tel',  { required:true }) +
+        field('email',     'Email',               'email',{ required:true }) +
+        field('ni',        'National Insurance no.', 'text', { required: !volunteer, hint: volunteer ? 'optional for volunteers' : 'format AB123456C' }) +
+      '</div>' +
+      '<div class="mt-3">' + field('address', 'Home address', 'textarea', { required: !agency, placeholder:'street · city · postcode' }) + '</div>' +
+    '</div>' +
+
+    // Step 4 — compliance & checks (the heart of conditional logic)
+    '<div class="surface-card p-5">' +
+      '<div class="ed-kicker mb-3">STEP 4 · COMPLIANCE · adapts to <strong>' + (ONBOARD_ROLE_TYPES.find(function(x){return x.key===rt;})||{}).label + '</strong></div>' +
+      '<div class="space-y-3">' +
+        // Right-to-work always
+        field('rtwStatus', 'Right-to-work status', 'select', { options:['UK / Irish citizen','Settled / Pre-settled status','Skilled Worker visa','Health and Care visa','Student visa (limited hours)','Other'], required:true }) +
+
+        // Clinical-specific
+        (clinical ? '' +
+          '<div class="ob-conditional">' +
+            '<div class="ob-cond-head">Clinical-only requirements</div>' +
+            field('dbsRef',     'DBS Enhanced certificate no.', 'text', { required:true, hint:'12-digit cert number from envelope' }) +
+            field('dbsDate',    'DBS issue date',                'date', { required:true, hint:'must be within last 3 years for new starters' }) +
+            field('nmcPin',     'NMC PIN (Nurse only)',          'text', { hint:'leave blank for non-Nurse roles' }) +
+            field('nmcRevalid', 'NMC revalidation due',          'date', { hint:'next revalidation deadline' }) +
+            field('careCert',   'Care Certificate status',       'select', { options:['Already completed','To complete in 12-week induction','Not applicable (Nurse)'] }) +
+            field('mandTrain',  'Mandatory training',            'select', { options:['Up to date · evidence uploaded','To complete in induction (4 weeks)','In progress'] }) +
+          '</div>'
+        : '') +
+
+        // Non-clinical specific
+        (nonClinical ? '' +
+          '<div class="ob-conditional">' +
+            '<div class="ob-cond-head">Non-clinical requirements</div>' +
+            field('dbsType',  'DBS level required', 'select', { options:['Standard (most non-clinical)','Enhanced (Activities · works with vulnerable adults)','Basic (driver / kitchen porter)'], required:true }) +
+            field('dbsRef',   'DBS certificate no.', 'text',  { required:true }) +
+            field('dbsDate',  'DBS issue date',      'date',  { required:true }) +
+            field('tradeQuals','Trade qualifications', 'text', { hint:'e.g. Food Hygiene L2, Gas Safe no., NICEIC reg, manual handling cert' }) +
+          '</div>'
+        : '') +
+
+        // Agency / bank specific
+        (agency ? '' +
+          '<div class="ob-conditional">' +
+            '<div class="ob-cond-head">Agency / bank framework</div>' +
+            field('agencyName',  'Agency / bank framework', 'select', { options:['NHS Professionals','Hays Healthcare','Newcross','Thornbury','Direct bank (we hold their docs)','Other'], required:true }) +
+            field('frameworkRef','Framework agreement ref', 'text', { hint:'agency PO / framework number' }) +
+            field('dbsSource',   'DBS source',              'select', { options:['Agency-verified · we trust their check','We have a copy of the cert on file','Worker has own enhanced DBS'], required:true }) +
+            field('availability','Availability pattern',    'textarea', { placeholder:'e.g. Mon–Wed nights · weekends · school holidays only' }) +
+            field('hourlyMarkup','Agency markup vs direct rate', 'text', { hint:'e.g. 25% above direct, or "framework-set"' }) +
+          '</div>'
+        : '') +
+
+        // Volunteer / student specific
+        (volunteer ? '' +
+          '<div class="ob-conditional">' +
+            '<div class="ob-cond-head">Volunteer / student safeguarding</div>' +
+            field('dbsRef',         'Enhanced DBS cert no.',     'text', { required:true, hint:'must be Enhanced — works with vulnerable adults' }) +
+            field('safegTrain',     'Safeguarding Adults training', 'select', { options:['Completed before first shift (mandatory)','Booked for week 1','Already trained elsewhere — evidence to upload'], required:true }) +
+            field('supervisor',     'Named supervisor on every shift', 'text', { required:true, hint:'must always be paired with a named permanent staff member' }) +
+            field('hoursLimit',     'Hours cap',                  'select', { options:['Up to 6h per week','Up to 12h per week','Placement timetable (set with provider)','One-off · special event'] }) +
+            (/(Student)/i.test(st.fields.role || '') ? '' +
+              field('eduProvider', 'Education provider',         'text', { required:true, placeholder:'e.g. London South Bank University' }) +
+              field('placementSup','Placement supervisor name',  'text', { required:true }) +
+              field('placementDates','Placement dates',          'text', { required:true, placeholder:'e.g. 12 May → 23 Jun 2026' })
+            : '') +
+            '<div class="text-[0.6875rem] muted italic">Volunteers + students are <strong>expenses-only</strong> · no payroll record created · still appear on the rota with a Volunteer chip.</div>' +
+          '</div>'
+        : '') +
+
+        // References (everyone except agency)
+        (!agency ? '' +
+          '<div class="ob-conditional">' +
+            '<div class="ob-cond-head">References (' + (clinical ? '2 required, 1 from most recent employer' : 'at least 1 from most recent employer') + ')</div>' +
+            field('ref1Name',  'Reference 1 — name',     'text', { required:true }) +
+            field('ref1Email', 'Reference 1 — email',    'email',{ required:true }) +
+            field('ref1Rel',   'Reference 1 — relationship', 'select', { options:['Most recent line manager','Previous employer','Senior colleague','Education provider'] }) +
+            (clinical ? field('ref2Name',  'Reference 2 — name',     'text', { required:true }) +
+                        field('ref2Email', 'Reference 2 — email',    'email',{ required:true }) +
+                        field('ref2Rel',   'Reference 2 — relationship', 'select', { options:['Previous line manager','Clinical supervisor','Senior colleague'] })
+            : '') +
+          '</div>'
+        : '') +
+
+        // Equality monitoring (CQC reporting requirement)
+        '<div class="ob-conditional">' +
+          '<div class="ob-cond-head">Equality monitoring · anonymised for CQC reporting only</div>' +
+          field('eqSex',       'Sex',          'select', { options:['Female','Male','Prefer not to say'] }) +
+          field('eqAge',       'Age band',     'select', { options:['18–24','25–34','35–44','45–54','55–64','65+','Prefer not to say'] }) +
+          field('eqEthnicity', 'Ethnicity',    'select', { options:['White British','White Other','Black African','Black Caribbean','Asian Indian','Asian Pakistani','Asian Bangladeshi','Mixed / Multiple','Other','Prefer not to say'] }) +
+          field('eqDisability','Disability',   'select', { options:['No','Yes','Prefer not to say'] }) +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+
+    // Step 5 — documents checklist
+    '<div class="surface-card p-5">' +
+      '<div class="ed-kicker mb-3">STEP 5 · DOCUMENTS · auto-generated checklist</div>' +
+      '<div class="space-y-2">' +
+        docs.map(function(d){
+          var checked = !!st.docs[d.key];
+          return '<label class="flex items-start gap-2.5 p-2.5 rounded-lg ' + (checked ? 'bg-[#DCFCE7]' : 'bg-[#FAFAF7]') + ' cursor-pointer">' +
+            '<input type="checkbox" ' + (checked ? 'checked' : '') + ' onchange="onboardSetDoc(\'' + d.key + '\', this.checked)" class="mt-0.5">' +
+            '<div class="flex-1"><div class="text-sm font-medium">' + d.label + '</div></div>' +
+            (d.req ? '<span class="chip text-[0.625rem]" style="background:#FFFBEB;color:#876300">required</span>' : '<span class="chip text-[0.625rem]">optional</span>') +
+          '</label>';
+        }).join('') +
+      '</div>' +
+      '<div class="mt-3 text-xs muted">' + Object.keys(st.docs).filter(function(k){ return st.docs[k]; }).length + ' / ' + docs.length + ' uploaded · the more you tick, the faster CQC inspection prep runs.</div>' +
+    '</div>' +
+
+    // Step 6 — submit
+    '<div class="surface-card p-5 bg-kapture-black text-white">' +
+      '<div class="flex items-start justify-between flex-wrap gap-3">' +
+        '<div><div class="ed-kicker on-dark">STEP 6 · SUBMIT TO REVIEW QUEUE</div><div class="font-display font-semibold text-lg mt-1">' + (st.fields.fullName || 'New starter') + ' · ' + (st.fields.role || (ONBOARD_ROLE_TYPES.find(function(x){return x.key===rt;})||{}).label) + '</div><p class="text-white/65 text-xs mt-2">On submit · file goes to Rae · references auto-emailed · DBS reminder armed · added to staff list with status <strong>Pre-employment</strong> until everything clears.</p></div>' +
+        '<div class="flex gap-2 flex-wrap">' +
+          '<button onclick="onboardReset()" class="chip" style="background:rgba(255,255,255,0.1);color:#fff;border:1px solid rgba(255,255,255,0.2)">Clear form</button>' +
+          '<button onclick="onboardSubmit()" class="btn-yellow text-xs">Submit to manager →</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+}
+
+function onboardSetRoleType(key) {
+  window.ONBOARD.roleType = key;
+  // Reset role-specific fields when type changes (keeps applicant basics)
+  window.ONBOARD.fields.role = '';
+  window.ONBOARD.fields.contract = '';
+  renderOnboarding(document.getElementById('hrSectionBody'));
+}
+function onboardSetField(id, value) {
+  window.ONBOARD.fields[id] = value;
+  // Re-render only on fields that change downstream conditional logic (role drives doc list)
+  if (id === 'role') renderOnboarding(document.getElementById('hrSectionBody'));
+}
+function onboardSetDoc(key, checked) {
+  window.ONBOARD.docs[key] = checked;
+  renderOnboarding(document.getElementById('hrSectionBody'));
+}
+function onboardReset() {
+  if (!confirm('Clear the entire onboarding form?')) return;
+  window.ONBOARD = { roleType:null, role:null, contract:null, fields:{}, docs:{} };
+  renderOnboarding(document.getElementById('hrSectionBody'));
+}
+function onboardSubmit() {
+  var f = window.ONBOARD.fields;
+  if (!window.ONBOARD.roleType) { kooperToast('Pick a staff type first'); return; }
+  if (!f.fullName || !f.role || !f.startDate) { kooperToast('Missing: name · role · start date'); return; }
+  kooperToast(f.fullName + ' submitted · references auto-emailed · added to staff list as Pre-employment');
+}
+
 // Render the inline surface based on ?view=
 (function(){
   var p = new URLSearchParams(window.location.search);
   var view = p.get('view');
   if (!view) return;
-  var titles = { staff:['STAFF','Staff list',renderStaff], training:['TRAINING','Mandatory training',renderTraining], payroll:['PAYROLL','Current period',renderPayroll], account:['ACCOUNT','Account type',renderAccount] };
+  var titles = {
+    staff:      ['STAFF',      'Staff list',                 renderStaff],
+    training:   ['TRAINING',   'Mandatory training',         renderTraining],
+    payroll:   ['PAYROLL',     'Current period',             renderPayroll],
+    account:    ['ACCOUNT',    'Account type',               renderAccount],
+    onboarding: ['ONBOARDING', 'Application & first-day forms', renderOnboarding]
+  };
   var t = titles[view]; if (!t) return;
   var surf = document.getElementById('hrInlineSurface');
   document.getElementById('hrSectionKicker').textContent = t[0];

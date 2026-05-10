@@ -87,6 +87,11 @@
   // Looks for #kooperHintsBtn first (every page has one), inserts before it.
   function injectBackPill(staff) {
     if (document.getElementById('kooperBackToDash')) return; // already there
+    // Skip pages that already have their own persona switcher (kooper-care-dashboards
+    // has #roleSwitcher; future pages can opt out via [data-persona-switcher]). The
+    // two UIs would visually collide otherwise.
+    if (document.getElementById('roleSwitcher')) return;
+    if (document.querySelector('[data-persona-switcher]')) return;
     var anchor = document.getElementById('kooperHintsBtn');
     if (!anchor) {
       // Fallback — try to find the first nav action area
