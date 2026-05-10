@@ -186,6 +186,38 @@
   .muted { color: #6B7280; }
   .ed-kicker { font-family: 'JetBrains Mono', monospace; font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: #876300; display: inline-flex; align-items: center; gap: 0.5rem; }
   .ed-kicker::before { content: ''; width: 18px; height: 2px; background: #FFD400; display: inline-block; }
+  .ed-kicker.on-dark { color: #FFD400; }
+  .ed-kicker.on-dark::before { background: #FFD400; }
+
+  /* Care plan editor sections */
+  .cp-section { background: #FFFFFF; border: 1px solid #ECEAE3; border-radius: 14px; padding: 1.125rem 1.25rem; transition: border-color 0.12s ease; }
+  .cp-section:focus-within { border-color: #0A0A0A; }
+  .cp-sec-head { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; margin-bottom: 0.625rem; flex-wrap: wrap; }
+  .cp-sec-title { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 1rem; line-height: 1.25; color: #0A0A0A; }
+  .cp-sec-meta { font-size: 0.6875rem; color: #6B7280; font-family: 'JetBrains Mono', monospace; }
+  .cp-sec-textarea { width: 100%; padding: 0.625rem 0.75rem; border: 1px solid #ECEAE3; border-radius: 10px; font-family: 'Inter', sans-serif; font-size: 0.875rem; line-height: 1.55; resize: vertical; min-height: 96px; background: #FFFFFF; color: #0A0A0A; transition: border-color 0.12s ease; }
+  .cp-sec-textarea:focus { outline: 0; border-color: #0A0A0A; }
+  .cp-sec-textarea.dirty { border-color: #FFD400; background: #FFFEF7; }
+
+  /* Notification rows */
+  .cp-notif-row { display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.625rem 0.75rem; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; transition: background 0.12s ease; cursor: pointer; text-decoration: none; color: #fff; }
+  .cp-notif-row:hover { background: rgba(255,255,255,0.08); }
+  .cp-notif-row.unseen { background: rgba(255,212,0,0.06); border-color: rgba(255,212,0,0.2); }
+  .cp-notif-row.unseen .cp-notif-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #FFD400; flex-shrink: 0; margin-top: 0.4375rem; box-shadow: 0 0 0 4px rgba(255,212,0,0.15); }
+  .cp-notif-dot { display: none; }
+  .cp-notif-icon { width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; flex-shrink: 0; font-family: 'JetBrains Mono', monospace; font-weight: 700; letter-spacing: 0.04em; }
+  .cp-notif-text { flex: 1; min-width: 0; font-size: 0.8125rem; line-height: 1.4; }
+  .cp-notif-time { font-family: 'JetBrains Mono', monospace; font-size: 0.6875rem; color: rgba(255,255,255,0.55); flex-shrink: 0; white-space: nowrap; }
+
+  /* Patient row visual distinctions for NEW + UPDATED plans */
+  .cp-patient-row.is-new { background: linear-gradient(90deg, rgba(255,212,0,0.08), transparent 60%); border-left: 3px solid #FFD400; padding-left: calc(1.125rem - 3px); }
+  .cp-patient-row.is-updated { background: linear-gradient(90deg, rgba(165,180,252,0.08), transparent 60%); border-left: 3px solid #818CF8; padding-left: calc(1.125rem - 3px); }
+  .cp-patient-row.unseen-notif::after { content: ''; position: absolute; right: 1rem; top: 50%; transform: translateY(-50%); width: 8px; height: 8px; border-radius: 50%; background: #FFD400; box-shadow: 0 0 0 5px rgba(255,212,0,0.18); animation: cpPulse 1.6s ease-in-out infinite; }
+  @keyframes cpPulse { 0%,100% { box-shadow: 0 0 0 5px rgba(255,212,0,0.18); } 50% { box-shadow: 0 0 0 8px rgba(255,212,0,0.05); } }
+  .cp-patient-row { position: relative; }
+
+  .cp-badge-new { display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 0.5625rem; font-weight: 700; letter-spacing: 0.08em; padding: 0.125rem 0.4375rem; border-radius: 4px; background: #FFD400; color: #0A0A0A; vertical-align: 1px; margin-left: 0.375rem; }
+  .cp-badge-edit { display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 0.5625rem; font-weight: 700; letter-spacing: 0.08em; padding: 0.125rem 0.4375rem; border-radius: 4px; background: #DBEAFE; color: #1E40AF; vertical-align: 1px; margin-left: 0.375rem; }
 </style>
 </head>
 <body class="min-h-screen">
@@ -262,6 +294,23 @@
       </a>
     </div>
 
+    <!-- ----- NOTIFICATIONS FEED · what other users have done ----- -->
+    <div id="cpNotifWrap" class="hidden max-w-4xl mx-auto mt-8">
+      <div class="bg-kapture-black text-white rounded-2xl p-5 relative overflow-hidden">
+        <div class="absolute -right-16 -top-16 w-48 h-48 rounded-full bg-kapture-yellow/15 blur-3xl pointer-events-none"></div>
+        <div class="relative">
+          <div class="flex items-center justify-between flex-wrap gap-2 mb-3">
+            <div class="flex items-center gap-2">
+              <span class="ed-kicker on-dark">TEAM ACTIVITY</span>
+              <span id="cpNotifBadge" class="chip text-[0.625rem]" style="background:rgba(255,212,0,0.2);color:#FFD400;border-color:rgba(255,212,0,0.4)">0 new</span>
+            </div>
+            <button onclick="cpMarkAllSeen()" class="text-[0.6875rem] text-white/60 hover:text-white">Mark all seen</button>
+          </div>
+          <div id="cpNotifList" class="space-y-2 text-sm"></div>
+        </div>
+      </div>
+    </div>
+
     <!-- ----- VIEW LIST · all patients with plan status ----- -->
     <div id="cpListWrap" class="hidden mt-10 max-w-4xl mx-auto">
       <div class="flex items-center justify-between mb-3 flex-wrap gap-2">
@@ -327,6 +376,49 @@
           </div>
         </div>
 
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================== -->
+<!-- CARE PLAN EDITOR — opens after Create flow OR  -->
+<!-- when ?view=edit&patient=ID is in URL.            -->
+<!-- ============================================== -->
+<section id="cpEditor" class="hidden bg-kapture-paper border-b border-kapture-fog min-h-[60vh]">
+  <div class="max-w-[1100px] mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-10">
+    <div class="flex items-center justify-between flex-wrap gap-3 mb-6">
+      <div class="flex items-center gap-3 min-w-0">
+        <div id="cpEdAvatar" class="w-12 h-12 rounded-full bg-kapture-coal text-white flex items-center justify-center font-display font-semibold text-sm flex-shrink-0">--</div>
+        <div class="min-w-0">
+          <div class="ed-kicker">CARE PLAN · EDITOR</div>
+          <h1 id="cpEdTitle" class="font-display font-semibold text-2xl tracking-tight mt-1">…</h1>
+          <p id="cpEdMeta" class="text-xs muted mt-1 flex flex-wrap gap-x-3 gap-y-1"></p>
+        </div>
+      </div>
+      <div class="flex gap-2 flex-wrap">
+        <a href="?view=list" class="chip text-xs">← Patient list</a>
+        <button onclick="cpSavePlan()" class="btn-primary text-xs">Save changes</button>
+      </div>
+    </div>
+
+    <!-- Activity log for THIS plan -->
+    <div id="cpEdActivity" class="bg-white border border-kapture-fog rounded-xl p-4 mb-5">
+      <div class="flex items-center justify-between mb-2 flex-wrap gap-2">
+        <span class="ed-kicker">PLAN ACTIVITY</span>
+        <span id="cpEdProgress" class="text-xs muted font-mono">0% complete</span>
+      </div>
+      <div id="cpEdActivityList" class="space-y-1.5 text-xs muted"></div>
+    </div>
+
+    <!-- Sections rendered per template -->
+    <div id="cpEdSections" class="space-y-4"></div>
+
+    <div class="mt-6 flex justify-between items-center flex-wrap gap-3">
+      <span class="text-xs muted">Edits auto-flag a notification to other carers and managers · audit-logged · CQC-evidence-ready.</span>
+      <div class="flex gap-2">
+        <button onclick="cpSavePlan()" class="btn-primary text-xs">Save changes</button>
+        <button onclick="cpOpenWorkspace()" class="chip text-xs">Open full workspace →</button>
       </div>
     </div>
   </div>
@@ -1286,65 +1378,203 @@
 </script>
 
 <!-- ============================================================ -->
-<!-- CARE PLANS LANDING ROUTING — Create / View / Patient picker  -->
+<!-- CARE PLANS · MAKER · live store + notifications              -->
 <!-- ============================================================ -->
 <script>
 (function(){
-  // ---------- Sample patient/client list ----------
-  // Persisted to localStorage so newly added patients survive a reload.
-  var SAMPLE = [
-    { id:'eb', name:'Mr Edward Banda',     pref:'Eddie',   age:78, room:'12', nhs:'485 777 3456', condition:'Vascular dementia · falls history',  funding:'NHS CHC',   plan:{ status:'active',    progress:61, lastReview:'2 May 2026', reviewsDue:2 } },
-    { id:'cc', name:'Mrs Catherine Cross', pref:'Cathy',   age:84, room:'07', nhs:'485 222 1180', condition:'End-of-life · diabetic + soft diet', funding:'Self-fund', plan:{ status:'active',    progress:78, lastReview:'29 Apr 2026', reviewsDue:0 } },
-    { id:'mh', name:'Mr Hubert Robinson',  pref:'Mr H',    age:81, room:'15', nhs:'485 909 4422', condition:'MUAC <22 · high-protein · frailty',  funding:'LA',        plan:{ status:'review',    progress:54, lastReview:'18 Apr 2026', reviewsDue:1 } },
-    { id:'mr', name:'Mr Reginald Asare',   pref:'Mr R',    age:73, room:'04', nhs:'485 113 9087', condition:'Post-stroke · rehab phase',          funding:'NHS CHC',   plan:{ status:'active',    progress:42, lastReview:'14 Apr 2026', reviewsDue:0 } },
-    { id:'jl', name:'Mrs Joyce Lambert',   pref:'Joyce',   age:88, room:'19', nhs:'485 660 2244', condition:'Late-stage dementia · BPSD',         funding:'LA',        plan:{ status:'active',    progress:71, lastReview:'30 Apr 2026', reviewsDue:0 } },
-    { id:'sn', name:'Ms Sophia Nakamura',  pref:'Sophia',  age:69, room:'21', nhs:'485 401 5588', condition:'Respite · 2 week stay · MS',          funding:'Self-fund', plan:{ status:'respite',   progress:30, lastReview:'5 May 2026',  reviewsDue:0 } },
-    { id:'pc', name:'Mr Paul Cosgrove',    pref:'Paul',    age:76, room:'09', nhs:'485 818 7711', condition:'New admission · awaiting plan',      funding:'LA',        plan:null },
-    { id:'av', name:'Mrs Anika Verma',     pref:'Anika',   age:91, room:'02', nhs:'485 232 0006', condition:'Frailty · falls · arrhythmia',       funding:'Mixed',     plan:{ status:'active',    progress:65, lastReview:'24 Apr 2026', reviewsDue:0 } }
+  // Sister Anne is the signed-in user when viewing care plans (per top-nav).
+  // Other "users" simulate cross-user activity for the notifications feed.
+  var CURRENT_USER = 'Sister Anne';
+  var OTHER_USERS = ['Rae Okonkwo', 'Rebecca Adesina', 'Daniel Kowalski', 'Craig Musara'];
+
+  // ---------- TEMPLATES — drive the section spine of a new plan ----------
+  var TEMPLATES = {
+    blank: {
+      label: 'Blank',
+      sections: [
+        { key:'general',     title:'General notes',           seed:'Start writing the plan here. Use the sections menu to add domains.' }
+      ]
+    },
+    dementia: {
+      label: 'Dementia + cognition',
+      sections: [
+        { key:'mca',         title:'Mental capacity assessment', seed:'Assessed under MCA 2005 · decision-specific · best-interests review scheduled.' },
+        { key:'bpsd',        title:'BPSD baseline + triggers',   seed:'Behavioural and psychological symptoms · timing patterns · de-escalation steps that work.' },
+        { key:'communication', title:'Communication preferences', seed:'Preferred language · cues · non-verbal signs · reminiscence prompts.' },
+        { key:'personal-care', title:'Personal care + dignity',   seed:'Bathing preferences · gendered carer · routine that prevents distress.' },
+        { key:'safety',      title:'Safety + wandering',         seed:'Wandering risk score · door alarms · last incident · MDT escalation route.' },
+        { key:'family',      title:'Family wishes',              seed:'Visit pattern · advance decisions · who to call first.' }
+      ]
+    },
+    frailty: {
+      label: 'Frailty + falls',
+      sections: [
+        { key:'mobility',    title:'Mobility baseline',          seed:'Aids in use · transfer pattern · last physio review.' },
+        { key:'falls',       title:'Falls risk + history',       seed:'Falls in last 30/90/365 days · time-of-day pattern · contributing factors.' },
+        { key:'muac',        title:'MUAC + nutrition',           seed:'MUAC reading · weight trend · supplement plan.' },
+        { key:'meds',        title:'Medication review',          seed:'Polypharmacy review date · STOPP/START flags · sedating meds at night.' },
+        { key:'bathroom',    title:'Bathroom + bedroom safety',  seed:'Grab rails · raised toilet seat · slip mat · night light.' }
+      ]
+    },
+    'end-life': {
+      label: 'End of life',
+      sections: [
+        { key:'respect',     title:'ReSPECT decisions',          seed:'CPR status · escalation ceiling · preferred place of care.' },
+        { key:'advance',     title:'Advance care wishes',        seed:'Patient wishes · spiritual / cultural needs · who must be present.' },
+        { key:'pain',        title:'Pain + symptom management',  seed:'Anticipatory meds · syringe driver · breakthrough plan.' },
+        { key:'family-eol',  title:'Family + visiting',          seed:'Open visiting · key relatives · communication preferences.' }
+      ]
+    },
+    'post-acute': {
+      label: 'Post-acute',
+      sections: [
+        { key:'rehab-goals', title:'Rehab goals',                seed:'Patient-set goals · MDT goals · 4-week / 12-week milestones.' },
+        { key:'mdt-review',  title:'MDT review schedule',        seed:'Weekly review attendees · escalation route.' },
+        { key:'mobility-rehab', title:'Mobility milestones',     seed:'Sit to stand · transfer · 10m walk · stairs.' },
+        { key:'discharge',   title:'Discharge target',           seed:'Target date · home / step-down / continued care · home assessment booked.' }
+      ]
+    },
+    respite: {
+      label: 'Respite',
+      sections: [
+        { key:'reason',      title:'Reason for respite',         seed:'Carer break / post-discharge / planned trial of residential.' },
+        { key:'routine',     title:'Routine + preferences',      seed:'Wake / sleep · diet · TV preferences · activities they enjoy.' },
+        { key:'discharge-resp', title:'Discharge summary plan',  seed:'Auto-built on day-of-departure · meds · GP letter · what to flag to family carer.' }
+      ]
+    }
+  };
+
+  // ---------- Sample patients ----------
+  var SAMPLE_PATIENTS = [
+    { id:'eb', name:'Mr Edward Banda',     pref:'Eddie',   age:78, room:'12', nhs:'485 777 3456', condition:'Vascular dementia · falls history',  funding:'NHS CHC' },
+    { id:'cc', name:'Mrs Catherine Cross', pref:'Cathy',   age:84, room:'07', nhs:'485 222 1180', condition:'End-of-life · diabetic + soft diet', funding:'Self-fund' },
+    { id:'mh', name:'Mr Hubert Robinson',  pref:'Mr H',    age:81, room:'15', nhs:'485 909 4422', condition:'MUAC <22 · high-protein · frailty',  funding:'LA' },
+    { id:'mr', name:'Mr Reginald Asare',   pref:'Mr R',    age:73, room:'04', nhs:'485 113 9087', condition:'Post-stroke · rehab phase',          funding:'NHS CHC' },
+    { id:'jl', name:'Mrs Joyce Lambert',   pref:'Joyce',   age:88, room:'19', nhs:'485 660 2244', condition:'Late-stage dementia · BPSD',         funding:'LA' },
+    { id:'sn', name:'Ms Sophia Nakamura',  pref:'Sophia',  age:69, room:'21', nhs:'485 401 5588', condition:'Respite · 2 week stay · MS',          funding:'Self-fund' },
+    { id:'pc', name:'Mr Paul Cosgrove',    pref:'Paul',    age:76, room:'09', nhs:'485 818 7711', condition:'New admission · awaiting plan',      funding:'LA' },
+    { id:'av', name:'Mrs Anika Verma',     pref:'Anika',   age:91, room:'02', nhs:'485 232 0006', condition:'Frailty · falls · arrhythmia',       funding:'Mixed' }
   ];
-  function loadPatients() {
-    try {
-      var raw = localStorage.getItem('kooper:carePlans:patients');
-      if (raw) return JSON.parse(raw);
-    } catch (e) {}
-    return SAMPLE;
+
+  function nowISO() { return new Date().toISOString(); }
+  function daysAgo(n) { return new Date(Date.now() - n*86400000).toISOString(); }
+  function hoursAgo(n) { return new Date(Date.now() - n*3600000).toISOString(); }
+
+  // Seeded plans + activity logs so the system feels alive on first load
+  function seedPlans() {
+    var p = {};
+    function seed(patientId, template, progress, lastEditedBy, lastEditedHrs, history) {
+      var tpl = TEMPLATES[template];
+      var sections = {};
+      tpl.sections.forEach(function(s){
+        sections[s.key] = { title: s.title, content: s.seed, lastEditedAt: hoursAgo(lastEditedHrs + Math.floor(Math.random()*48)), lastEditedBy: lastEditedBy };
+      });
+      p[patientId] = {
+        patientId: patientId, template: template, progress: progress, status: progress > 0 ? 'active' : 'draft',
+        createdAt: daysAgo(28), createdBy: 'Sister Anne',
+        lastEditedAt: hoursAgo(lastEditedHrs), lastEditedBy: lastEditedBy,
+        sections: sections, history: history || []
+      };
+    }
+    seed('eb', 'dementia',  61, 'Rae Okonkwo',     2,  [{ at:hoursAgo(2),   by:'Rae Okonkwo',     msg:'Updated wandering risk score' },{ at:daysAgo(1), by:'Sister Anne', msg:'Added family communication note' }]);
+    seed('cc', 'end-life',  78, 'Sister Anne',     6,  [{ at:hoursAgo(6),   by:'Sister Anne',     msg:'ReSPECT updated · CPR ceiling agreed with family' }]);
+    seed('mh', 'frailty',   54, 'Rebecca Adesina', 18, [{ at:hoursAgo(18),  by:'Rebecca Adesina', msg:'MUAC reading 21cm — protein supplement plan revised' },{ at:daysAgo(3),  by:'Rebecca Adesina', msg:'Falls risk reassessed after Wed incident' }]);
+    seed('mr', 'post-acute', 42, 'Sister Anne',    72, [{ at:daysAgo(3),    by:'Sister Anne',     msg:'Mobility milestone hit — sit-to-stand independent' }]);
+    seed('jl', 'dementia',  71, 'Sister Anne',     96, [{ at:daysAgo(4),    by:'Sister Anne',     msg:'BPSD trigger pattern updated · evening agitation' }]);
+    seed('sn', 'respite',   30, 'Daniel Kowalski', 24, [{ at:hoursAgo(24),  by:'Daniel Kowalski', msg:'Activities preferences logged' }]);
+    seed('av', 'frailty',   65, 'Sister Anne',     120,[{ at:daysAgo(5),    by:'Sister Anne',     msg:'Quarterly review — bathroom safety updated' }]);
+    return p;
   }
-  function savePatients(list) {
-    try { localStorage.setItem('kooper:carePlans:patients', JSON.stringify(list)); } catch (e) {}
+  function seedNotifications() {
+    return [
+      { id:'n_seed_1', type:'edit',   patientId:'eb', section:'Safety + wandering',       by:'Rae Okonkwo',     at: hoursAgo(2),  seen:false },
+      { id:'n_seed_2', type:'edit',   patientId:'mh', section:'MUAC + nutrition',          by:'Rebecca Adesina', at: hoursAgo(18), seen:false },
+      { id:'n_seed_3', type:'edit',   patientId:'sn', section:'Routine + preferences',     by:'Daniel Kowalski', at: hoursAgo(24), seen:false },
+      { id:'n_seed_4', type:'review', patientId:'mh', section:'Quarterly review due',      by:'kooper · ai',     at: hoursAgo(36), seen:true  }
+    ];
   }
-  var PATIENTS = loadPatients();
+
+  // ---------- Persistence layer ----------
+  function load(key, fallback) {
+    try { var raw = localStorage.getItem(key); return raw ? JSON.parse(raw) : fallback; } catch (e) { return fallback; }
+  }
+  function save(key, value) {
+    try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {}
+  }
+  var PATIENTS      = load('kooper:carePlans:patients', SAMPLE_PATIENTS);
+  var PLANS         = load('kooper:carePlans:plans',    seedPlans());
+  var NOTIFICATIONS = load('kooper:carePlans:notif',    seedNotifications());
+
+  function savePatients() { save('kooper:carePlans:patients', PATIENTS); }
+  function savePlans()    { save('kooper:carePlans:plans',    PLANS); }
+  function saveNotif()    { save('kooper:carePlans:notif',    NOTIFICATIONS); }
+
+  // Helpers
+  function patientById(id) { return PATIENTS.find(function (x) { return x.id === id; }) || null; }
+  function planFor(id)     { return PLANS[id] || null; }
+  function timeAgo(iso) {
+    if (!iso) return '';
+    var diff = (Date.now() - new Date(iso).getTime()) / 1000;
+    if (diff < 60)        return 'just now';
+    if (diff < 3600)      return Math.floor(diff/60) + ' min ago';
+    if (diff < 86400)     return Math.floor(diff/3600) + 'h ago';
+    if (diff < 86400*7)   return Math.floor(diff/86400) + 'd ago';
+    return new Date(iso).toLocaleDateString('en-GB', { day:'numeric', month:'short' });
+  }
+  function pushNotif(notif) {
+    notif.id = notif.id || ('n_' + Date.now());
+    notif.at = notif.at || nowISO();
+    notif.seen = false;
+    NOTIFICATIONS.unshift(notif);
+    NOTIFICATIONS = NOTIFICATIONS.slice(0, 30); // cap to last 30
+    saveNotif();
+  }
 
   // ---------- Routing ----------
   function getParam(k) { var p = new URLSearchParams(window.location.search); return p.get(k); }
   function activate() {
-    var landing  = document.getElementById('cpLanding');
-    var work     = document.getElementById('cpWorkspace');
-    var listWrap = document.getElementById('cpListWrap');
+    var landing    = document.getElementById('cpLanding');
+    var work       = document.getElementById('cpWorkspace');
+    var editor     = document.getElementById('cpEditor');
+    var listWrap   = document.getElementById('cpListWrap');
     var createWrap = document.getElementById('cpCreateWrap');
-    var view = getParam('view');
-    var resident = getParam('resident');
+    var notifWrap  = document.getElementById('cpNotifWrap');
+    var view       = getParam('view');
+    var resident   = getParam('resident');
+    var patientId  = getParam('patient');
 
-    // If a resident is in the URL, jump straight into the deep workspace
+    // Editor mode — open the live plan maker
+    if (view === 'edit' && patientId && planFor(patientId)) {
+      landing.classList.add('hidden'); work.classList.add('hidden');
+      editor.classList.remove('hidden');
+      renderEditor(patientId);
+      return;
+    }
+    // Deep workspace mode — existing editorial reading view
     if (resident) {
-      landing.classList.add('hidden');
+      landing.classList.add('hidden'); editor.classList.add('hidden');
       work.classList.remove('hidden');
-      // (Future: rebuild the deep workspace per resident. For now it loads Edward as the demo.)
+      // Mark any unseen notifications for this patient as seen
+      NOTIFICATIONS.forEach(function (n) { if (n.patientId === resident) n.seen = true; });
+      saveNotif();
       return;
     }
     // Otherwise show the landing
-    work.classList.add('hidden');
+    work.classList.add('hidden'); editor.classList.add('hidden');
     landing.classList.remove('hidden');
-    listWrap.classList.toggle('hidden', view !== 'list');
+    listWrap.classList.toggle('hidden',   view !== 'list');
     createWrap.classList.toggle('hidden', view !== 'create');
+    notifWrap.classList.toggle('hidden',  !!view); // show notifications only on default landing
 
-    if (view === 'list') renderList();
+    if (view === 'list')   renderList();
     if (view === 'create') renderCreate();
+    if (!view)             renderNotifFeed();
 
-    // Update CTA counts
-    var total = PATIENTS.length;
-    var dueCount = PATIENTS.reduce(function (n, p) { return n + ((p.plan && p.plan.reviewsDue) || 0); }, 0);
-    var elT = document.getElementById('cpCountTotal'); if (elT) elT.textContent = total;
-    var elR = document.getElementById('cpCountReview'); if (elR) elR.textContent = dueCount;
+    // Update CTA counts from live PLANS
+    var total = Object.keys(PLANS).length;
+    var dueCount = Object.values(PLANS).filter(function (p) { return p.status === 'review' || (p.history && p.history.some(function(h){ return /review/i.test(h.msg); })); }).length;
+    var elT = document.getElementById('cpCountTotal');  if (elT) elT.textContent = total;
+    var elR = document.getElementById('cpCountReview'); if (elR) elR.textContent = NOTIFICATIONS.filter(function(n){ return !n.seen; }).length;
   }
 
   // ---------- View · patient list ----------
@@ -1352,27 +1582,159 @@
     var host = document.getElementById('cpList');
     if (!host) return;
     host.innerHTML = PATIENTS.map(function (p) {
-      var status = p.plan ? p.plan.status : 'no-plan';
-      var statusChip = status === 'no-plan' ? '<span class="chip text-[0.625rem]" style="background:#FEE2E2;color:#B42318">No plan</span>'
-                     : status === 'review'  ? '<span class="chip text-[0.625rem]" style="background:#FFFBEB;color:#876300">Review due</span>'
-                     : status === 'respite' ? '<span class="chip text-[0.625rem]" style="background:#DBEAFE;color:#1E40AF">Respite</span>'
-                     :                        '<span class="chip text-[0.625rem]" style="background:#DCFCE7;color:#047857">Active · ' + (p.plan.progress || 0) + '%</span>';
-      var meta = p.plan
-        ? 'Last reviewed ' + p.plan.lastReview + (p.plan.reviewsDue ? ' · <strong style="color:#B42318">' + p.plan.reviewsDue + ' review(s) due</strong>' : '')
+      var plan = planFor(p.id);
+      var hasPlan = !!plan;
+      // NEW = plan created in last 7 days; UPDATED = plan edited in last 24h
+      var isNew = hasPlan && (Date.now() - new Date(plan.createdAt).getTime()) < 7*86400000;
+      var isUpdated = hasPlan && !isNew && (Date.now() - new Date(plan.lastEditedAt).getTime()) < 24*3600000;
+      var hasUnseenNotif = NOTIFICATIONS.some(function(n){ return n.patientId === p.id && !n.seen; });
+      var rowClasses = ['cp-patient-row'];
+      if (isNew)         rowClasses.push('is-new');
+      else if (isUpdated)rowClasses.push('is-updated');
+      if (hasUnseenNotif)rowClasses.push('unseen-notif');
+
+      var statusChip = !hasPlan ? '<span class="chip text-[0.625rem]" style="background:#FEE2E2;color:#B42318">No plan</span>'
+                     : plan.status === 'respite' ? '<span class="chip text-[0.625rem]" style="background:#DBEAFE;color:#1E40AF">Respite · ' + plan.progress + '%</span>'
+                     :                             '<span class="chip text-[0.625rem]" style="background:#DCFCE7;color:#047857">Active · ' + plan.progress + '%</span>';
+      var nameBadges = (isNew ? '<span class="cp-badge-new">NEW</span>' : '') + (isUpdated ? '<span class="cp-badge-edit">UPDATED</span>' : '');
+      var meta = hasPlan
+        ? 'Edited ' + timeAgo(plan.lastEditedAt) + ' by <strong>' + plan.lastEditedBy + '</strong>' + (plan.lastEditedBy !== CURRENT_USER && hasUnseenNotif ? ' · <span style="color:#876300;font-weight:600">unseen</span>' : '')
         : '<strong style="color:#B42318">Awaiting first plan</strong> · admitted recently';
-      // Whole row is the link — no nested anchors (the action becomes a visual chevron, not a separate button)
-      var rowHref = p.plan ? ('?resident=' + p.id) : ('?view=create&patient=' + p.id);
-      var actionLabel = p.plan ? 'Open + edit' : 'Create plan';
-      return '<a href="' + rowHref + '" class="cp-patient-row">' +
+      var rowHref = hasPlan ? ('?view=edit&patient=' + p.id) : ('?view=create&patient=' + p.id);
+      var actionLabel = hasPlan ? 'Open + edit' : 'Create plan';
+      return '<a href="' + rowHref + '" class="' + rowClasses.join(' ') + '">' +
         '<div style="width:36px;height:36px;border-radius:50%;background:#0A0A0A;color:#FFD400;display:flex;align-items:center;justify-content:center;font-family:Space Grotesk,sans-serif;font-weight:700;font-size:0.75rem;flex-shrink:0">' +
           (p.pref || p.name.split(' ')[1] || '?').slice(0,2).toUpperCase() +
         '</div>' +
-        '<div class="min-w-0"><div class="font-medium text-sm">' + p.name + '<span class="muted text-[0.6875rem] ml-2">· ' + p.pref + ' · ' + p.age + ' · room ' + p.room + '</span></div><div class="text-xs muted truncate">' + p.condition + ' · ' + p.funding + ' · ' + meta + '</div></div>' +
+        '<div class="min-w-0"><div class="font-medium text-sm">' + p.name + nameBadges + '<span class="muted text-[0.6875rem] ml-2">· ' + p.pref + ' · ' + p.age + ' · room ' + p.room + '</span></div><div class="text-xs muted truncate">' + p.condition + ' · ' + p.funding + ' · ' + meta + '</div></div>' +
         '<div class="cp-pr-status">' + statusChip + '</div>' +
         '<div class="cp-pr-action text-xs font-mono muted whitespace-nowrap">' + actionLabel + ' <span style="color:#0A0A0A;font-weight:600">→</span></div>' +
       '</a>';
     }).join('');
   }
+
+  // ---------- View · notifications feed (top of landing) ----------
+  function renderNotifFeed() {
+    var host = document.getElementById('cpNotifList');
+    var badge = document.getElementById('cpNotifBadge');
+    if (!host) return;
+    var unseen = NOTIFICATIONS.filter(function (n) { return !n.seen; });
+    if (badge) badge.textContent = unseen.length === 0 ? 'all caught up' : unseen.length + ' new';
+    if (NOTIFICATIONS.length === 0) {
+      host.innerHTML = '<div class="text-xs text-white/55">No team activity yet · edits and new plans show up here.</div>';
+      return;
+    }
+    host.innerHTML = NOTIFICATIONS.slice(0, 6).map(function (n) {
+      var p = patientById(n.patientId);
+      var name = p ? p.name : (n.patientName || 'Unknown patient');
+      var verb = n.type === 'create' ? 'created a new plan for' : (n.type === 'review' ? 'flagged a review on' : 'edited');
+      var iconBg = n.type === 'create' ? '#DCFCE7;color:#047857' : n.type === 'review' ? '#FFFBEB;color:#876300' : '#DBEAFE;color:#1E40AF';
+      var iconLabel = n.type === 'create' ? 'NEW' : n.type === 'review' ? 'REV' : 'EDIT';
+      var sectionLine = n.section ? ' · <span style="color:rgba(255,255,255,0.65)">' + n.section + '</span>' : '';
+      var href = (p && planFor(p.id)) ? '?view=edit&patient=' + p.id : '?view=list';
+      return '<a href="' + href + '" onclick="cpMarkNotifSeen(\'' + n.id + '\')" class="cp-notif-row ' + (n.seen ? '' : 'unseen') + '">' +
+        '<span class="cp-notif-dot"></span>' +
+        '<span class="cp-notif-icon" style="background:' + iconBg + '">' + iconLabel + '</span>' +
+        '<span class="cp-notif-text"><strong>' + n.by + '</strong> ' + verb + ' <strong>' + name + '</strong>' + sectionLine + '</span>' +
+        '<span class="cp-notif-time">' + timeAgo(n.at) + '</span>' +
+      '</a>';
+    }).join('');
+  }
+
+  // ---------- View · editor (the live plan maker) ----------
+  function renderEditor(patientId) {
+    var p = patientById(patientId); var plan = planFor(patientId);
+    if (!p || !plan) { window.location.href = '?view=list'; return; }
+    var tpl = TEMPLATES[plan.template] || TEMPLATES.blank;
+
+    // Header
+    var av = document.getElementById('cpEdAvatar');
+    av.textContent = (p.pref || p.name.split(' ')[1] || '?').slice(0,2).toUpperCase();
+    document.getElementById('cpEdTitle').textContent = p.name + ' · care plan';
+    document.getElementById('cpEdMeta').innerHTML =
+      '<span><strong>' + tpl.label + '</strong> template</span>' +
+      '<span class="text-kapture-fog">·</span>' +
+      '<span>' + p.condition + '</span>' +
+      '<span class="text-kapture-fog">·</span>' +
+      '<span>Created ' + timeAgo(plan.createdAt) + ' by ' + plan.createdBy + '</span>' +
+      '<span class="text-kapture-fog">·</span>' +
+      '<span>Last edit ' + timeAgo(plan.lastEditedAt) + ' by <strong>' + plan.lastEditedBy + '</strong></span>';
+
+    document.getElementById('cpEdProgress').textContent = plan.progress + '% complete';
+
+    // Activity log
+    var actHost = document.getElementById('cpEdActivityList');
+    actHost.innerHTML = (plan.history || []).slice(0, 6).map(function (h) {
+      var isOther = h.by !== CURRENT_USER;
+      return '<div class="flex items-center gap-2"><span style="width:6px;height:6px;border-radius:50%;background:' + (isOther ? '#FFD400' : '#10B981') + ';display:inline-block;flex-shrink:0"></span><span class="font-mono">' + timeAgo(h.at) + '</span> · <strong style="color:' + (isOther ? '#876300' : '#0A0A0A') + '">' + h.by + '</strong> · ' + h.msg + '</div>';
+    }).join('') || '<div class="text-xs muted italic">No prior edits.</div>';
+
+    // Sections — each one editable
+    var secsHost = document.getElementById('cpEdSections');
+    secsHost.innerHTML = tpl.sections.map(function (sDef) {
+      var s = plan.sections[sDef.key] || { title: sDef.title, content: sDef.seed, lastEditedAt: plan.createdAt, lastEditedBy: plan.createdBy };
+      var editorOther = s.lastEditedBy !== CURRENT_USER;
+      var safeContent = (s.content || '').replace(/&/g,'&amp;').replace(/</g,'&lt;');
+      return '<div class="cp-section">' +
+        '<div class="cp-sec-head">' +
+          '<div class="cp-sec-title">' + s.title + '</div>' +
+          '<div class="cp-sec-meta">' + (editorOther ? '✎ ' : '') + 'Edited ' + timeAgo(s.lastEditedAt) + ' by ' + s.lastEditedBy + '</div>' +
+        '</div>' +
+        '<textarea class="cp-sec-textarea" data-section="' + sDef.key + '" oninput="cpMarkDirty(this)">' + safeContent + '</textarea>' +
+      '</div>';
+    }).join('');
+  }
+
+  // ---------- Actions ----------
+  window.cpMarkDirty = function (el) { el.classList.add('dirty'); };
+
+  window.cpSavePlan = function () {
+    var patientId = getParam('patient');
+    var plan = planFor(patientId);
+    if (!plan) return;
+    var changed = [];
+    document.querySelectorAll('#cpEdSections textarea').forEach(function (t) {
+      var key = t.getAttribute('data-section');
+      var newContent = t.value;
+      var sec = plan.sections[key];
+      if (!sec || sec.content !== newContent) {
+        if (!sec) sec = plan.sections[key] = { title: t.closest('.cp-section').querySelector('.cp-sec-title').textContent };
+        sec.content = newContent;
+        sec.lastEditedAt = nowISO();
+        sec.lastEditedBy = CURRENT_USER;
+        changed.push(sec.title);
+        t.classList.remove('dirty');
+      }
+    });
+    if (changed.length === 0) { kooperToast('No changes to save'); return; }
+    plan.lastEditedAt = nowISO();
+    plan.lastEditedBy = CURRENT_USER;
+    plan.progress = Math.min(100, plan.progress + Math.min(8, changed.length * 3));
+    plan.history = (plan.history || []);
+    plan.history.unshift({ at: nowISO(), by: CURRENT_USER, msg: 'Edited ' + changed.length + ' section(s): ' + changed.slice(0,3).join(', ') + (changed.length > 3 ? '…' : '') });
+    plan.history = plan.history.slice(0, 20);
+    savePlans();
+    pushNotif({ type:'edit', patientId: patientId, patientName: patientById(patientId).name, section: changed[0], by: CURRENT_USER });
+    kooperToast(changed.length + ' section(s) saved · team notified');
+    renderEditor(patientId);
+  };
+
+  window.cpOpenWorkspace = function () {
+    var patientId = getParam('patient');
+    if (patientId) window.location.href = '?resident=' + patientId;
+  };
+
+  window.cpMarkNotifSeen = function (id) {
+    var n = NOTIFICATIONS.find(function (x) { return x.id === id; });
+    if (n) { n.seen = true; saveNotif(); }
+  };
+  window.cpMarkAllSeen = function () {
+    NOTIFICATIONS.forEach(function (n) { n.seen = true; });
+    saveNotif();
+    renderNotifFeed();
+    activate();
+    kooperToast('All marked as seen');
+  };
 
   // ---------- View · create flow ----------
   function renderCreate() {
@@ -1432,17 +1794,32 @@
     document.getElementById('cpPatientPicker').value = newP.id;
     window.cpPickPatient(newP.id);
   };
-  window.cpStartPlan = function (template) {
+  window.cpStartPlan = function (templateKey) {
     var pickerVal = document.getElementById('cpPatientPicker').value;
     var p = PATIENTS.find(function (x) { return x.id === pickerVal; });
     if (!p) { kooperToast('Pick a patient first'); return; }
-    // Mark the patient as having a plan now (active, 5% progress for the template seed)
-    if (!p.plan) {
-      p.plan = { status:'active', progress:5, lastReview:'today', reviewsDue:0, template: template };
-      savePatients(PATIENTS);
-    }
-    kooperToast(p.name + ' · ' + template + ' template applied · opening workspace');
-    window.location.href = '?resident=' + p.id;
+    var tpl = TEMPLATES[templateKey] || TEMPLATES.blank;
+    // Build the plan from the template — every section seeded with starter content
+    var sections = {};
+    tpl.sections.forEach(function (s) {
+      sections[s.key] = { title: s.title, content: s.seed, lastEditedAt: nowISO(), lastEditedBy: CURRENT_USER };
+    });
+    PLANS[p.id] = {
+      patientId: p.id,
+      template:  templateKey,
+      status:    'active',
+      progress:  5,
+      createdAt: nowISO(),
+      createdBy: CURRENT_USER,
+      lastEditedAt: nowISO(),
+      lastEditedBy: CURRENT_USER,
+      sections:  sections,
+      history:   [{ at: nowISO(), by: CURRENT_USER, msg: 'Plan created from ' + tpl.label + ' template' }]
+    };
+    savePlans();
+    pushNotif({ type:'create', patientId: p.id, patientName: p.name, by: CURRENT_USER });
+    kooperToast(p.name + ' · ' + tpl.label + ' plan created · opening editor');
+    window.location.href = '?view=edit&patient=' + p.id;
   };
 
   document.addEventListener('DOMContentLoaded', activate);
