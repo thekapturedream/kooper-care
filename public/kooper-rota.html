@@ -241,16 +241,17 @@
         <h1 class="h-hero text-white mb-2" id="rotaTitle">Your week, ready to go.</h1>
         <p class="text-white/70 max-w-2xl text-sm lg:text-base" id="rotaLede">Your shifts, your hours, your pay. Switch to Team Rota to see who else is on. Request swaps and time off, pick up open cover.</p>
 
-        <!-- View toggle · My Rota / Team Rota / (Manage Rota for managers) -->
+        <!-- View toggle · personalised per persona by personalizeRota()
+             Manager (Rae) sees: Manage Rota | Team Rota
+             Staff sees:        My Rota     | Team Rota -->
         <div class="mt-6 flex flex-wrap gap-2 items-center" id="viewToggle">
-          <button class="view-pill active" data-view="my" onclick="switchView(this,'my')">My Rota <span class="vp-key">M</span></button>
-          <button class="view-pill" data-view="team" onclick="switchView(this,'team')">Team Rota <span class="vp-key">T</span></button>
-          <a id="manageRotaBtn" href="#" onclick="event.preventDefault(); var b=document.querySelector('[data-view=manage]'); if(b) switchView(b,'manage');" class="btn-yellow text-xs whitespace-nowrap" style="display:none;text-decoration:none">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-            Manage Rota
-          </a>
-          <!-- Manage view is hidden from the toggle row but reachable via the Manage Rota button above -->
-          <button class="view-pill" data-view="manage" onclick="switchView(this,'manage')" style="display:none">Manage</button>
+          <button id="pillMy"     class="view-pill" data-view="my"     onclick="switchView(this,'my')">My Rota <span class="vp-key">M</span></button>
+          <button id="pillManage" class="view-pill" data-view="manage" onclick="switchView(this,'manage')" style="display:none">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="display:inline-block;vertical-align:-2px;margin-right:0.25rem"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>Manage Rota <span class="vp-key">R</span>
+          </button>
+          <button id="pillTeam"   class="view-pill" data-view="team"   onclick="switchView(this,'team')">Team Rota <span class="vp-key">T</span></button>
+          <!-- Legacy CTA kept hidden; the pill above takes its place -->
+          <a id="manageRotaBtn" href="#" style="display:none"></a>
         </div>
       </div>
 
@@ -820,7 +821,7 @@ function switchView(btn, key){
 // Keyboard shortcuts
 document.addEventListener('keydown', e => {
   if (e.target.matches('input, textarea, select')) return;
-  if (e.key.toLowerCase() === 'm') { var b = document.querySelector('[data-view="my"]'); if (b) switchView(b,'my'); }
+  if (e.key.toLowerCase() === 'm') { var b = document.querySelector('section[data-view="my"]'); if (b) switchView(b,'my'); }
   if (e.key.toLowerCase() === 't') { var b = document.querySelector('[data-view="team"]'); if (b) switchView(b,'team'); }
   if (e.key.toLowerCase() === 'r') { var b = document.querySelector('[data-view="manage"]'); if (b && b.style.display !== 'none') switchView(b,'manage'); }
 });
@@ -1401,6 +1402,11 @@ function readRotaUser() {
   } catch (e) {}
   return ROTA_USERS.cm;
 }
+// Cost-per-hour by role — drives the per-staff earnings line
+// Cost-per-hour by base role (matched after splitting any qualifier off the role string)
+const ROTA_COST_PER_HOUR = { 'Nurse': 22, 'Senior Carer': 16, 'Carer': 13, 'Activities Coordinator': 13, 'Activities': 13, 'Cook': 12, 'Maintenance': 14, 'Volunteer Carer': 0, 'Registered Manager': 0 };
+const ROTA_DAY_LABELS = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+
 function personalizeRota() {
   var u = readRotaUser();
   var isManager = (u === ROTA_USERS.lo);
@@ -1414,19 +1420,135 @@ function personalizeRota() {
     ? "Drag-drop the week, fix coverage gaps with AI suggestions, approve swaps and time-off in one tap. Your team's shifts on a single grid."
     : "Your shifts, your hours, your pay. Switch to Team Rota to see who else is on. Request swaps and time off, pick up open cover.";
 
-  // Manage Rota button — manager-only
-  var manageBtn = document.getElementById('manageRotaBtn');
-  if (manageBtn) manageBtn.style.display = isManager ? 'inline-flex' : 'none';
+  // ============================================================
+  // PILL VISIBILITY · Manager sees Manage+Team; staff see My+Team
+  // ============================================================
+  var pillMy     = document.getElementById('pillMy');
+  var pillManage = document.getElementById('pillManage');
+  var pillTeam   = document.getElementById('pillTeam');
+  if (pillMy)     pillMy.style.display     = isManager ? 'none' : 'inline-flex';
+  if (pillManage) pillManage.style.display = isManager ? 'inline-flex' : 'none';
+  if (pillTeam)   pillTeam.style.display   = 'inline-flex';
 
-  // My Rota worker header — rewrite avatar + name + role line per signed-in user
-  var myView = document.querySelector('[data-view="my"]');
-  if (myView) {
-    var avatarEl = myView.querySelector('.w-12.h-12.rounded-full');
-    var nameEl   = myView.querySelector('.font-display.text-lg');
-    var metaEl   = nameEl ? nameEl.nextElementSibling : null;
-    if (avatarEl) { avatarEl.style.background = u.bg; avatarEl.style.color = u.fg; avatarEl.textContent = u.init; }
-    if (nameEl)   nameEl.textContent = u.name;
-    if (metaEl)   metaEl.textContent = u.role + ' · ' + u.site.split(' ·')[0] + ' · ' + u.contracted;
+  // Default landing view per persona
+  var defaultView = isManager ? 'manage' : 'my';
+  document.querySelectorAll('.view-pill').forEach(function (p) { p.classList.remove('active'); });
+  var defaultPill = document.querySelector('[data-view="' + defaultView + '"]');
+  if (defaultPill) defaultPill.classList.add('active');
+  document.querySelectorAll('section.view').forEach(function (s) { s.classList.toggle('is-active', s.dataset.view === defaultView); });
+
+  // ============================================================
+  // PERSONALISE MY ROTA · rewrite from the signed-in user's shift data
+  // (Skip for manager — she has no personal shifts)
+  // ============================================================
+  if (!isManager) personalizeMyRota(u);
+}
+
+// ----------------------------------------------------------------
+// MY ROTA · per-staff content. Pulls shifts from WORKERS (defined
+// near the week-grid) so each persona sees THEIR own week, not
+// Craig's. Falls back gracefully if the user isn't in WORKERS.
+// ----------------------------------------------------------------
+function personalizeMyRota(u) {
+  var myView = document.querySelector('section[data-view="my"]');
+  if (!myView) return;
+  var workerId = (function findWorkerId() {
+    var p = new URLSearchParams(window.location.search);
+    var k = p.get('as');
+    if (k) return k;
+    try { return localStorage.getItem('kooper:session:as'); } catch (e) { return null; }
+  })();
+  var worker = (typeof WORKERS !== 'undefined') ? WORKERS.find(function (w) { return w.id === workerId; }) : null;
+
+  // Header avatar + name + role
+  var avatarEl = myView.querySelector('.w-12.h-12.rounded-full');
+  var nameEl   = myView.querySelector('.font-display.text-lg');
+  var metaEl   = nameEl ? nameEl.nextElementSibling : null;
+  if (avatarEl) { avatarEl.style.background = u.bg; avatarEl.style.color = u.fg; avatarEl.textContent = u.init; }
+  if (nameEl)   nameEl.textContent = u.name;
+  if (metaEl)   metaEl.textContent = u.role + ' · ' + u.site.split(' ·')[0] + ' · ' + u.contracted;
+
+  // Build a per-day schedule. If the user isn't in WORKERS (e.g., Joy on agency,
+  // Ben as volunteer), fall back to an empty week so we still rebuild the cards
+  // — better than leaving Craig's hardcoded content showing.
+  var shifts = (worker && typeof SHIFT_STATE !== 'undefined' && SHIFT_STATE[worker.id]) ? SHIFT_STATE[worker.id]
+             : worker ? worker.shifts
+             : ['off','off','off','off','off','off','off'];
+  var weekHours = shifts.reduce(function (acc, k) { return acc + ((typeof SHIFT_HOURS !== 'undefined' ? SHIFT_HOURS[k] : 0) || 0); }, 0);
+
+  // Find the first non-off shift starting from today (Wed = index 2 in our week)
+  var todayIdx = 2; // Wed = current "today" anchor in the demo week
+  var nextIdx = -1, nextShiftKey = null;
+  for (var offset = 0; offset < 7; offset++) {
+    var idx = (todayIdx + offset) % 7;
+    if (shifts[idx] && shifts[idx] !== 'off') { nextIdx = idx; nextShiftKey = shifts[idx]; break; }
+  }
+
+  // Next-shift card
+  var nextCard = myView.querySelector('.my-shift-card.next');
+  if (nextCard) {
+    if (nextShiftKey && typeof SHIFT_TEMPLATES !== 'undefined') {
+      var tpl = SHIFT_TEMPLATES[nextShiftKey];
+      var dayLabel = nextIdx === todayIdx ? 'Today' : (nextIdx === ((todayIdx + 1) % 7) ? 'Tomorrow' : ROTA_DAY_LABELS[nextIdx]);
+      var hours = SHIFT_HOURS[nextShiftKey] || 8;
+      nextCard.innerHTML =
+        '<div class="ms-day">' + dayLabel + ' · ' + tpl.label.toLowerCase() + ' shift</div>' +
+        '<div class="ms-time">' + tpl.time.replace('–', ' — ') + '</div>' +
+        '<div class="ms-meta">' + tpl.label + ' · Draycott · ' + hours + 'h shift</div>' +
+        '<div class="mt-4 pt-4 border-t border-white/10 flex flex-wrap gap-2">' +
+          '<button onclick="kooperToast(\'Clocked in · welcome ' + u.first + '\')" class="btn-yellow text-xs">Clock in</button>' +
+          '<button onclick="kooperToast(\'Sister Anne notified · running 5 min late\')" class="btn-secondary-on-dark text-xs">I\'ll be late</button>' +
+        '</div>';
+    } else {
+      nextCard.innerHTML =
+        '<div class="ms-day">No shifts scheduled this week</div>' +
+        '<div class="ms-time">Off duty</div>' +
+        '<div class="ms-meta">Pick up open cover or check Team Rota for swap opportunities.</div>';
+    }
+  }
+
+  // This week card · scheduled hours + day-by-day list
+  var weekCard = myView.querySelectorAll('.my-shift-card')[1];
+  if (weekCard) {
+    var rows = ROTA_DAY_LABELS.map(function (lbl, i) {
+      var k = shifts[i];
+      var label = (i === todayIdx) ? lbl + ' · today' : lbl;
+      var val = (k === 'off' || !k) ? 'off' : ((typeof SHIFT_TEMPLATES !== 'undefined' && SHIFT_TEMPLATES[k]) ? SHIFT_TEMPLATES[k].time : k);
+      return '<div class="flex justify-between"><span class="text-kapture-smoke">' + label + '</span><span class="font-mono">' + val + '</span></div>';
+    }).join('');
+    var contractMeta = (function () {
+      var m = (u.contracted || '').match(/(\d+(?:\.\d+)?)\s*h/);
+      var contractedHrs = m ? parseFloat(m[1]) : 0;
+      var diff = weekHours - contractedHrs;
+      var diffLabel = (diff === 0 ? 'matches contract'
+        : diff > 0 ? '+' + (diff % 1 === 0 ? diff : diff.toFixed(1)) + 'h overtime'
+        : (Math.abs(diff) % 1 === 0 ? Math.abs(diff) : Math.abs(diff).toFixed(1)) + 'h under contract');
+      return shifts.filter(function (k) { return k !== 'off'; }).length + ' shifts · ' + diffLabel;
+    })();
+    weekCard.innerHTML =
+      '<div class="ms-day">This week</div>' +
+      '<div class="ms-time">' + weekHours + 'h scheduled</div>' +
+      '<div class="ms-meta">' + contractMeta + '</div>' +
+      '<div class="mt-4 pt-4 border-t border-kapture-fog text-xs space-y-1">' + rows + '</div>';
+  }
+
+  // Earnings card · period total derived from rate × week hours × ~4 weeks
+  var earnCard = myView.querySelectorAll('.my-shift-card')[2];
+  if (earnCard) {
+    // Role strings have qualifiers ("Nurse · RGN", "Senior Carer · Shift Lead") — match on the base role
+    var baseRole = (u.role || '').split(' · ')[0].trim();
+    var rate = ROTA_COST_PER_HOUR[baseRole] || ROTA_COST_PER_HOUR[u.role] || 13;
+    var periodHours = weekHours * 4; // 4-week period
+    var periodPay = rate * periodHours;
+    var payLabel = u.role === 'Volunteer Carer' ? 'Volunteer · expenses only' : '£' + periodPay.toLocaleString();
+    earnCard.innerHTML =
+      '<div class="ms-day">Earnings · this period</div>' +
+      '<div class="ms-time">' + payLabel + '</div>' +
+      '<div class="ms-meta">' + periodHours + 'h · period 27 Apr → 24 May · paid Fri 30 May</div>' +
+      '<div class="mt-4 pt-4 border-t border-kapture-fog flex flex-wrap gap-2">' +
+        '<button onclick="kooperToast(\'Last 3 payslips opened in new tab\')" class="chip text-xs">Payslips</button>' +
+        '<button onclick="kooperToast(\'Timesheet signed · sent to Rae for approval\')" class="chip text-xs">Sign timesheet</button>' +
+      '</div>';
   }
 }
 
