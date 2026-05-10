@@ -990,6 +990,13 @@ document.addEventListener('DOMContentLoaded', function(){
   (function bootContext () {
     try {
       var p = new URLSearchParams(window.location.search);
+      // Translate ?as=<id> from session.js convention into reporting's user-pill key
+      var asToUser = { sa:'nurse', cm:'carer', ra:'senior', dk:'activities', lo:'manager' };
+      var as = p.get('as');
+      if (as && asToUser[as]) {
+        var pill = document.querySelector('.user-pill[data-user="' + asToUser[as] + '"]');
+        if (pill && typeof switchUser === 'function') switchUser(pill, asToUser[as]);
+      }
       var rid = p.get('resident') || localStorage.getItem('kooper:reporting:resident');
       if (rid && RESIDENT_DATA.find(function (x) { return x.id === rid; })) {
         switchResident(null, rid);

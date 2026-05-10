@@ -663,6 +663,9 @@ function onboardSubmit() {
 // Render the inline surface based on ?view=
 (function(){
   var p = new URLSearchParams(window.location.search);
+  // URL ?as= wins on every page load — persist back to localStorage so other pages stay aligned
+  var as = p.get('as');
+  if (as) { try { localStorage.setItem('kooper:session:as', as); } catch (e) {} }
   var view = p.get('view');
   if (!view) return;
   var titles = {

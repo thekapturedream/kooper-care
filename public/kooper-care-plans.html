@@ -1680,11 +1680,25 @@
   }
 
   // Current user — read from URL ?user=Name OR localStorage. Sister Anne by default.
+  // ?as=<id> → full user name (matches kooper-session.js STAFF map)
+  var AS_TO_USER = {
+    sa:'Sister Anne', cm:'Craig Musara', ra:'Rebecca Adesina', dk:'Daniel Kowalski',
+    mc:'Mary Chen',   tb:'Tomas Bauer',  jm:'Joy Munemo',      bp:'Ben Pearce',
+    lo:'Rae Okonkwo'
+  };
   var CURRENT_USER = (function () {
     try {
       var p = new URLSearchParams(window.location.search);
+      // ?user=Name wins (page's own convention)
       var u = p.get('user');
       if (u && USERS[u]) { localStorage.setItem('kooper:carePlans:currentUser', u); return u; }
+      // ?as=ID also wins — translates from session.js convention so cross-app links work
+      var as = p.get('as');
+      if (as && AS_TO_USER[as] && USERS[AS_TO_USER[as]]) {
+        var translated = AS_TO_USER[as];
+        localStorage.setItem('kooper:carePlans:currentUser', translated);
+        return translated;
+      }
       var saved = localStorage.getItem('kooper:carePlans:currentUser');
       if (saved && USERS[saved]) return saved;
     } catch (e) {}

@@ -286,7 +286,17 @@ const ACCENT = {
 function readStaffId() {
   const params = new URLSearchParams(window.location.search);
   const k = params.get('as');
-  return STAFF[k] ? k : 'sa';
+  if (STAFF[k]) {
+    // URL wins · also persist to localStorage so cross-page links stay consistent
+    try { localStorage.setItem('kooper:session:as', k); } catch (e) {}
+    return k;
+  }
+  // Fallback to whatever session.js persisted
+  try {
+    const stored = localStorage.getItem('kooper:session:as');
+    if (stored && STAFF[stored]) return stored;
+  } catch (e) {}
+  return 'sa';
 }
 function loadCustomApps(id) {
   try {
