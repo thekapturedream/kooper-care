@@ -1397,7 +1397,12 @@ function readRotaUser() {
   try {
     var p = new URLSearchParams(window.location.search);
     var k = p.get('as');
-    if (k && ROTA_USERS[k]) return ROTA_USERS[k];
+    // URL always wins. If different from localStorage, OVERWRITE localStorage so the
+    // session is consistent across pages (no stale data winning later).
+    if (k && ROTA_USERS[k]) {
+      try { localStorage.setItem('kooper:session:as', k); } catch (e) {}
+      return ROTA_USERS[k];
+    }
     var stored = localStorage.getItem('kooper:session:as');
     if (stored && ROTA_USERS[stored]) return ROTA_USERS[stored];
   } catch (e) {}
