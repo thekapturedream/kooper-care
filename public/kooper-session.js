@@ -170,4 +170,16 @@
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();
+
+  // ============================================================
+  // Auto-load the kooper · ai widget so every page that includes
+  // kooper-session.js gets the persistent AI assistant for free.
+  // No-op if the widget is already loaded.
+  // ============================================================
+  if (!window.__kooperAI && !document.querySelector('script[src$="kooper-ai-widget.js"]')) {
+    var s = document.createElement('script');
+    s.src = 'kooper-ai-widget.js';
+    s.defer = true;
+    document.head.appendChild(s);
+  }
 })();
