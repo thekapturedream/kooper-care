@@ -630,7 +630,64 @@
   </div>
 </section>
 
-<!-- =============== Existing deep workspace below — wrapped so we can hide on landing =============== -->
+<!-- ============================================== -->
+<!-- CARE PLAN READER · clean data-driven view       -->
+<!-- Shown when ?resident=ID is in URL — pulls live  -->
+<!-- patient + plan data, supports read-only viewing  -->
+<!-- and admin actions (delete plan).                  -->
+<!-- ============================================== -->
+<section id="cpReader" class="hidden bg-kapture-paper border-b border-kapture-fog min-h-[60vh]">
+  <div class="max-w-[1100px] mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-10 space-y-5">
+
+    <!-- Top action bar -->
+    <div class="flex items-center justify-between flex-wrap gap-3">
+      <a href="?view=list" class="btn-secondary btn-sm">← Patient list</a>
+      <div class="flex gap-2 flex-wrap">
+        <button id="cpReaderEditBtn"   onclick="cpReaderOpenEditor()" class="btn-primary btn-sm">Edit plan</button>
+        <button onclick="cpReaderPrint()" class="btn-secondary btn-sm">Print / PDF</button>
+        <button id="cpReaderDeleteBtn" onclick="cpReaderDelete()" class="btn-danger-outline btn-sm hidden">Delete plan</button>
+      </div>
+    </div>
+
+    <!-- Patient + plan header -->
+    <div class="bg-white rounded-2xl border border-kapture-fog overflow-hidden">
+      <div class="p-5 lg:p-6 flex items-start gap-4 flex-wrap">
+        <div id="cpReaderAvatar" class="w-14 h-14 rounded-full bg-kapture-coal text-white flex items-center justify-center font-display font-semibold text-lg flex-shrink-0">--</div>
+        <div class="flex-1 min-w-0">
+          <div class="ed-kicker mb-1">CARE PLAN · READER</div>
+          <h1 id="cpReaderName"  class="font-display font-semibold text-2xl lg:text-3xl tracking-tight text-kapture-black">…</h1>
+          <p id="cpReaderMeta"   class="text-xs muted mt-2 flex flex-wrap gap-x-3 gap-y-1"></p>
+        </div>
+        <div id="cpReaderStatus" class="flex flex-col items-end gap-1.5 flex-shrink-0"></div>
+      </div>
+      <div id="cpReaderFacts" class="grid grid-cols-2 sm:grid-cols-4 gap-px bg-kapture-fog"></div>
+    </div>
+
+    <!-- Plan sections rendered as readable prose -->
+    <div id="cpReaderSections" class="space-y-4"></div>
+
+    <!-- Activity log -->
+    <div class="bg-white rounded-2xl border border-kapture-fog p-5">
+      <div class="ed-kicker mb-3">PLAN ACTIVITY · LAST 8 EDITS</div>
+      <div id="cpReaderActivity" class="space-y-1.5 text-xs muted"></div>
+    </div>
+
+    <!-- Admin danger zone -->
+    <div id="cpReaderAdminZone" class="hidden bg-white rounded-2xl border border-rose-200 p-5">
+      <div class="flex items-center justify-between flex-wrap gap-3">
+        <div>
+          <div class="ed-kicker" style="color:#B42318">ADMIN · DANGER ZONE</div>
+          <div class="text-sm font-medium text-kapture-black mt-1">Delete this care plan</div>
+          <div class="text-xs muted mt-0.5">Removes the plan record, all sections, and history. The patient stays — only their plan is removed. This action is logged in team activity.</div>
+        </div>
+        <button onclick="cpReaderDelete()" class="btn-danger-outline btn-sm">Delete plan permanently</button>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- =============== Legacy editorial workspace (Edward demo only) =============== -->
 <div id="cpWorkspace" class="hidden">
 
 <!-- ============================================== -->
@@ -1866,17 +1923,24 @@
       renderEditor(patientId);
       return;
     }
-    // Deep workspace mode — existing editorial reading view
-    if (resident) {
-      landing.classList.add('hidden'); editor.classList.add('hidden');
-      work.classList.remove('hidden');
+    // Reader mode — clean data-driven view of the plan
+    var reader = document.getElementById('cpReader');
+    if (resident && planFor(resident)) {
+      landing.classList.add('hidden'); editor.classList.add('hidden'); work.classList.add('hidden');
+      reader.classList.remove('hidden');
+      renderReader(resident);
       // Mark any unseen notifications for this patient as seen
       NOTIFICATIONS.forEach(function (n) { if (n.patientId === resident) n.seen = true; });
       saveNotif();
       return;
     }
+    // Resident with no plan — bounce to create
+    if (resident && !planFor(resident)) {
+      window.location.href = '?view=create&patient=' + resident;
+      return;
+    }
     // Otherwise show the landing
-    work.classList.add('hidden'); editor.classList.add('hidden');
+    work.classList.add('hidden'); editor.classList.add('hidden'); reader.classList.add('hidden');
     landing.classList.remove('hidden');
     listWrap.classList.toggle('hidden',   view !== 'list');
     createWrap.classList.toggle('hidden', view !== 'create');
@@ -2301,6 +2365,147 @@
     document.getElementById('cpPatientPicker').value = newP.id;
     window.cpPickPatient(newP.id);
   };
+  // ---------- Reader (read-only data-driven view) ----------
+  function renderReader(patientId) {
+    var p = patientById(patientId); var plan = planFor(patientId);
+    if (!p || !plan) { window.location.href = '?view=list'; return; }
+    var tpl = TEMPLATES[plan.template] || TEMPLATES.blank;
+
+    // Avatar + header
+    var av = document.getElementById('cpReaderAvatar');
+    av.textContent = (p.pref || p.name.split(' ')[1] || '?').slice(0,2).toUpperCase();
+    document.getElementById('cpReaderName').textContent = p.name;
+
+    var statusChip = plan.status === 'review'
+        ? '<span class="chip text-[0.6875rem]" style="background:#FFFBEB;color:#876300;border-color:#FDE68A">Review due</span>'
+        : plan.status === 'respite'
+        ? '<span class="chip text-[0.6875rem]" style="background:#DBEAFE;color:#1E40AF;border-color:rgba(30,64,175,0.18)">Respite</span>'
+        : '<span class="chip text-[0.6875rem]" style="background:#DCFCE7;color:#047857;border-color:rgba(4,120,87,0.18)">Active · ' + plan.progress + '%</span>';
+    var priorityChip = plan.priority === 'critical'
+        ? '<span class="chip text-[0.6875rem]" style="background:#FEE2E2;color:#B42318;border-color:#FECACA">Critical priority</span>'
+        : plan.priority === 'enhanced'
+        ? '<span class="chip text-[0.6875rem]" style="background:#FFFBEB;color:#876300;border-color:#FDE68A">Enhanced needs</span>'
+        : '';
+    document.getElementById('cpReaderStatus').innerHTML = statusChip + (priorityChip ? '<span class="chip text-[0.625rem]" style="background:#F5F5F5;color:#6B7280;border-color:#ECEAE3">' + (tpl.label || 'Care plan') + '</span>' + priorityChip : '<span class="chip text-[0.625rem]" style="background:#F5F5F5;color:#6B7280;border-color:#ECEAE3">' + (tpl.label || 'Care plan') + '</span>');
+
+    document.getElementById('cpReaderMeta').innerHTML =
+      '<span><strong>' + p.condition + '</strong></span>' +
+      '<span class="text-kapture-fog">·</span>' +
+      '<span>' + (p.pref ? p.pref + ' · ' : '') + 'age ' + p.age + ' · room ' + p.room + '</span>' +
+      '<span class="text-kapture-fog">·</span>' +
+      '<span>NHS ' + p.nhs + '</span>' +
+      '<span class="text-kapture-fog">·</span>' +
+      '<span>Last edit ' + timeAgo(plan.lastEditedAt) + ' by <strong>' + plan.lastEditedBy + '</strong></span>';
+
+    // Facts strip — quick at-a-glance reference info
+    var facts = [
+      { label:'Template',        value: tpl.label },
+      { label:'Lead clinician',  value: plan.lead || plan.createdBy },
+      { label:'Review schedule', value: plan.reviewSchedule || 'Quarterly' },
+      { label:'Funding',         value: p.funding }
+    ];
+    document.getElementById('cpReaderFacts').innerHTML = facts.map(function (f) {
+      return '<div class="bg-white p-4">' +
+        '<div class="text-[0.625rem] uppercase tracking-widest font-mono muted">' + f.label + '</div>' +
+        '<div class="font-medium text-sm mt-1 text-kapture-black">' + (f.value || '—') + '</div>' +
+      '</div>';
+    }).join('');
+
+    // Sections — render in template order, then any custom sections, in clean read-only prose
+    var sectionKeys = [];
+    tpl.sections.forEach(function (s) { if (plan.sections[s.key] !== undefined) sectionKeys.push(s.key); });
+    Object.keys(plan.sections).forEach(function (k) { if (sectionKeys.indexOf(k) < 0) sectionKeys.push(k); });
+
+    var pendingMap = {};
+    (window.PENDING_CHANGES || []).forEach(function (pc) {
+      if (pc.patientId === patientId && !pc.resolved) (pendingMap[pc.sectionKey] = pendingMap[pc.sectionKey] || []).push(pc);
+    });
+
+    var secsHost = document.getElementById('cpReaderSections');
+    if (sectionKeys.length === 0) {
+      secsHost.innerHTML = '<div class="bg-white border border-kapture-fog rounded-2xl p-6 text-sm muted text-center">This plan has no sections yet · open the editor to start adding content.</div>';
+    } else {
+      secsHost.innerHTML = sectionKeys.map(function (key) {
+        var s = plan.sections[key]; if (!s) return '';
+        var pendingHere = (pendingMap[key] || []);
+        var pendingBanner = pendingHere.length
+          ? '<div style="background:#FFFBEB;border:1px solid #FDE68A;color:#876300;padding:0.5rem 0.75rem;border-radius:8px;font-size:0.75rem;margin-bottom:0.625rem">⏳ ' + pendingHere.length + ' pending edit' + (pendingHere.length>1?'s':'') + ' from ' + pendingHere.map(function(pc){return pc.by;}).join(', ') + '</div>'
+          : '';
+        var content = (s.content || '').trim();
+        var formatted = content
+          ? content.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/\n\n+/g, '</p><p>').replace(/\n/g, '<br>')
+          : '<em class="muted">— not yet written —</em>';
+        return '<div class="bg-white border border-kapture-fog rounded-2xl p-5 lg:p-6">' +
+          pendingBanner +
+          '<div class="flex items-center justify-between flex-wrap gap-2 mb-3">' +
+            '<div class="font-display font-semibold text-base lg:text-lg text-kapture-black">' + s.title + '</div>' +
+            '<div class="text-[0.6875rem] muted font-mono">Edited ' + timeAgo(s.lastEditedAt) + ' by ' + s.lastEditedBy + '</div>' +
+          '</div>' +
+          '<div class="text-[0.9375rem] leading-relaxed text-kapture-ink" style="font-family:Source Serif 4,Georgia,serif"><p>' + formatted + '</p></div>' +
+        '</div>';
+      }).join('');
+    }
+
+    // Activity log
+    var actHost = document.getElementById('cpReaderActivity');
+    actHost.innerHTML = (plan.history || []).slice(0, 8).map(function (h) {
+      var byInfo = userInfo(h.by);
+      return '<div class="flex items-center gap-2"><span class="cp-notif-avatar" style="background:' + byInfo.bg + ';color:' + byInfo.fg + ';width:22px;height:22px;font-size:0.5rem">' + byInfo.init + '</span><span class="font-mono text-[0.6875rem]">' + timeAgo(h.at) + '</span><span> · <strong>' + h.by + '</strong> · ' + h.msg + '</span></div>';
+    }).join('') || '<div class="italic">No edits yet.</div>';
+
+    // Admin-only Delete + button visibility
+    var adminZone = document.getElementById('cpReaderAdminZone');
+    var deleteBtn = document.getElementById('cpReaderDeleteBtn');
+    if (CURRENT_PERMS.canApprove) {
+      adminZone.classList.remove('hidden');
+      deleteBtn.classList.remove('hidden');
+    } else {
+      adminZone.classList.add('hidden');
+      deleteBtn.classList.add('hidden');
+    }
+    // View-only users get the Edit button greyed but visible (so they know it exists)
+    var editBtn = document.getElementById('cpReaderEditBtn');
+    if (!CURRENT_PERMS.canEdit) {
+      editBtn.classList.remove('btn-primary');
+      editBtn.classList.add('btn-secondary');
+      editBtn.textContent = 'View only — ask admin to edit';
+      editBtn.disabled = true;
+      editBtn.style.cursor = 'not-allowed';
+      editBtn.style.opacity = '0.7';
+    }
+  }
+
+  window.cpReaderOpenEditor = function () {
+    if (!CURRENT_PERMS.canEdit) return;
+    var resident = getParam('resident');
+    if (resident) window.location.href = '?view=edit&patient=' + resident;
+  };
+  window.cpReaderPrint = function () {
+    window.print();
+  };
+  window.cpReaderDelete = function () {
+    if (!CURRENT_PERMS.canApprove) { kooperToast('Only admins can delete a plan'); return; }
+    var resident = getParam('resident');
+    var plan = planFor(resident); var p = patientById(resident);
+    if (!plan || !p) return;
+    var typed = prompt('Type the patient\'s full name to confirm permanent deletion of their care plan:\n\n' + p.name);
+    if (!typed) return;
+    if (typed.trim().toLowerCase() !== p.name.trim().toLowerCase()) {
+      kooperToast('Name did not match · plan not deleted');
+      return;
+    }
+    // Snapshot for the audit notification
+    var template = plan.template;
+    delete PLANS[resident];
+    savePlans();
+    // Drop any pending changes for this patient
+    window.PENDING_CHANGES = (window.PENDING_CHANGES || []).filter(function (pc) { return pc.patientId !== resident; });
+    savePending();
+    pushNotif({ type:'edit', patientId: resident, patientName: p.name, section: 'PLAN DELETED · ' + (TEMPLATES[template] || {}).label, by: CURRENT_USER });
+    kooperToast(p.name + ' · plan deleted · team notified');
+    setTimeout(function () { window.location.href = '?view=list'; }, 600);
+  };
+
   // ---------- Create Care Plan modal ----------
   window.cpOpenCreateModal = function () {
     if (!CURRENT_PERMS.canEdit) { kooperToast('Your role is view-only · ask a carer or manager to create plans'); return; }
