@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Forms — pre-built compliance forms for every industry</title>
+<meta name="description" content="The forms store. Pre-built, branded, exportable web forms for healthcare, HR, finance, legal, education, hospitality, real estate and more. Export as PDF, DOCX, HTML, CSV, Google Forms. By Kapture." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = { theme: { extend: { colors: { kapture: { black:'#0A0A0A',ink:'#111111',coal:'#1A1A1A',ash:'#2A2A2A',smoke:'#3A3A3A',mist:'#9A9A9A',fog:'#D4D4D4',paper:'#F5F5F5',white:'#FFFFFF',yellow:'#FFD400',amber:'#F5B400'} }, fontFamily:{display:['Space Grotesk','sans-serif'],sans:['Inter','sans-serif'],mono:['JetBrains Mono','monospace'],serif:['Source Serif 4','Georgia','serif']}}}};
+</script>
+<style>
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Inter', sans-serif; background: #FFFFFF; color: #0A0A0A; -webkit-font-smoothing: antialiased; margin: 0; }
+  .font-display { font-family: 'Space Grotesk', sans-serif; }
+  .font-mono { font-family: 'JetBrains Mono', monospace; }
+  .font-serif { font-family: 'Source Serif 4', Georgia, serif; }
+
+  .container-c { max-width: 1280px; margin-left: auto; margin-right: auto; padding-left: 1rem; padding-right: 1rem; }
+  @media (min-width: 640px) { .container-c { padding-left: 1.5rem; padding-right: 1.5rem; } }
+  @media (min-width: 1024px) { .container-c { padding-left: 2rem; padding-right: 2rem; } }
+
+  .ed-kicker { font-family: 'JetBrains Mono', monospace; font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #876300; display: inline-flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; }
+  .ed-kicker::before { content: ''; width: 24px; height: 2px; background: #FFD400; display: inline-block; }
+  .ed-kicker.on-dark { color:#FFD400; }
+  .ed-kicker.on-dark::before { background:#fff; }
+
+  .h-section { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: clamp(2rem, 4vw, 3rem); line-height: 1.05; letter-spacing: -0.02em; }
+
+  .nav-link { padding: 0.5rem 0.75rem; font-size: 0.875rem; font-weight: 500; color: #FFFFFF; opacity: 0.75; border-radius: 8px; transition: all 0.15s ease; text-decoration: none; }
+  .nav-link:hover { opacity: 1; background: #1A1A1A; }
+  .nav-link-active { opacity: 1; background: #1A1A1A; color: #FFD400; }
+
+  .btn-primary { background:#0A0A0A; color:#FFFFFF; border:1px solid #0A0A0A; padding:0.625rem 1rem; border-radius:10px; font-weight:500; transition:all 0.15s ease; cursor:pointer; display:inline-flex; align-items:center; gap:0.5rem; font-size:0.875rem; text-decoration:none; line-height:1; }
+  .btn-primary:hover { background:transparent; color:#0A0A0A; }
+  .btn-secondary { background:transparent; color:#0A0A0A; border:1px solid #0A0A0A; padding:0.625rem 1rem; border-radius:10px; font-weight:500; transition:all 0.15s ease; cursor:pointer; display:inline-flex; align-items:center; gap:0.5rem; font-size:0.875rem; text-decoration:none; line-height:1; }
+  .btn-secondary:hover { background:#0A0A0A; color:#FFFFFF; }
+  .btn-yellow { background:#FFD400; color:#0A0A0A; border:1px solid #FFD400; padding:0.625rem 1rem; border-radius:10px; font-weight:600; transition:all 0.15s ease; cursor:pointer; display:inline-flex; align-items:center; gap:0.5rem; font-size:0.875rem; text-decoration:none; line-height:1; }
+  .btn-yellow:hover { background:#F5B400; }
+  .btn-ghost-light { background:transparent; color:#FFFFFF; border:1px solid rgba(255,255,255,0.25); padding:0.625rem 1rem; border-radius:10px; font-weight:500; font-size:0.875rem; text-decoration:none; transition:all 0.15s ease; }
+  .btn-ghost-light:hover { background:rgba(255,255,255,0.08); }
+
+  .chip { display:inline-flex; align-items:center; gap:0.375rem; padding:0.25rem 0.625rem; border-radius:999px; font-size:0.75rem; font-weight:500; line-height:1; background:#F5F5F5; color:#2A2A2A; border:1px solid #D4D4D4; }
+  .chip-yellow { background:#FFD400; color:#0A0A0A; border-color:#FFD400; font-family:'JetBrains Mono', monospace; font-weight:600; letter-spacing:0.04em; }
+  .chip-dark { background:#0A0A0A; color:#FFFFFF; border-color:#0A0A0A; }
+  .chip-ok { background:rgba(16,185,129,0.1); color:#047857; border-color:rgba(16,185,129,0.25); }
+  .chip-outline-light { background:transparent; color:#FFFFFF; border-color:rgba(255,255,255,0.25); }
+
+  /* INDUSTRY CARDS */
+  .ind-card { background:#FAFAF7; border:1px solid #ECEAE3; border-radius:14px; padding:1.25rem; transition:all 0.18s ease; cursor:pointer; display:block; text-decoration:none; color:inherit; height:100%; }
+  .ind-card:hover { border-color:#FFD400; transform:translateY(-2px); box-shadow:0 18px 40px -20px rgba(255,212,0,0.4); }
+  .ind-card .ind-icon { width:40px; height:40px; border-radius:10px; background:#0A0A0A; color:#FFD400; display:flex; align-items:center; justify-content:center; font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:0.875rem; margin-bottom:0.875rem; }
+  .ind-card.live { background:linear-gradient(180deg,#FFFBEB 0%,#fff 60%); border-color:#FCD34D; }
+  .ind-card.live .ind-icon { background:#FFD400; color:#0A0A0A; }
+
+  /* PRODUCT CARDS (featured row) */
+  .prod-card { background:#fff; border:1px solid #ECEAE3; border-radius:14px; overflow:hidden; transition:all 0.15s ease; display:flex; flex-direction:column; text-decoration:none; color:inherit; }
+  .prod-card:hover { border-color:#0A0A0A; transform:translateY(-2px); box-shadow:0 18px 40px -20px rgba(0,0,0,0.2); }
+  .prod-card.live { border-color:#0A0A0A; }
+  .prod-card .prod-cover { background:#0A0A0A; color:#FFD400; padding:1rem 1.25rem; display:flex; align-items:center; justify-content:space-between; }
+  .prod-card .prod-cover .prod-init { width:40px; height:40px; border-radius:10px; background:#FFD400; color:#0A0A0A; display:flex; align-items:center; justify-content:center; font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:0.875rem; }
+  .prod-card .prod-body { padding:1.125rem 1.25rem; flex:1; display:flex; flex-direction:column; }
+  .prod-card .prod-foot { padding:0.875rem 1.25rem; border-top:1px solid #ECEAE3; background:#FAFAF7; display:flex; justify-content:space-between; align-items:center; gap:0.5rem; flex-wrap:wrap; }
+  .prod-card .prod-foot .price { font-family:'JetBrains Mono', monospace; font-size:0.8125rem; font-weight:600; color:#0A0A0A; }
+  .prod-card .prod-foot .price small { color:#6B7280; font-weight:500; }
+
+  /* EXPORT FORMAT BADGES */
+  .fmt-badge { display:inline-flex; align-items:center; padding:0.125rem 0.5rem; border-radius:6px; font-family:'JetBrains Mono', monospace; font-size:0.625rem; font-weight:700; letter-spacing:0.04em; }
+  .fmt-pdf { background:#FEE2E2; color:#B42318; }
+  .fmt-docx { background:#DBEAFE; color:#1E40AF; }
+  .fmt-html { background:#0A0A0A; color:#FFD400; }
+  .fmt-csv { background:#DCFCE7; color:#047857; }
+  .fmt-gforms { background:#EDE9FE; color:#5B21B6; }
+  .fmt-web { background:#FFD400; color:#0A0A0A; }
+
+  /* PRICE TIERS */
+  .tier { background:#fff; border:1px solid #E5E7EB; border-radius:16px; padding:1.5rem; display:flex; flex-direction:column; }
+  .tier h3 { font-family:'Space Grotesk', sans-serif; font-weight:600; margin:0 0 0.5rem; font-size:1rem; }
+  .tier .price { font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:1.625rem; line-height:1; margin:0.5rem 0 0.25rem; }
+  .tier .price-foot { font-size:0.75rem; color:#6B7280; margin-bottom:1rem; }
+  .tier ul { list-style:none; padding:0; margin:0 0 1.25rem; }
+  .tier ul li { padding:0.25rem 0; font-size:0.8125rem; }
+
+  .toast { position:fixed; bottom:1.5rem; left:50%; transform:translateX(-50%); background:#0A0A0A; color:#FFD400; padding:0.75rem 1.25rem; border-radius:10px; font-size:0.875rem; font-weight:500; box-shadow:0 12px 30px -8px rgba(0,0,0,0.3); z-index:100; opacity:0; transition:opacity 0.2s ease; pointer-events:none; }
+  .toast.on { opacity:1; }
+</style>
+</head>
+<body>
+
+<!-- ============================================== -->
+<!-- TOP NAV — marketing pattern (Forms-store level)  -->
+<!-- ============================================== -->
+<nav class="bg-kapture-black text-white sticky top-0 z-50">
+  <div class="container-c">
+    <div class="flex items-center justify-between h-16 gap-4">
+      <a href="kooper-forms.html" class="flex items-center gap-3 shrink-0">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" class="text-kapture-yellow"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="14" x2="15" y2="14"/><line x1="9" y1="18" x2="15" y2="18"/></svg>
+        <span class="hidden sm:flex items-center gap-2 font-display lowercase tracking-wide text-base">
+          <span class="font-semibold">Forms</span><span class="text-white/40">·</span><span class="font-medium text-kapture-yellow">store</span>
+        </span>
+      </a>
+      <div class="hidden md:flex items-center gap-1">
+        <a href="#industries" class="nav-link">Industries</a>
+        <a href="#featured" class="nav-link">Featured</a>
+        <a href="#exports" class="nav-link">Exports</a>
+        <a href="#pricing" class="nav-link">Pricing</a>
+        <a href="#partner" class="nav-link">Become a publisher</a>
+        <a href="kooper-care-landing.html" class="nav-link">kooper · care</a>
+      </div>
+      <div class="flex items-center gap-2">
+        <a href="kooper-onboarding.html" class="hidden md:inline-flex btn-ghost-light text-sm">Live demo</a>
+        <a href="#partner" class="btn-yellow text-sm">List your pack</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ============================================== -->
+<!-- HERO                                              -->
+<!-- ============================================== -->
+<section class="bg-kapture-black text-white relative overflow-hidden">
+  <div class="absolute -right-40 -top-40 w-[500px] h-[500px] rounded-full bg-kapture-yellow/15 blur-3xl pointer-events-none"></div>
+  <div class="absolute -left-40 bottom-0 w-[400px] h-[400px] rounded-full bg-kapture-yellow/8 blur-3xl pointer-events-none"></div>
+  <div class="container-c relative py-14 lg:py-20">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+      <div class="lg:col-span-7">
+        <div class="flex items-center gap-2 mb-6 flex-wrap">
+          <span class="chip-yellow chip">FORMS · STORE</span>
+          <span class="chip chip-outline-light">By Kapture</span>
+          <span class="chip chip-outline-light">v0.1 · early access</span>
+        </div>
+        <h1 class="h-section text-white mb-5">The forms store.<br>For every industry. For every workflow.</h1>
+        <p class="font-serif text-lg text-white/80 leading-relaxed max-w-2xl mb-7">Pre-built, branded, audit-hashed compliance forms. Healthcare. HR. Legal. Finance. Education. Hospitality. Real estate. Construction. One form set, five export formats — printable PDF, DOCX, embeddable HTML, HRIS-ready CSV, Google Forms spec. Pay once or run hosted with magic links.</p>
+        <div class="flex flex-wrap gap-3">
+          <a href="#industries" class="btn-yellow">Browse industries →</a>
+          <a href="kooper-onboarding.html" class="btn-ghost-light">Try the live one</a>
+        </div>
+        <div class="mt-8 flex items-center gap-4 text-xs text-white/55 font-mono flex-wrap">
+          <span><span class="text-kapture-yellow">●</span> 1 live · 9 in review</span>
+          <span><span class="text-kapture-yellow">●</span> 5 export formats</span>
+          <span><span class="text-kapture-yellow">●</span> White-label ready</span>
+        </div>
+      </div>
+      <div class="lg:col-span-5">
+        <div class="bg-kapture-coal border border-kapture-ash rounded-2xl p-5 lg:p-6">
+          <div class="flex items-center justify-between mb-4">
+            <span class="font-mono text-[0.625rem] tracking-widest uppercase text-kapture-yellow">FIRST LIVE PRODUCT</span>
+            <span class="chip" style="background:rgba(16,185,129,0.15); color:#86EFAC; border-color:rgba(16,185,129,0.3); font-family:'JetBrains Mono', monospace; font-size:0.625rem; letter-spacing:0.06em">LIVE</span>
+          </div>
+          <h3 class="font-display font-semibold text-xl mb-2">kooper · onboarding</h3>
+          <p class="text-sm text-white/70 leading-relaxed mb-4">Staff onboarding for UK care providers. Four pathways: Permanent clinical, Permanent non-clinical, Agency-bank, Volunteer-student. DBS, NMC, mandatory training, references, bank, pension — all in one flow.</p>
+          <div class="flex flex-wrap gap-1.5 mb-4">
+            <span class="fmt-badge fmt-pdf">PDF</span>
+            <span class="fmt-badge fmt-docx">DOCX</span>
+            <span class="fmt-badge fmt-html">HTML</span>
+            <span class="fmt-badge fmt-csv">CSV</span>
+            <span class="fmt-badge fmt-gforms">GFORMS</span>
+            <span class="fmt-badge fmt-web">HOSTED</span>
+          </div>
+          <div class="pt-4 border-t border-kapture-ash flex items-center justify-between gap-2 flex-wrap">
+            <span class="font-mono text-xs text-white/55">From £29 / month</span>
+            <a href="kooper-onboarding.html" class="btn-yellow text-xs">Open product →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================== -->
+<!-- INDUSTRIES                                        -->
+<!-- ============================================== -->
+<section id="industries" class="bg-white py-16 lg:py-20 border-b border-kapture-fog">
+  <div class="container-c">
+    <div class="max-w-3xl mb-10">
+      <span class="ed-kicker">TEN INDUSTRIES</span>
+      <h2 class="h-section text-kapture-black">Pick your sector. We've already drafted the form.</h2>
+      <p class="font-serif text-base text-kapture-smoke leading-relaxed mt-3">Each industry pack ships with the regulator's required fields, the audit trail you need to defend in front of an inspector, and your brand chrome on top. Healthcare ships first. The rest open in 2026.</p>
+    </div>
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+
+      <a href="#featured" class="ind-card live" id="healthcare">
+        <div class="ind-icon">HC</div>
+        <div class="font-mono text-[0.625rem] uppercase tracking-widest text-kapture-yellow mb-1">LIVE · 1 PRODUCT</div>
+        <h3 class="font-display font-semibold text-base mb-1">Healthcare</h3>
+        <p class="text-xs text-kapture-smoke leading-relaxed">CQC SAF aligned. NMC, HCPC, DBS, DSPT, ReSPECT, DoLS.</p>
+      </a>
+
+      <div class="ind-card" id="hr">
+        <div class="ind-icon">HR</div>
+        <div class="font-mono text-[0.625rem] uppercase tracking-widest text-kapture-mist mb-1">SOON · Q2 2026</div>
+        <h3 class="font-display font-semibold text-base mb-1">HR &amp; people</h3>
+        <p class="text-xs text-kapture-smoke leading-relaxed">Onboarding, performance, exit, grievance, return to work.</p>
+      </div>
+
+      <div class="ind-card" id="finance">
+        <div class="ind-icon">FN</div>
+        <div class="font-mono text-[0.625rem] uppercase tracking-widest text-kapture-mist mb-1">SOON · Q3 2026</div>
+        <h3 class="font-display font-semibold text-base mb-1">Finance &amp; banking</h3>
+        <p class="text-xs text-kapture-smoke leading-relaxed">KYC, AML, FCA suitability, customer onboarding.</p>
+      </div>
+
+      <div class="ind-card" id="legal">
+        <div class="ind-icon">LG</div>
+        <div class="font-mono text-[0.625rem] uppercase tracking-widest text-kapture-mist mb-1">SOON · Q3 2026</div>
+        <h3 class="font-display font-semibold text-base mb-1">Legal</h3>
+        <p class="text-xs text-kapture-smoke leading-relaxed">Client intake, conflict checks, regulatory notices, AML.</p>
+      </div>
+
+      <div class="ind-card" id="education">
+        <div class="ind-icon">ED</div>
+        <div class="font-mono text-[0.625rem] uppercase tracking-widest text-kapture-mist mb-1">SOON · Q4 2026</div>
+        <h3 class="font-display font-semibold text-base mb-1">Education</h3>
+        <p class="text-xs text-kapture-smoke leading-relaxed">Admissions, parent consent, SEND plans, trip forms.</p>
+      </div>
+
+      <div class="ind-card" id="hospitality">
+        <div class="ind-icon">HS</div>
+        <div class="font-mono text-[0.625rem] uppercase tracking-widest text-kapture-mist mb-1">SOON · Q1 2027</div>
+        <h3 class="font-display font-semibold text-base mb-1">Hospitality</h3>
+        <p class="text-xs text-kapture-smoke leading-relaxed">Booking, T&amp;Cs, supplier onboarding, EHO compliance.</p>
+      </div>
+
+      <div class="ind-card" id="realestate">
+        <div class="ind-icon">RE</div>
+        <div class="font-mono text-[0.625rem] uppercase tracking-widest text-kapture-mist mb-1">SOON · Q1 2027</div>
+        <h3 class="font-display font-semibold text-base mb-1">Real estate</h3>
+        <p class="text-xs text-kapture-smoke leading-relaxed">Tenant referencing, AML, property disclosure, EPC.</p>
+      </div>
+
+      <div class="ind-card" id="construction">
+        <div class="ind-icon">CN</div>
+        <div class="font-mono text-[0.625rem] uppercase tracking-widest text-kapture-mist mb-1">SOON · Q2 2027</div>
+        <h3 class="font-display font-semibold text-base mb-1">Construction</h3>
+        <p class="text-xs text-kapture-smoke leading-relaxed">RAMS, H&amp;S, CDM, contractor onboarding, near-miss.</p>
+      </div>
+
+      <div class="ind-card" id="public">
+        <div class="ind-icon">PB</div>
+        <div class="font-mono text-[0.625rem] uppercase tracking-widest text-kapture-mist mb-1">SOON · Q2 2027</div>
+        <h3 class="font-display font-semibold text-base mb-1">Public sector</h3>
+        <p class="text-xs text-kapture-smoke leading-relaxed">Grants, licensing, disclosure, citizen service requests.</p>
+      </div>
+
+      <div class="ind-card" id="logistics">
+        <div class="ind-icon">LO</div>
+        <div class="font-mono text-[0.625rem] uppercase tracking-widest text-kapture-mist mb-1">SOON · Q3 2027</div>
+        <h3 class="font-display font-semibold text-base mb-1">Logistics</h3>
+        <p class="text-xs text-kapture-smoke leading-relaxed">Driver onboarding, tachograph, customs, incident.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================== -->
+<!-- FEATURED PRODUCTS                                 -->
+<!-- ============================================== -->
+<section id="featured" class="bg-kapture-paper py-16 lg:py-20">
+  <div class="container-c">
+    <div class="max-w-3xl mb-10">
+      <span class="ed-kicker">HEALTHCARE PACK</span>
+      <h2 class="h-section text-kapture-black">First wave: six healthcare forms. One live today.</h2>
+      <p class="font-serif text-base text-kapture-smoke leading-relaxed mt-3">Each form is a pre-engineered template — fields locked to the regulator's required schema, conditional logic for the role / setting / risk band, audit hash baked into every submission.</p>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+
+      <a href="kooper-onboarding.html" class="prod-card live">
+        <div class="prod-cover">
+          <div class="prod-init">SO</div>
+          <span class="chip" style="background:rgba(16,185,129,0.2); color:#86EFAC; border-color:rgba(16,185,129,0.4); font-family:'JetBrains Mono', monospace; font-size:0.625rem; letter-spacing:0.06em">LIVE</span>
+        </div>
+        <div class="prod-body">
+          <h3 class="font-display text-lg font-semibold mb-1">Staff onboarding · UK care</h3>
+          <div class="font-mono text-[0.625rem] uppercase tracking-widest text-kapture-mist mb-3">4 pathways · 19 sections · 12 templates</div>
+          <p class="text-sm text-kapture-smoke leading-relaxed mb-4">Permanent clinical, permanent non-clinical, agency / bank, volunteer / student. DBS, NMC, HCPC, mandatory training, references, bank, pension. Conditional fields per role.</p>
+          <div class="flex flex-wrap gap-1.5 mb-4">
+            <span class="fmt-badge fmt-pdf">PDF</span>
+            <span class="fmt-badge fmt-docx">DOCX</span>
+            <span class="fmt-badge fmt-html">HTML</span>
+            <span class="fmt-badge fmt-csv">CSV</span>
+            <span class="fmt-badge fmt-gforms">GFORMS</span>
+            <span class="fmt-badge fmt-web">HOSTED</span>
+          </div>
+        </div>
+        <div class="prod-foot">
+          <span class="price">£29 <small>/ mo or one-off</small></span>
+          <span class="text-xs font-medium text-kapture-black">Open product →</span>
+        </div>
+      </a>
+
+      <div class="prod-card" style="opacity:0.85">
+        <div class="prod-cover" style="background:#3A3A3A"><div class="prod-init" style="background:#9A9A9A">PI</div><span class="chip">Coming soon</span></div>
+        <div class="prod-body">
+          <h3 class="font-display text-lg font-semibold mb-1">Patient intake · primary care</h3>
+          <div class="font-mono text-[0.625rem] uppercase tracking-widest text-kapture-mist mb-3">3 pathways · 12 sections</div>
+          <p class="text-sm text-kapture-smoke leading-relaxed mb-4">New patient registration, GP transfer, NHS-funded continuing healthcare. Demographics, NHS number, allergies, meds, capacity flags.</p>
+          <div class="flex flex-wrap gap-1.5 mb-4">
+            <span class="fmt-badge fmt-pdf">PDF</span><span class="fmt-badge fmt-csv">CSV</span><span class="fmt-badge fmt-html">HTML</span>
+          </div>
+        </div>
+        <div class="prod-foot"><span class="price">£39 <small>/ mo</small></span><span class="text-xs text-kapture-mist">Q1 2026</span></div>
+      </div>
+
+      <div class="prod-card" style="opacity:0.85">
+        <div class="prod-cover" style="background:#3A3A3A"><div class="prod-init" style="background:#9A9A9A">IR</div><span class="chip">Coming soon</span></div>
+        <div class="prod-body">
+          <h3 class="font-display text-lg font-semibold mb-1">Incident report · adverse event</h3>
+          <div class="font-mono text-[0.625rem] uppercase tracking-widest text-kapture-mist mb-3">5 categories · 8 sections</div>
+          <p class="text-sm text-kapture-smoke leading-relaxed mb-4">Falls, medication errors, pressure injuries, behaviour incidents, near-miss. SAF mapping, RCA, escalation routing.</p>
+          <div class="flex flex-wrap gap-1.5 mb-4">
+            <span class="fmt-badge fmt-pdf">PDF</span><span class="fmt-badge fmt-html">HTML</span><span class="fmt-badge fmt-csv">CSV</span>
+          </div>
+        </div>
+        <div class="prod-foot"><span class="price">£19 <small>/ mo</small></span><span class="text-xs text-kapture-mist">Q1 2026</span></div>
+      </div>
+
+      <div class="prod-card" style="opacity:0.85">
+        <div class="prod-cover" style="background:#3A3A3A"><div class="prod-init" style="background:#9A9A9A">CC</div><span class="chip">Coming soon</span></div>
+        <div class="prod-body">
+          <h3 class="font-display text-lg font-semibold mb-1">Consent &amp; capacity · MCA / DoLS</h3>
+          <div class="font-mono text-[0.625rem] uppercase tracking-widest text-kapture-mist mb-3">2 pathways · 6 sections</div>
+          <p class="text-sm text-kapture-smoke leading-relaxed mb-4">MCA decision-specific, DoLS standard authorisation, ReSPECT — best-interests rationale captured, professional sign-off.</p>
+          <div class="flex flex-wrap gap-1.5 mb-4">
+            <span class="fmt-badge fmt-pdf">PDF</span><span class="fmt-badge fmt-docx">DOCX</span>
+          </div>
+        </div>
+        <div class="prod-foot"><span class="price">£29 <small>/ mo</small></span><span class="text-xs text-kapture-mist">Q2 2026</span></div>
+      </div>
+
+      <div class="prod-card" style="opacity:0.85">
+        <div class="prod-cover" style="background:#3A3A3A"><div class="prod-init" style="background:#9A9A9A">SR</div><span class="chip">Coming soon</span></div>
+        <div class="prod-body">
+          <h3 class="font-display text-lg font-semibold mb-1">Safeguarding referral · adults</h3>
+          <div class="font-mono text-[0.625rem] uppercase tracking-widest text-kapture-mist mb-3">1 pathway · 5 sections</div>
+          <p class="text-sm text-kapture-smoke leading-relaxed mb-4">Section 42 enquiry triggers, allegation capture, automatic LA / CQC notification, audit-hashed timeline.</p>
+          <div class="flex flex-wrap gap-1.5 mb-4">
+            <span class="fmt-badge fmt-pdf">PDF</span><span class="fmt-badge fmt-html">HTML</span>
+          </div>
+        </div>
+        <div class="prod-foot"><span class="price">£19 <small>/ mo</small></span><span class="text-xs text-kapture-mist">Q2 2026</span></div>
+      </div>
+
+      <div class="prod-card" style="opacity:0.85">
+        <div class="prod-cover" style="background:#3A3A3A"><div class="prod-init" style="background:#9A9A9A">FA</div><span class="chip">Coming soon</span></div>
+        <div class="prod-body">
+          <h3 class="font-display text-lg font-semibold mb-1">Family agreement &amp; consent</h3>
+          <div class="font-mono text-[0.625rem] uppercase tracking-widest text-kapture-mist mb-3">1 pathway · 4 sections</div>
+          <p class="text-sm text-kapture-smoke leading-relaxed mb-4">Photography, social media, end-of-life preferences, advance decisions, communication preferences. Refresh annually.</p>
+          <div class="flex flex-wrap gap-1.5 mb-4">
+            <span class="fmt-badge fmt-pdf">PDF</span><span class="fmt-badge fmt-gforms">GFORMS</span>
+          </div>
+        </div>
+        <div class="prod-foot"><span class="price">£12 <small>/ mo</small></span><span class="text-xs text-kapture-mist">Q3 2026</span></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================== -->
+<!-- EXPORT FORMATS                                   -->
+<!-- ============================================== -->
+<section id="exports" class="bg-white py-16 lg:py-20 border-t border-kapture-fog">
+  <div class="container-c">
+    <div class="max-w-3xl mb-10">
+      <span class="ed-kicker">EXPORTS</span>
+      <h2 class="h-section text-kapture-black">One submission. Six shapes. Buyer's choice.</h2>
+      <p class="font-serif text-base text-kapture-smoke leading-relaxed mt-3">Every Forms product ships with the same export menu. Pick what your stack actually consumes — no rebuild, no rework, just a different button.</p>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div class="bg-kapture-paper rounded-xl p-5 border border-kapture-fog"><span class="fmt-badge fmt-pdf mb-3 inline-flex">PDF</span><h3 class="font-display font-semibold text-base mb-1 mt-2">Print-ready PDF</h3><p class="text-sm text-kapture-smoke leading-relaxed">A4. Signature blocks. Audit footer with hash. Drop in the HR file.</p><div class="font-mono text-xs text-kapture-mist mt-2">Included in every pack</div></div>
+      <div class="bg-kapture-paper rounded-xl p-5 border border-kapture-fog"><span class="fmt-badge fmt-docx mb-3 inline-flex">DOCX</span><h3 class="font-display font-semibold text-base mb-1 mt-2">Editable DOCX</h3><p class="text-sm text-kapture-smoke leading-relaxed">Microsoft Word. Track-changes ready. Edit in your house style.</p><div class="font-mono text-xs text-kapture-mist mt-2">£9 / pack add-on</div></div>
+      <div class="bg-kapture-paper rounded-xl p-5 border border-kapture-fog"><span class="fmt-badge fmt-html mb-3 inline-flex">HTML</span><h3 class="font-display font-semibold text-base mb-1 mt-2">Embeddable HTML</h3><p class="text-sm text-kapture-smoke leading-relaxed">Drop in your careers / intake page. Same form, your domain.</p><div class="font-mono text-xs text-kapture-mist mt-2">£19 / domain</div></div>
+      <div class="bg-kapture-paper rounded-xl p-5 border border-kapture-fog"><span class="fmt-badge fmt-csv mb-3 inline-flex">CSV</span><h3 class="font-display font-semibold text-base mb-1 mt-2">HRIS / system CSV</h3><p class="text-sm text-kapture-smoke leading-relaxed">Standard fields plus extras column. Imports into Bamboo, Breathe, Workday.</p><div class="font-mono text-xs text-kapture-mist mt-2">Included in every pack</div></div>
+      <div class="bg-kapture-paper rounded-xl p-5 border border-kapture-fog"><span class="fmt-badge fmt-gforms mb-3 inline-flex">GFORMS</span><h3 class="font-display font-semibold text-base mb-1 mt-2">Google Forms spec</h3><p class="text-sm text-kapture-smoke leading-relaxed">Importable JSON. Same fields, same logic, paste into Google Forms.</p><div class="font-mono text-xs text-kapture-mist mt-2">£12 / pack add-on</div></div>
+      <div class="bg-kapture-paper rounded-xl p-5 border border-kapture-fog"><span class="fmt-badge fmt-web mb-3 inline-flex">HOSTED</span><h3 class="font-display font-semibold text-base mb-1 mt-2">Hosted web form</h3><p class="text-sm text-kapture-smoke leading-relaxed">Branded URL. Magic-link invitations. We host the queue and audit log.</p><div class="font-mono text-xs text-kapture-mist mt-2">From £29 / mo</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================== -->
+<!-- PRICING                                          -->
+<!-- ============================================== -->
+<section id="pricing" class="bg-kapture-paper py-16 lg:py-20 border-t border-kapture-fog">
+  <div class="container-c">
+    <div class="max-w-3xl mb-10">
+      <span class="ed-kicker">PRICING MODEL</span>
+      <h2 class="h-section text-kapture-black">Buy once. Run hosted. Or licence as a marketplace partner.</h2>
+      <p class="font-serif text-base text-kapture-smoke leading-relaxed mt-3">Same form pack, three commercial models. Pick the one your operations team will actually use day-to-day.</p>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+
+      <div class="tier">
+        <h3>Single download</h3>
+        <p class="text-xs text-kapture-smoke">One-time, lifetime use, single workspace.</p>
+        <div class="price">£29</div>
+        <div class="price-foot">one-time · per pack</div>
+        <ul>
+          <li>· All pack pathways</li>
+          <li>· PDF + CSV included</li>
+          <li>· Other formats add-on</li>
+          <li>· Single workspace</li>
+        </ul>
+        <a href="kooper-onboarding.html" class="btn-secondary text-xs justify-center mt-auto">Try the live one</a>
+      </div>
+
+      <div class="tier" style="border-color:#FFD400; background:linear-gradient(180deg,#FFFBEB 0%,#fff 60%)">
+        <h3>Hosted licence</h3>
+        <p class="text-xs text-kapture-smoke">Per-pack, per-month, fully hosted.</p>
+        <div class="price">£29 <span class="text-sm font-medium text-kapture-smoke font-display">/ mo</span></div>
+        <div class="price-foot">unlimited submissions</div>
+        <ul>
+          <li>· Branded URL</li>
+          <li>· Magic-link invites</li>
+          <li>· HR queue + approvals</li>
+          <li>· All formats included</li>
+          <li>· Inspector read-only</li>
+        </ul>
+        <a href="kooper-sign-in.html#book" class="btn-yellow text-xs justify-center mt-auto">Start free trial</a>
+      </div>
+
+      <div class="tier">
+        <h3>Multi-site / NHS</h3>
+        <p class="text-xs text-kapture-smoke">Group rollup, SSO, custom templates.</p>
+        <div class="price">From £199 <span class="text-sm font-medium text-kapture-smoke font-display">/ mo</span></div>
+        <div class="price-foot">10+ sites · pricing on application</div>
+        <ul>
+          <li>· Multi-site dashboard</li>
+          <li>· SSO + SAML</li>
+          <li>· Custom templates</li>
+          <li>· Account manager + SLA</li>
+        </ul>
+        <a href="kooper-sign-in.html#book" class="btn-secondary text-xs justify-center mt-auto">Talk to us</a>
+      </div>
+
+      <div class="tier" style="background:#0A0A0A; color:#fff; border-color:#0A0A0A">
+        <h3 style="color:#fff">Marketplace publisher</h3>
+        <p class="text-xs" style="color:rgba(255,255,255,0.7)">List your form pack on Forms · earn revenue share.</p>
+        <div class="price" style="color:#FFD400">70 / 30</div>
+        <div class="price-foot" style="color:rgba(255,255,255,0.6)">publisher / platform · transparent</div>
+        <ul style="color:rgba(255,255,255,0.85)">
+          <li style="color:#FFD400">· Brandable storefront</li>
+          <li style="color:#FFD400">· Hosted infra + payments</li>
+          <li style="color:#FFD400">· DPA / DPO supplied</li>
+          <li style="color:#FFD400">· Editorial review on submit</li>
+        </ul>
+        <a href="#partner" class="btn-yellow text-xs justify-center mt-auto">Publish a pack →</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================== -->
+<!-- PARTNER · publish your own pack                  -->
+<!-- ============================================== -->
+<section id="partner" class="bg-kapture-yellow py-16 lg:py-20">
+  <div class="container-c grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+    <div class="lg:col-span-7">
+      <span class="ed-kicker" style="color:#876300">PUBLISHER PROGRAMME</span>
+      <h2 class="h-section text-kapture-black mb-4">You wrote the form once. Sell it forever.</h2>
+      <p class="font-serif text-base text-kapture-coal leading-relaxed mb-5">Compliance officers, HR consultants, sector specialists, regulators-turned-consultants — your form pack is an asset. List it on Forms and earn 70% of every download, every monthly licence, every multi-site renewal. We handle the platform, the auditing, the payments, the marketing.</p>
+      <div class="flex flex-wrap gap-3">
+        <a href="kooper-sign-in.html#book" class="btn-primary">Apply to publish →</a>
+        <a href="#exports" class="btn-secondary">See export schema</a>
+      </div>
+    </div>
+    <div class="lg:col-span-5">
+      <div class="bg-kapture-black text-white rounded-2xl p-6">
+        <div class="font-mono text-[0.625rem] tracking-widest uppercase text-kapture-yellow mb-3">PUBLISHER REQUIREMENTS</div>
+        <ul class="space-y-2.5 text-sm">
+          <li class="flex items-start gap-2"><span class="text-kapture-yellow font-bold">01</span> Subject-matter authority — relevant qualification or sector role.</li>
+          <li class="flex items-start gap-2"><span class="text-kapture-yellow font-bold">02</span> Form pack passes editorial review (regulator-mapped fields, audit trail, conditional logic correctness).</li>
+          <li class="flex items-start gap-2"><span class="text-kapture-yellow font-bold">03</span> DPA + indemnity in place — Kapture supplies templates.</li>
+          <li class="flex items-start gap-2"><span class="text-kapture-yellow font-bold">04</span> Two annual revisions (regulators move; your pack moves with them).</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================== -->
+<!-- FOOTER                                            -->
+<!-- ============================================== -->
+<footer class="bg-kapture-black text-white py-12">
+  <div class="container-c grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
+    <div>
+      <a href="kooper-forms.html" class="flex items-center gap-2 mb-3">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" class="text-kapture-yellow"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        <span class="font-display font-semibold lowercase tracking-wide text-base">Forms · store</span>
+      </a>
+      <p class="text-xs text-white/55 leading-relaxed">By Kapture. The forms store for every industry, every workflow. Pre-built. Audit-hashed. Exportable. White-label ready.</p>
+    </div>
+    <div>
+      <div class="font-mono text-[0.625rem] uppercase tracking-widest text-kapture-yellow mb-3">FORMS</div>
+      <a href="#industries" class="block text-sm text-white/55 hover:text-white mb-1.5">Industries</a>
+      <a href="#featured" class="block text-sm text-white/55 hover:text-white mb-1.5">Featured products</a>
+      <a href="#exports" class="block text-sm text-white/55 hover:text-white mb-1.5">Export formats</a>
+      <a href="#pricing" class="block text-sm text-white/55 hover:text-white mb-1.5">Pricing</a>
+      <a href="#partner" class="block text-sm text-white/55 hover:text-white mb-1.5">Become a publisher</a>
+    </div>
+    <div>
+      <div class="font-mono text-[0.625rem] uppercase tracking-widest text-kapture-yellow mb-3">KAPTURE</div>
+      <a href="kooper-care-landing.html" class="block text-sm text-white/55 hover:text-white mb-1.5">kooper · care</a>
+      <a href="kooper-onboarding.html" class="block text-sm text-white/55 hover:text-white mb-1.5">kooper · onboarding</a>
+      <a href="kooper-sign-in.html" class="block text-sm text-white/55 hover:text-white mb-1.5">Sign in</a>
+      <a href="kooper-sign-in.html#book" class="block text-sm text-white/55 hover:text-white mb-1.5">Book a demo</a>
+    </div>
+  </div>
+  <div class="container-c mt-8 pt-6 border-t border-kapture-ash text-xs text-white/40 font-mono flex flex-wrap items-center justify-between gap-3">
+    <span>Forms · v0.1 early access · By Kapture</span>
+    <span>· Curated marketplace · Editorial review on submit · 70/30 publisher share</span>
+  </div>
+</footer>
+
+<div id="formsToast" class="toast"></div>
+
+<script src="kooper-nav.js" defer></script>
+</body>
+</html>

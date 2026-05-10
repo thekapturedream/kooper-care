@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>kooper · onboarding — staff onboarding that finishes itself</title>
+<meta name="description" content="Pre-built, branded, exportable staff onboarding for UK care providers. Four pathways: Permanent clinical, Permanent non-clinical, Agency / bank, Volunteer / student. DBS, NMC, right-to-work, mandatory training in one flow." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600&display=swap" rel="stylesheet" />
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = { theme: { extend: { colors: { kapture: { black:'#0A0A0A',ink:'#111111',coal:'#1A1A1A',ash:'#2A2A2A',smoke:'#3A3A3A',mist:'#9A9A9A',fog:'#D4D4D4',paper:'#F5F5F5',white:'#FFFFFF',yellow:'#FFD400',amber:'#F5B400'} }, fontFamily:{display:['Space Grotesk','sans-serif'],sans:['Inter','sans-serif'],mono:['JetBrains Mono','monospace'],serif:['Source Serif 4','Georgia','serif']}}}};
+</script>
+<style>
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Inter', sans-serif; background: #FFFFFF; color: #0A0A0A; -webkit-font-smoothing: antialiased; margin: 0; }
+  .font-display { font-family: 'Space Grotesk', sans-serif; }
+  .font-mono { font-family: 'JetBrains Mono', monospace; }
+  .font-serif { font-family: 'Source Serif 4', Georgia, serif; }
+
+  .container-c { max-width: 1280px; margin-left: auto; margin-right: auto; padding-left: 1rem; padding-right: 1rem; }
+  @media (min-width: 640px) { .container-c { padding-left: 1.5rem; padding-right: 1.5rem; } }
+  @media (min-width: 1024px) { .container-c { padding-left: 2rem; padding-right: 2rem; } }
+
+  .ed-kicker { font-family: 'JetBrains Mono', monospace; font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #876300; display: inline-flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem; }
+  .ed-kicker::before { content: ''; width: 24px; height: 2px; background: #FFD400; display: inline-block; }
+
+  .h-section { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: clamp(2rem, 4vw, 3rem); line-height: 1.05; letter-spacing: -0.02em; }
+
+  .nav-link { padding: 0.5rem 0.75rem; font-size: 0.875rem; font-weight: 500; color: #FFFFFF; opacity: 0.75; border-radius: 8px; transition: all 0.15s ease; text-decoration: none; }
+  .nav-link:hover { opacity: 1; background: #1A1A1A; }
+  .nav-link-active { opacity: 1; background: #1A1A1A; color: #FFD400; }
+
+  .btn-primary { background:#0A0A0A; color:#FFFFFF; border:1px solid #0A0A0A; padding:0.625rem 1rem; border-radius:10px; font-weight:500; transition:all 0.15s ease; cursor:pointer; display:inline-flex; align-items:center; gap:0.5rem; font-size:0.875rem; text-decoration:none; line-height:1; }
+  .btn-primary:hover { background:transparent; color:#0A0A0A; }
+  .btn-secondary { background:transparent; color:#0A0A0A; border:1px solid #0A0A0A; padding:0.625rem 1rem; border-radius:10px; font-weight:500; transition:all 0.15s ease; cursor:pointer; display:inline-flex; align-items:center; gap:0.5rem; font-size:0.875rem; text-decoration:none; line-height:1; }
+  .btn-secondary:hover { background:#0A0A0A; color:#FFFFFF; }
+  .btn-yellow { background:#FFD400; color:#0A0A0A; border:1px solid #FFD400; padding:0.625rem 1rem; border-radius:10px; font-weight:600; transition:all 0.15s ease; cursor:pointer; display:inline-flex; align-items:center; gap:0.5rem; font-size:0.875rem; text-decoration:none; line-height:1; }
+  .btn-yellow:hover { background:#F5B400; }
+  .btn-ghost-light { background:transparent; color:#FFFFFF; border:1px solid rgba(255,255,255,0.25); padding:0.625rem 1rem; border-radius:10px; font-weight:500; transition:all 0.15s ease; cursor:pointer; font-size:0.875rem; text-decoration:none; }
+  .btn-ghost-light:hover { background:rgba(255,255,255,0.08); }
+  .btn-sm { padding:0.4rem 0.625rem; font-size:0.75rem; }
+
+  .chip { display:inline-flex; align-items:center; gap:0.375rem; padding:0.25rem 0.625rem; border-radius:999px; font-size:0.75rem; font-weight:500; line-height:1; background:#F5F5F5; color:#2A2A2A; border:1px solid #D4D4D4; }
+  .chip-yellow { background:#FFD400; color:#0A0A0A; border-color:#FFD400; font-family:'JetBrains Mono', monospace; font-weight:600; letter-spacing:0.04em; }
+  .chip-dark { background:#0A0A0A; color:#FFFFFF; border-color:#0A0A0A; }
+  .chip-ok { background:rgba(16,185,129,0.1); color:#047857; border-color:rgba(16,185,129,0.25); }
+  .chip-warn { background:rgba(255,212,0,0.2); color:#876300; border-color:rgba(255,212,0,0.5); }
+  .chip-outline-light { background:transparent; color:#FFFFFF; border-color:rgba(255,255,255,0.25); }
+
+  /* PATHWAY CARDS */
+  .pw-card { background:#FAFAF7; border:1px solid #ECEAE3; border-radius:16px; padding:1.5rem; transition:all 0.2s ease; cursor:pointer; display:block; text-decoration:none; color:inherit; position:relative; overflow:hidden; }
+  .pw-card:hover { border-color:#FFD400; box-shadow:0 18px 40px -20px rgba(255,212,0,0.45); transform:translateY(-2px); }
+  .pw-card .pw-icon { width:48px; height:48px; border-radius:12px; background:#0A0A0A; color:#FFD400; display:flex; align-items:center; justify-content:center; margin-bottom:1rem; }
+  .pw-card.dark { background:#0A0A0A; color:#fff; border-color:#0A0A0A; }
+  .pw-card.dark:hover { box-shadow:0 18px 40px -20px rgba(0,0,0,0.5); border-color:#FFD400; }
+  .pw-card.dark .pw-icon { background:#FFD400; color:#0A0A0A; }
+  .pw-card.dark .pw-meta { color:rgba(255,255,255,0.65); }
+  .pw-meta { font-family:'JetBrains Mono', monospace; font-size:0.6875rem; letter-spacing:0.08em; text-transform:uppercase; color:#6B7280; }
+
+  /* FORM SHELL */
+  .form-shell { background:#FAFAF7; border:1px solid #ECEAE3; border-radius:18px; padding:1.5rem 1.75rem; }
+  @media (max-width:640px) { .form-shell { padding:1.25rem; border-radius:14px; } }
+  .form-progress { display:flex; align-items:center; gap:0.5rem; margin-bottom:1.5rem; flex-wrap:wrap; }
+  .progress-step { padding:0.25rem 0.625rem; border-radius:999px; font-family:'JetBrains Mono', monospace; font-size:0.625rem; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; background:#fff; color:#9A9A9A; border:1px solid #ECEAE3; cursor:pointer; }
+  .progress-step.active { background:#0A0A0A; color:#FFD400; border-color:#0A0A0A; }
+  .progress-step.done { background:#FFFBEB; color:#876300; border-color:#FCD34D; }
+  .progress-line { flex:1; height:1px; background:#ECEAE3; min-width:8px; }
+
+  label.fld { display:block; margin-bottom:1rem; }
+  label.fld > .lbl { display:flex; justify-content:space-between; font-family:'JetBrains Mono', monospace; font-size:0.6875rem; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:#6B7280; margin-bottom:0.375rem; }
+  label.fld > .lbl .req { color:#B42318; font-weight:700; }
+  label.fld > input, label.fld > select, label.fld > textarea { width:100%; border:1px solid #E5E7EB; border-radius:10px; padding:0.625rem 0.875rem; font-size:0.9375rem; font-family:'Inter', sans-serif; background:#fff; outline:none; transition:border-color 0.15s ease; line-height:1.4; }
+  label.fld > input:focus, label.fld > select:focus, label.fld > textarea:focus { border-color:#0A0A0A; box-shadow:0 0 0 3px rgba(255,212,0,0.18); }
+  label.fld > textarea { resize:vertical; min-height:5.5rem; }
+  .fld-help { font-size:0.75rem; color:#6B7280; margin-top:0.25rem; }
+  .fld-row { display:grid; grid-template-columns:1fr 1fr; gap:0.875rem; }
+  @media (max-width:640px) { .fld-row { grid-template-columns:1fr; } }
+  .check-row { display:flex; align-items:flex-start; gap:0.625rem; margin-bottom:0.625rem; }
+  .check-row input { margin-top:0.25rem; flex-shrink:0; accent-color:#FFD400; width:1rem; height:1rem; }
+  .check-row label { font-size:0.875rem; line-height:1.45; cursor:pointer; }
+
+  .form-section { padding-top:1.25rem; padding-bottom:1.25rem; border-bottom:1px solid #ECEAE3; }
+  .form-section:last-of-type { border-bottom:0; }
+  .form-section h3 { font-family:'Space Grotesk', sans-serif; font-weight:600; font-size:1.125rem; margin:0 0 0.875rem; color:#0A0A0A; }
+  .form-section p.section-lede { font-size:0.875rem; color:#6B7280; margin:-0.5rem 0 1rem; line-height:1.5; }
+
+  .conditional { display:none; padding:1rem 1.125rem; border-radius:12px; background:#fff; border:1px dashed #FCD34D; margin:0.5rem 0 1rem; }
+  .conditional.on { display:block; }
+
+  /* EXPORT PANEL */
+  .export-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:1rem; }
+  .export-card { background:#fff; border:1px solid #ECEAE3; border-radius:14px; padding:1.125rem; transition:all 0.15s ease; cursor:pointer; }
+  .export-card:hover { border-color:#0A0A0A; transform:translateY(-2px); box-shadow:0 12px 24px -16px rgba(0,0,0,0.2); }
+  .export-card .icon { width:36px; height:36px; border-radius:8px; background:#F5F5F5; display:flex; align-items:center; justify-content:center; margin-bottom:0.625rem; font-family:'JetBrains Mono', monospace; font-size:0.6875rem; font-weight:700; color:#0A0A0A; letter-spacing:0.04em; }
+  .export-card .icon.pdf { background:#FEE2E2; color:#B42318; }
+  .export-card .icon.docx { background:#DBEAFE; color:#1E40AF; }
+  .export-card .icon.html { background:#0A0A0A; color:#FFD400; }
+  .export-card .icon.csv { background:#DCFCE7; color:#047857; }
+  .export-card .icon.gforms { background:#EDE9FE; color:#5B21B6; }
+  .export-card .icon.web { background:#FFD400; color:#0A0A0A; }
+  .export-card h4 { font-family:'Space Grotesk', sans-serif; font-weight:600; margin:0 0 0.25rem; font-size:0.9375rem; }
+  .export-card .price { font-family:'JetBrains Mono', monospace; font-size:0.75rem; color:#876300; font-weight:600; }
+  .export-card .desc { font-size:0.75rem; color:#6B7280; margin-top:0.375rem; line-height:1.4; }
+
+  /* TOAST */
+  .toast { position:fixed; bottom:1.5rem; left:50%; transform:translateX(-50%); background:#0A0A0A; color:#FFD400; padding:0.75rem 1.25rem; border-radius:10px; font-size:0.875rem; font-weight:500; box-shadow:0 12px 30px -8px rgba(0,0,0,0.3); z-index:100; opacity:0; transition:opacity 0.2s ease; pointer-events:none; }
+  .toast.on { opacity:1; }
+
+  /* MODAL */
+  .scrim { position:fixed; inset:0; background:rgba(10,10,10,0.5); z-index:80; opacity:0; pointer-events:none; transition:opacity 0.18s ease; }
+  .scrim.on { opacity:1; pointer-events:auto; }
+  .modal { position:fixed; left:50%; top:50%; transform:translate(-50%,-50%); background:#fff; border-radius:18px; padding:0; z-index:90; width:min(96vw, 56rem); max-height:92vh; overflow-y:auto; opacity:0; pointer-events:none; transition:opacity 0.18s ease; }
+  .modal.on { opacity:1; pointer-events:auto; }
+  .modal-head { padding:1.25rem 1.75rem; border-bottom:1px solid #ECEAE3; display:flex; align-items:center; justify-content:space-between; gap:1rem; position:sticky; top:0; background:#fff; z-index:5; }
+  .modal-head h2 { margin:0; font-family:'Space Grotesk', sans-serif; font-weight:600; font-size:1.125rem; }
+  .modal-body { padding:1.5rem 1.75rem; }
+  .modal-foot { padding:1rem 1.75rem; border-bottom-left-radius:18px; border-bottom-right-radius:18px; border-top:1px solid #ECEAE3; display:flex; justify-content:space-between; gap:0.75rem; flex-wrap:wrap; background:#FAFAF7; position:sticky; bottom:0; }
+  .x-btn { background:transparent; border:0; cursor:pointer; padding:0.375rem 0.5rem; border-radius:6px; font-size:1.25rem; line-height:1; color:#6B7280; }
+  .x-btn:hover { background:#F5F5F5; color:#0A0A0A; }
+
+  /* PRICE TIERS */
+  .tier { background:#fff; border:1px solid #E5E7EB; border-radius:16px; padding:1.5rem 1.5rem 1.75rem; display:flex; flex-direction:column; }
+  .tier.featured { border-color:#FFD400; background:linear-gradient(180deg,#FFFBEB 0%,#fff 50%); position:relative; }
+  .tier.featured::before { content:'MOST POPULAR'; position:absolute; top:-12px; right:1rem; padding:0.25rem 0.625rem; background:#FFD400; color:#0A0A0A; border-radius:999px; font-family:'JetBrains Mono', monospace; font-size:0.625rem; font-weight:700; letter-spacing:0.08em; }
+  .tier h3 { font-family:'Space Grotesk', sans-serif; font-weight:600; margin:0 0 0.5rem; font-size:1.125rem; }
+  .tier .price { font-family:'Space Grotesk', sans-serif; font-weight:700; font-size:2rem; line-height:1; margin:0.5rem 0 0.25rem; }
+  .tier .price-foot { font-size:0.8125rem; color:#6B7280; margin-bottom:1rem; }
+  .tier ul { list-style:none; padding:0; margin:0 0 1.25rem; }
+  .tier ul li { padding:0.375rem 0; font-size:0.875rem; display:flex; gap:0.5rem; align-items:flex-start; }
+  .tier ul li::before { content:'✓'; color:#10B981; font-weight:700; }
+
+  /* SIGN-IN AS card */
+  .role-card { background:#fff; border:1px solid #ECEAE3; border-radius:14px; padding:1.25rem; cursor:pointer; transition:all 0.15s ease; text-decoration:none; color:inherit; display:block; }
+  .role-card:hover { border-color:#0A0A0A; transform:translateY(-2px); }
+  .role-card .role-icon { width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; margin-bottom:0.75rem; font-family:'Space Grotesk', sans-serif; font-weight:700; }
+</style>
+</head>
+<body>
+
+<!-- ============================================== -->
+<!-- TOP NAV — marketing pattern                      -->
+<!-- ============================================== -->
+<nav class="bg-kapture-black text-white sticky top-0 z-50">
+  <div class="container-c">
+    <div class="flex items-center justify-between h-16 gap-4">
+      <a href="kooper-care-landing.html" class="flex items-center gap-3 shrink-0">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="28" height="28" fill="none" aria-label="kooper" role="img" class="text-white"><path fill="currentColor" fill-rule="evenodd" clip-rule="evenodd" d="M255.75 133.125c67.679 0 122.625 54.946 122.625 122.625S323.429 378.375 255.75 378.375 133.125 323.429 133.125 255.75s54.946-122.625 122.625-122.625m0-132.75c18.832 0 34.121 15.289 34.121 34.121s-15.289 34.121-34.121 34.121-34.121-15.289-34.121-34.121S236.918.375 255.75.375M75.173 75.173c13.316-13.316 34.938-13.316 48.254 0s13.316 34.938 0 48.254-34.938 13.316-48.254 0-13.316-34.938 0-48.254M511.125 255.75c0 18.832-15.289 34.121-34.121 34.121s-34.121-15.289-34.121-34.121 15.289-34.121 34.121-34.121 34.121 15.289 34.121 34.121M255.75 442.883c18.832 0 34.121 15.289 34.121 34.121s-15.289 34.121-34.121 34.121-34.121-15.289-34.121-34.121 15.289-34.121 34.121-34.121m132.323-54.81c13.316-13.316 34.938-13.316 48.254 0s13.316 34.938 0 48.254-34.938 13.316-48.254 0-13.316-34.938 0-48.254M68.617 255.75c0 18.832-15.289 34.121-34.121 34.121S.375 274.582.375 255.75s15.289-34.121 34.121-34.121 34.121 15.289 34.121 34.121m54.81 132.323c13.316 13.316 13.316 34.938 0 48.254s-34.938 13.316-48.254 0-13.316-34.938 0-48.254 34.938-13.316 48.254 0"/><path fill="#FFD400" fill-rule="evenodd" clip-rule="evenodd" d="M436.327 75.173c13.316 13.316 13.316 34.938 0 48.254s-34.938 13.316-48.254 0-13.316-34.938 0-48.254 34.938-13.316 48.254 0"/></svg>
+        <span class="hidden sm:flex items-center gap-2 font-display lowercase tracking-wide text-base">
+          <span class="font-semibold">kooper</span><span class="text-white/40">·</span><span class="font-medium">onboarding</span>
+        </span>
+      </a>
+      <div class="hidden md:flex items-center gap-1">
+        <a href="kooper-care-landing.html" class="nav-link">Home</a>
+        <a href="#pathways" class="nav-link">Pathways</a>
+        <a href="#demo" class="nav-link">Live demo</a>
+        <a href="#exports" class="nav-link">Exports</a>
+        <a href="#pricing" class="nav-link">Pricing</a>
+        <a href="kooper-forms.html" class="nav-link">Forms store</a>
+      </div>
+      <div class="flex items-center gap-2">
+        <a href="kooper-sign-in.html" class="hidden md:inline-flex btn-ghost-light text-sm">Sign in</a>
+        <a href="#pathways" class="btn-yellow text-sm">Start onboarding</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ============================================== -->
+<!-- HERO                                              -->
+<!-- ============================================== -->
+<section class="bg-kapture-black text-white relative overflow-hidden">
+  <div class="absolute -right-40 -top-40 w-[500px] h-[500px] rounded-full bg-kapture-yellow/15 blur-3xl pointer-events-none"></div>
+  <div class="absolute -left-40 bottom-0 w-[400px] h-[400px] rounded-full bg-kapture-yellow/8 blur-3xl pointer-events-none"></div>
+  <div class="container-c relative py-14 lg:py-20">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+      <div class="lg:col-span-7">
+        <div class="flex items-center gap-2 mb-6 flex-wrap">
+          <span class="chip-yellow chip">PART OF KOOPER · CARE</span>
+          <span class="chip chip-outline-light">Live</span>
+          <span class="chip chip-outline-light">CQC SAF aligned</span>
+          <span class="chip chip-outline-light">DSPT</span>
+        </div>
+        <h1 class="h-section text-white mb-5">Staff onboarding that<br>finishes itself.</h1>
+        <p class="font-serif text-lg text-white/80 leading-relaxed max-w-2xl mb-7">Four pathways. One flow per role. DBS, NMC, HCPC, right-to-work, mandatory training, references — all collected, all checked, all exported in the format your HR system actually accepts. Fillable web. Print PDF. DOCX. CSV. Google Forms. Keep what works.</p>
+        <div class="flex flex-wrap gap-3">
+          <a href="#pathways" class="btn-yellow">Start onboarding →</a>
+          <a href="#demo" class="btn-ghost-light">See it in action</a>
+        </div>
+        <div class="mt-8 flex items-center gap-4 text-xs text-white/55 font-mono flex-wrap">
+          <span><span class="text-kapture-yellow">●</span> 12 templates · 4 pathways</span>
+          <span><span class="text-kapture-yellow">●</span> 5 export formats</span>
+          <span><span class="text-kapture-yellow">●</span> Audit-hashed</span>
+        </div>
+      </div>
+      <div class="lg:col-span-5">
+        <div class="bg-kapture-coal border border-kapture-ash rounded-2xl p-5 lg:p-6">
+          <div class="flex items-center justify-between mb-4">
+            <span class="font-mono text-[0.625rem] tracking-widest uppercase text-kapture-yellow">FORM PREVIEW</span>
+            <span class="font-mono text-[0.625rem] text-white/40">3 of 4 pathways · 11 sections</span>
+          </div>
+          <div class="space-y-2.5">
+            <div class="bg-kapture-ash rounded-lg p-3 flex items-center gap-3">
+              <span class="w-7 h-7 rounded-md bg-kapture-yellow text-kapture-black flex items-center justify-center text-xs font-bold">PC</span>
+              <div class="flex-1 min-w-0">
+                <div class="text-sm font-medium">Permanent · clinical</div>
+                <div class="text-xs text-white/50">NMC PIN · Enhanced DBS · Mandatory training × 14</div>
+              </div>
+              <span class="font-mono text-[0.625rem] text-kapture-yellow">7 sections</span>
+            </div>
+            <div class="bg-kapture-ash rounded-lg p-3 flex items-center gap-3">
+              <span class="w-7 h-7 rounded-md bg-white text-kapture-black flex items-center justify-center text-xs font-bold">PN</span>
+              <div class="flex-1 min-w-0">
+                <div class="text-sm font-medium">Permanent · non-clinical</div>
+                <div class="text-xs text-white/50">Standard DBS · Mandatory training × 9</div>
+              </div>
+              <span class="font-mono text-[0.625rem] text-kapture-yellow">5 sections</span>
+            </div>
+            <div class="bg-kapture-ash rounded-lg p-3 flex items-center gap-3">
+              <span class="w-7 h-7 rounded-md bg-white text-kapture-black flex items-center justify-center text-xs font-bold">AB</span>
+              <div class="flex-1 min-w-0">
+                <div class="text-sm font-medium">Agency · bank</div>
+                <div class="text-xs text-white/50">Framework code · day-rate · agency contract</div>
+              </div>
+              <span class="font-mono text-[0.625rem] text-kapture-yellow">4 sections</span>
+            </div>
+            <div class="bg-kapture-ash rounded-lg p-3 flex items-center gap-3">
+              <span class="w-7 h-7 rounded-md bg-emerald-200 text-emerald-900 flex items-center justify-center text-xs font-bold">VS</span>
+              <div class="flex-1 min-w-0">
+                <div class="text-sm font-medium">Volunteer · student</div>
+                <div class="text-xs text-white/50">Placement · supervisor · expenses-only</div>
+              </div>
+              <span class="font-mono text-[0.625rem] text-kapture-yellow">3 sections</span>
+            </div>
+          </div>
+          <div class="mt-4 pt-4 border-t border-kapture-ash flex items-center justify-between">
+            <span class="text-xs text-white/55">Average completion · <strong class="text-white">11 min</strong></span>
+            <a href="#pathways" class="text-kapture-yellow text-xs font-medium hover:underline">Pick a pathway →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================== -->
+<!-- WHO ARE YOU — login privilege protocols          -->
+<!-- ============================================== -->
+<section class="bg-white py-14 border-b border-kapture-fog">
+  <div class="container-c">
+    <div class="max-w-3xl mb-8">
+      <span class="ed-kicker">WHO ARE YOU</span>
+      <h2 class="h-section text-kapture-black">Three roles. Three views.</h2>
+      <p class="font-serif text-base text-kapture-smoke leading-relaxed mt-3">Each role sees only what their job needs. New hires see their own form. HR admins see the queue and the completed pack. Inspectors see the audit trail, read-only.</p>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <a href="#queue" class="role-card" onclick="setRole('admin')">
+        <div class="role-icon" style="background:#FFD400;color:#0A0A0A">HR</div>
+        <h3 class="font-display font-semibold mb-1">HR admin</h3>
+        <p class="text-sm text-kapture-smoke leading-relaxed mb-3">Send invitations. Configure pathway templates. Review submissions. Approve. Export to your HRIS in 5 formats.</p>
+        <ul class="text-xs text-kapture-mist font-mono space-y-1">
+          <li>· Submission queue · approval queue</li>
+          <li>· DBS / NMC verification log</li>
+          <li>· Mandatory training assignment</li>
+          <li>· Bulk export · CSV · DOCX · PDF</li>
+        </ul>
+      </a>
+      <a href="#pathways" class="role-card" onclick="setRole('hire')" style="border-color:#FFD400">
+        <div class="role-icon" style="background:#0A0A0A;color:#FFD400">NH</div>
+        <h3 class="font-display font-semibold mb-1">New hire</h3>
+        <p class="text-sm text-kapture-smoke leading-relaxed mb-3">Open your invitation, fill your form, sign documents, upload evidence. Save and resume any time. Submit when complete.</p>
+        <ul class="text-xs text-kapture-mist font-mono space-y-1">
+          <li>· Personal details · right-to-work</li>
+          <li>· Bank · pension · emergency contact</li>
+          <li>· Mandatory training acknowledgements</li>
+          <li>· Save & resume · auto-saved every field</li>
+        </ul>
+      </a>
+      <a href="#audit" class="role-card" onclick="setRole('inspector')">
+        <div class="role-icon" style="background:#1F4E53;color:#FFD400">CQ</div>
+        <h3 class="font-display font-semibold mb-1">CQC inspector</h3>
+        <p class="text-sm text-kapture-smoke leading-relaxed mb-3">Read-only audit pack. Every onboarding record, every signature, every audit hash, time-stamped. Time-bound access.</p>
+        <ul class="text-xs text-kapture-mist font-mono space-y-1">
+          <li>· Read-only on every record</li>
+          <li>· Audit hash on every signature</li>
+          <li>· Request-clarity sticky notes</li>
+          <li>· Time-bound visit window</li>
+        </ul>
+      </a>
+    </div>
+    <div class="mt-6 text-xs text-kapture-mist">
+      <span id="onbCurrentRole" class="font-mono">Active role: <strong>HR admin</strong></span> · click any card to switch
+    </div>
+  </div>
+</section>
+
+<!-- ============================================== -->
+<!-- PATHWAYS                                          -->
+<!-- ============================================== -->
+<section id="pathways" class="bg-kapture-paper py-16 lg:py-20">
+  <div class="container-c">
+    <div class="max-w-3xl mb-10">
+      <span class="ed-kicker">FOUR PATHWAYS</span>
+      <h2 class="h-section text-kapture-black">Pick a pathway. We adapt the form.</h2>
+      <p class="font-serif text-base text-kapture-smoke leading-relaxed mt-3">Every staff type has different evidence requirements. Permanent clinical needs an NMC or HCPC PIN, enhanced DBS, professional indemnity. Volunteer needs a supervisor, expenses-only contract, lighter training. Pick the right form, skip the irrelevant fields.</p>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+
+      <a href="#" onclick="event.preventDefault(); openPathway('perm-clinical')" class="pw-card dark">
+        <div class="pw-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
+        <div class="pw-meta mb-1" style="color:#FFD400">PATHWAY 01 · MOST DETAILED</div>
+        <h3 class="font-display text-xl font-semibold mb-2">Permanent · clinical</h3>
+        <p class="text-sm leading-relaxed mb-4 text-white/75">Nurse, senior carer, clinical lead, manager (RGN). NMC or HCPC PIN, Enhanced DBS, mandatory training × 14, references × 2.</p>
+        <div class="text-xs font-mono text-white/55 mb-4">7 sections · 11 min average</div>
+        <span class="inline-flex items-center gap-1 text-sm font-medium text-kapture-yellow">Start pathway <span aria-hidden="true">→</span></span>
+      </a>
+
+      <a href="#" onclick="event.preventDefault(); openPathway('perm-non-clinical')" class="pw-card">
+        <div class="pw-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg></div>
+        <div class="pw-meta mb-1">PATHWAY 02</div>
+        <h3 class="font-display text-xl font-semibold mb-2">Permanent · non-clinical</h3>
+        <p class="text-sm leading-relaxed mb-4 text-kapture-smoke">Cook, maintenance, activities coordinator, admin. Standard DBS, mandatory training × 9, references × 1.</p>
+        <div class="text-xs font-mono text-kapture-mist mb-4">5 sections · 8 min average</div>
+        <span class="inline-flex items-center gap-1 text-sm font-medium text-kapture-black">Start pathway <span aria-hidden="true">→</span></span>
+      </a>
+
+      <a href="#" onclick="event.preventDefault(); openPathway('agency-bank')" class="pw-card">
+        <div class="pw-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/></svg></div>
+        <div class="pw-meta mb-1">PATHWAY 03</div>
+        <h3 class="font-display text-xl font-semibold mb-2">Agency · bank</h3>
+        <p class="text-sm leading-relaxed mb-4 text-kapture-smoke">Agency carer, bank nurse, framework worker. Agency contract, framework code, day-rate, DBS verified by agency.</p>
+        <div class="text-xs font-mono text-kapture-mist mb-4">4 sections · 5 min average</div>
+        <span class="inline-flex items-center gap-1 text-sm font-medium text-kapture-black">Start pathway <span aria-hidden="true">→</span></span>
+      </a>
+
+      <a href="#" onclick="event.preventDefault(); openPathway('volunteer')" class="pw-card" style="border-color:#86EFAC">
+        <div class="pw-icon" style="background:#86EFAC;color:#064E3B"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></div>
+        <div class="pw-meta mb-1" style="color:#047857">PATHWAY 04 · LIGHT</div>
+        <h3 class="font-display text-xl font-semibold mb-2">Volunteer · student</h3>
+        <p class="text-sm leading-relaxed mb-4 text-kapture-smoke">Volunteer carer, nursing student, university placement. Supervisor sign-off, expenses-only, mandatory training × 5.</p>
+        <div class="text-xs font-mono text-kapture-mist mb-4">3 sections · 4 min average</div>
+        <span class="inline-flex items-center gap-1 text-sm font-medium text-kapture-black">Start pathway <span aria-hidden="true">→</span></span>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================== -->
+<!-- LIVE DEMO — embedded form preview                -->
+<!-- ============================================== -->
+<section id="demo" class="bg-white py-16 lg:py-20 border-t border-kapture-fog">
+  <div class="container-c">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+      <div class="lg:col-span-4">
+        <span class="ed-kicker">LIVE DEMO</span>
+        <h2 class="h-section text-kapture-black">No mock data.<br>Try it yourself.</h2>
+        <p class="font-serif text-base text-kapture-smoke leading-relaxed mt-3 mb-6">The form below is the actual Permanent · clinical pathway. Fill any field, switch sections, save and resume. Everything persists locally — no account needed for the demo.</p>
+        <div class="space-y-3">
+          <div class="flex items-start gap-2">
+            <span class="font-mono text-xs text-kapture-yellow font-bold mt-0.5">01</span>
+            <div class="text-sm text-kapture-coal"><strong>Conditional fields.</strong> Pick a role, watch the form adapt — clinical questions appear or disappear in real time.</div>
+          </div>
+          <div class="flex items-start gap-2">
+            <span class="font-mono text-xs text-kapture-yellow font-bold mt-0.5">02</span>
+            <div class="text-sm text-kapture-coal"><strong>Save & resume.</strong> Every field auto-saves to localStorage. Close the tab, come back tomorrow, pick up exactly where you left off.</div>
+          </div>
+          <div class="flex items-start gap-2">
+            <span class="font-mono text-xs text-kapture-yellow font-bold mt-0.5">03</span>
+            <div class="text-sm text-kapture-coal"><strong>Five export formats.</strong> Submit and export to PDF, DOCX, HTML, CSV, or Google Forms — same record, five shapes.</div>
+          </div>
+          <div class="flex items-start gap-2">
+            <span class="font-mono text-xs text-kapture-yellow font-bold mt-0.5">04</span>
+            <div class="text-sm text-kapture-coal"><strong>Audit-hashed submit.</strong> Every submission gets a hash. Inspectors can verify the record hasn't been altered post-signing.</div>
+          </div>
+        </div>
+      </div>
+      <div class="lg:col-span-8" id="formHost">
+        <!-- Live form gets rendered here on page load -->
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================== -->
+<!-- HR QUEUE SAMPLE                                  -->
+<!-- ============================================== -->
+<section id="queue" class="bg-kapture-paper py-16 lg:py-20 border-t border-kapture-fog">
+  <div class="container-c">
+    <div class="max-w-3xl mb-8">
+      <span class="ed-kicker">HR ADMIN VIEW</span>
+      <h2 class="h-section text-kapture-black">The submission queue.</h2>
+      <p class="font-serif text-base text-kapture-smoke leading-relaxed mt-3">When a candidate submits, the form lands here. Approve, request changes, or export. Bulk select supported.</p>
+    </div>
+    <div class="bg-white border border-kapture-fog rounded-2xl overflow-hidden">
+      <div class="px-5 py-3 border-b border-kapture-fog flex items-center justify-between flex-wrap gap-2 bg-kapture-paper">
+        <div class="flex items-center gap-3">
+          <span class="font-mono text-[0.625rem] uppercase tracking-widest text-kapture-mist">Queue</span>
+          <span id="onbQueueCount" class="chip chip-yellow">3 awaiting review</span>
+        </div>
+        <div class="flex gap-2">
+          <button onclick="exportAll()" class="btn-secondary btn-sm">Bulk export CSV</button>
+          <button onclick="approveAll()" class="btn-primary btn-sm">Approve all checked</button>
+        </div>
+      </div>
+      <div id="onbQueueList"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================== -->
+<!-- EXPORT FORMATS                                   -->
+<!-- ============================================== -->
+<section id="exports" class="bg-white py-16 lg:py-20 border-t border-kapture-fog">
+  <div class="container-c">
+    <div class="max-w-3xl mb-8">
+      <span class="ed-kicker">FIVE EXPORT FORMATS</span>
+      <h2 class="h-section text-kapture-black">One submission. Five shapes.</h2>
+      <p class="font-serif text-base text-kapture-smoke leading-relaxed mt-3">Your HRIS reads CSV. Your trustees want PDF. Compliance wants DOCX with audit trail. The candidate wants a Google Forms shareable link. Done.</p>
+    </div>
+    <div class="export-grid">
+      <div class="export-card" onclick="onbExport('pdf')">
+        <div class="icon pdf">PDF</div>
+        <h4>Print-ready PDF</h4>
+        <div class="price">Included</div>
+        <p class="desc">A4 layout, signature blocks, audit footer. The version your HR file expects.</p>
+      </div>
+      <div class="export-card" onclick="onbExport('docx')">
+        <div class="icon docx">DOCX</div>
+        <h4>Editable DOCX</h4>
+        <div class="price">£9 / pack</div>
+        <p class="desc">Microsoft Word. Edit in your house style. Track-changes ready.</p>
+      </div>
+      <div class="export-card" onclick="onbExport('html')">
+        <div class="icon html">HTML</div>
+        <h4>Embed HTML</h4>
+        <div class="price">£19 / domain</div>
+        <p class="desc">Drop into your own careers page. Same form, your branding.</p>
+      </div>
+      <div class="export-card" onclick="onbExport('csv')">
+        <div class="icon csv">CSV</div>
+        <h4>HRIS CSV</h4>
+        <div class="price">Included</div>
+        <p class="desc">Standard fields plus an extras column. Imports into BambooHR, BreatheHR, Workday.</p>
+      </div>
+      <div class="export-card" onclick="onbExport('gforms')">
+        <div class="icon gforms">G</div>
+        <h4>Google Forms</h4>
+        <div class="price">£12 / pack</div>
+        <p class="desc">Spec file you import into Google Forms. Same fields, same logic, same outputs.</p>
+      </div>
+      <div class="export-card" onclick="onbExport('web')">
+        <div class="icon web">⚡</div>
+        <h4>Hosted web form</h4>
+        <div class="price">From £29 / mo</div>
+        <p class="desc">Branded URL, you control the magic link, we host the submissions.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================== -->
+<!-- PRICING                                          -->
+<!-- ============================================== -->
+<section id="pricing" class="bg-kapture-paper py-16 lg:py-20 border-t border-kapture-fog">
+  <div class="container-c">
+    <div class="max-w-3xl mb-10">
+      <span class="ed-kicker">PRICING</span>
+      <h2 class="h-section text-kapture-black">Pay once. Or run it monthly.</h2>
+      <p class="font-serif text-base text-kapture-smoke leading-relaxed mt-3">Buy the form set outright as a download pack. Or run it as a hosted service with magic links + queue + automated reminders.</p>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+
+      <div class="tier">
+        <h3>Single download</h3>
+        <p class="text-sm text-kapture-smoke">For a single use. Lifetime download, your branding.</p>
+        <div class="price">£29</div>
+        <div class="price-foot">one-time · 4 pathways · 5 formats</div>
+        <ul>
+          <li>All 4 staff pathways</li>
+          <li>PDF + CSV included</li>
+          <li>DOCX + HTML + Google Forms add-ons</li>
+          <li>Use forever, single workspace</li>
+        </ul>
+        <a href="#" onclick="event.preventDefault(); kooperToast('Single download · £29 · in cart')" class="btn-secondary mt-auto justify-center">Buy single</a>
+      </div>
+
+      <div class="tier featured">
+        <h3>Care home licence</h3>
+        <p class="text-sm text-kapture-smoke">For one care home. Hosted, branded, magic links, queue.</p>
+        <div class="price">£29 <span class="text-sm font-medium text-kapture-smoke font-display">/ mo</span></div>
+        <div class="price-foot">unlimited submissions · all formats included</div>
+        <ul>
+          <li>Everything in Single, plus:</li>
+          <li>Hosted web forms · branded URL</li>
+          <li>Magic-link invitations</li>
+          <li>HR queue · approvals · audit hash</li>
+          <li>Bulk CSV export to your HRIS</li>
+          <li>CQC inspector read-only access</li>
+        </ul>
+        <a href="kooper-sign-in.html#book" class="btn-yellow mt-auto justify-center">Start free trial</a>
+      </div>
+
+      <div class="tier">
+        <h3>Group · multi-site</h3>
+        <p class="text-sm text-kapture-smoke">For groups, NHS blocks, domiciliary networks.</p>
+        <div class="price">From £199 <span class="text-sm font-medium text-kapture-smoke font-display">/ mo</span></div>
+        <div class="price-foot">10+ sites · pricing on application</div>
+        <ul>
+          <li>Everything in Care home, plus:</li>
+          <li>Multi-site rollup dashboard</li>
+          <li>Custom pathway templates</li>
+          <li>Single sign-on · SSO + SAML</li>
+          <li>Branded across every site</li>
+          <li>Account manager · SLA · DPO contact</li>
+        </ul>
+        <a href="kooper-sign-in.html#book" class="btn-secondary mt-auto justify-center">Talk to us</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ============================================== -->
+<!-- FOOTER · powered by Forms                        -->
+<!-- ============================================== -->
+<footer class="bg-kapture-black text-white py-12">
+  <div class="container-c grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
+    <div>
+      <a href="kooper-care-landing.html" class="flex items-center gap-2 mb-3">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="22" height="22" fill="none"><path fill="currentColor" d="M255.75 133.125c67.679 0 122.625 54.946 122.625 122.625S323.429 378.375 255.75 378.375 133.125 323.429 133.125 255.75s54.946-122.625 122.625-122.625m0-132.75c18.832 0 34.121 15.289 34.121 34.121s-15.289 34.121-34.121 34.121-34.121-15.289-34.121-34.121S236.918.375 255.75.375M75.173 75.173c13.316-13.316 34.938-13.316 48.254 0s13.316 34.938 0 48.254-34.938 13.316-48.254 0-13.316-34.938 0-48.254M511.125 255.75c0 18.832-15.289 34.121-34.121 34.121s-34.121-15.289-34.121-34.121 15.289-34.121 34.121-34.121 34.121 15.289 34.121 34.121M255.75 442.883c18.832 0 34.121 15.289 34.121 34.121s-15.289 34.121-34.121 34.121-34.121-15.289-34.121-34.121 15.289-34.121 34.121-34.121m132.323-54.81c13.316-13.316 34.938-13.316 48.254 0s13.316 34.938 0 48.254-34.938 13.316-48.254 0-13.316-34.938 0-48.254M68.617 255.75c0 18.832-15.289 34.121-34.121 34.121S.375 274.582.375 255.75s15.289-34.121 34.121-34.121 34.121 15.289 34.121 34.121m54.81 132.323c13.316 13.316 13.316 34.938 0 48.254s-34.938 13.316-48.254 0-13.316-34.938 0-48.254 34.938-13.316 48.254 0"/><path fill="#FFD400" d="M436.327 75.173c13.316 13.316 13.316 34.938 0 48.254s-34.938 13.316-48.254 0-13.316-34.938 0-48.254 34.938-13.316 48.254 0"/></svg>
+        <span class="font-display font-semibold lowercase tracking-wide text-base">kooper · onboarding</span>
+      </a>
+      <p class="text-xs text-white/55 leading-relaxed">Part of <a href="kooper-care-landing.html" class="text-kapture-yellow hover:underline">kooper · care</a>. Powered by Forms — a curated marketplace of pre-built compliance forms for every industry.</p>
+    </div>
+    <div>
+      <div class="font-mono text-[0.625rem] uppercase tracking-widest text-kapture-yellow mb-3">FORMS · STORE</div>
+      <a href="kooper-forms.html" class="block text-sm text-white/80 hover:text-white mb-1.5">Browse all forms →</a>
+      <a href="kooper-forms.html#healthcare" class="block text-sm text-white/55 hover:text-white mb-1">Healthcare forms</a>
+      <a href="kooper-forms.html#hr" class="block text-sm text-white/55 hover:text-white mb-1">HR forms</a>
+      <a href="kooper-forms.html#partner" class="block text-sm text-white/55 hover:text-white mb-1">List your form pack →</a>
+    </div>
+    <div>
+      <div class="font-mono text-[0.625rem] uppercase tracking-widest text-kapture-yellow mb-3">KOOPER · CARE</div>
+      <a href="kooper-care-landing.html" class="block text-sm text-white/55 hover:text-white mb-1">Home</a>
+      <a href="kooper-care-dashboards.html" class="block text-sm text-white/55 hover:text-white mb-1">Dashboards</a>
+      <a href="kooper-hr.html" class="block text-sm text-white/55 hover:text-white mb-1">HR module</a>
+      <a href="kooper-care-plans.html" class="block text-sm text-white/55 hover:text-white mb-1">Care plans</a>
+      <a href="kooper-sign-in.html" class="block text-sm text-white/55 hover:text-white mb-1">Sign in</a>
+    </div>
+  </div>
+  <div class="container-c mt-8 pt-6 border-t border-kapture-ash text-xs text-white/40 font-mono flex flex-wrap items-center justify-between gap-3">
+    <span>kooper · onboarding · v0.1 · Forms-engine: Kapture</span>
+    <span>· No real PII · Mock data · CQC SAF aligned · DSPT</span>
+  </div>
+</footer>
+
+<div id="onbToast" class="toast"></div>
+
+<!-- ============================================== -->
+<!-- PATHWAY MODAL                                    -->
+<!-- ============================================== -->
+<div id="onbScrim" class="scrim" onclick="closePathway()"></div>
+<div id="onbModal" class="modal" role="dialog" aria-modal="true">
+  <div class="modal-head">
+    <div>
+      <span class="ed-kicker" id="onbModalKicker" style="margin:0">PATHWAY</span>
+      <h2 id="onbModalTitle">…</h2>
+    </div>
+    <button class="x-btn" onclick="closePathway()" aria-label="Close">×</button>
+  </div>
+  <div class="modal-body" id="onbModalBody"></div>
+  <div class="modal-foot">
+    <button class="btn-secondary btn-sm" onclick="closePathway()">Save & close</button>
+    <div class="flex gap-2">
+      <button class="btn-secondary btn-sm" onclick="onbPrev()" id="onbPrevBtn">← Previous</button>
+      <button class="btn-yellow btn-sm" onclick="onbNext()" id="onbNextBtn">Next →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- ENGINE                                            -->
+<!-- ============================================== -->
+<script>
+(function () {
+  'use strict';
+
+  // ---- Pathway templates ----
+  // Each pathway is an ordered list of sections. Each section
+  // has a title + an array of fields. Fields: { key, type, label,
+  // required, options?, condition?, help?, placeholder?, rows? }.
+  // `condition: { field, equals }` only renders the field when
+  // another field matches the value.
+  var PATHWAYS = {
+    'perm-clinical': {
+      kicker:'Pathway 01 · Most detailed', label:'Permanent · clinical',
+      avg:'11 min average · 7 sections',
+      sections: [
+        { title:'Personal details', lede:'Used on your contract and your right-to-work check.', fields:[
+          { key:'firstName', type:'text', label:'First name', required:true },
+          { key:'lastName',  type:'text', label:'Family name', required:true },
+          { key:'dob',       type:'date', label:'Date of birth', required:true },
+          { key:'pronouns',  type:'select', label:'Pronouns', options:['—','he/him','she/her','they/them','prefer not to say'] },
+          { key:'addr',      type:'textarea', label:'Home address', required:true, rows:3 },
+          { key:'mobile',    type:'tel', label:'Mobile', required:true },
+          { key:'personalEmail', type:'email', label:'Personal email', required:true }
+        ]},
+        { title:'Right to work', lede:'UK Home Office requires us to verify before day one.', fields:[
+          { key:'rtw', type:'select', label:'Right-to-work status', required:true, options:['—','UK / Irish citizen','Settled status','Pre-settled status','Skilled Worker visa','Health & Care Worker visa','Other visa'] },
+          { key:'shareCode', type:'text', label:'Home Office share code', help:'Required for everyone who is not a UK or Irish citizen.', condition:{field:'rtw', notEquals:['—','UK / Irish citizen']} },
+          { key:'visaExpiry', type:'date', label:'Visa expiry', condition:{field:'rtw', notEquals:['—','UK / Irish citizen','Settled status']} }
+        ]},
+        { title:'Professional registration', lede:'NMC for nurses, HCPC for allied health, none if you are a senior carer.', fields:[
+          { key:'profBody', type:'select', label:'Professional body', required:true, options:['—','NMC','HCPC','None / not applicable'] },
+          { key:'pin', type:'text', label:'PIN / registration number', condition:{field:'profBody', notEquals:['—','None / not applicable']}, help:'NMC PIN format e.g. 12A3456E or HCPC e.g. PH123456.' },
+          { key:'pinExpiry', type:'date', label:'Renewal due', condition:{field:'profBody', notEquals:['—','None / not applicable']} },
+          { key:'indemnity', type:'select', label:'Professional indemnity', options:['—','RCN cover','Unison cover','Personal policy','Employer-provided'], condition:{field:'profBody', notEquals:['—','None / not applicable']} }
+        ]},
+        { title:'DBS · Enhanced', lede:'Enhanced DBS is mandatory for clinical roles. Must be on the Update Service or renewed annually.', fields:[
+          { key:'dbsType', type:'select', label:'DBS type', required:true, options:['—','Enhanced + Adult barred','Enhanced (no barred)','Update Service'] },
+          { key:'dbsNumber', type:'text', label:'DBS certificate number', required:true },
+          { key:'dbsIssued', type:'date', label:'Issued date', required:true },
+          { key:'dbsUpdate', type:'select', label:'Subscribed to Update Service', options:['—','Yes','No'] }
+        ]},
+        { title:'Mandatory training', lede:'Acknowledge each item. Attach evidence on submit.', fields:[
+          { key:'trainPack', type:'multi', label:'Mandatory training acknowledgements', required:true, options:[
+            'Safeguarding adults · Level 2', 'Safeguarding children · Level 2', 'Mental Capacity Act + DoLS',
+            'Equality, diversity & inclusion', 'Manual handling · people + objects', 'Infection prevention & control',
+            'Fire safety + evacuation', 'Health & safety at work', 'Food hygiene · Level 2',
+            'First aid (basic)', 'Information governance', 'Medication awareness',
+            'PMVA / restrictive practice', 'Tissue viability'
+          ]}
+        ]},
+        { title:'References', lede:'Two references required. One must be your most recent clinical employer.', fields:[
+          { key:'ref1Name', type:'text', label:'Reference 1 — name', required:true },
+          { key:'ref1Role', type:'text', label:'Reference 1 — role', required:true },
+          { key:'ref1Email', type:'email', label:'Reference 1 — email', required:true },
+          { key:'ref2Name', type:'text', label:'Reference 2 — name', required:true },
+          { key:'ref2Role', type:'text', label:'Reference 2 — role', required:true },
+          { key:'ref2Email', type:'email', label:'Reference 2 — email', required:true }
+        ]},
+        { title:'Bank, pension, emergency contact', lede:'Used for payroll and in case anything happens on shift.', fields:[
+          { key:'bankName', type:'text', label:'Bank name', required:true },
+          { key:'sortCode', type:'text', label:'Sort code', placeholder:'00-00-00', required:true },
+          { key:'accountNo', type:'text', label:'Account number', placeholder:'8 digits', required:true },
+          { key:'pension', type:'select', label:'Pension scheme', options:['—','NEST (default)','NHS Pension','Opt out (sign separately)'] },
+          { key:'kinName', type:'text', label:'Emergency contact — name', required:true },
+          { key:'kinPhone', type:'tel', label:'Emergency contact — phone', required:true },
+          { key:'kinRel', type:'text', label:'Relationship', placeholder:'e.g. partner, sister' }
+        ]}
+      ]
+    },
+    'perm-non-clinical': {
+      kicker:'Pathway 02', label:'Permanent · non-clinical',
+      avg:'8 min average · 5 sections',
+      sections: [
+        { title:'Personal details', lede:'For your contract and right-to-work check.', fields:[
+          { key:'firstName', type:'text', label:'First name', required:true },
+          { key:'lastName',  type:'text', label:'Family name', required:true },
+          { key:'dob',       type:'date', label:'Date of birth', required:true },
+          { key:'addr',      type:'textarea', label:'Home address', required:true, rows:3 },
+          { key:'mobile',    type:'tel', label:'Mobile', required:true },
+          { key:'personalEmail', type:'email', label:'Personal email', required:true }
+        ]},
+        { title:'Right to work', fields:[
+          { key:'rtw', type:'select', label:'Right-to-work status', required:true, options:['—','UK / Irish citizen','Settled status','Pre-settled status','Other'] },
+          { key:'shareCode', type:'text', label:'Home Office share code', condition:{field:'rtw', notEquals:['—','UK / Irish citizen']} }
+        ]},
+        { title:'Role', fields:[
+          { key:'role', type:'select', label:'Role', required:true, options:['—','Cook','Maintenance','Housekeeping','Activities coordinator','Admin / reception','Driver'] },
+          { key:'startDate', type:'date', label:'Start date' },
+          { key:'hours', type:'select', label:'Hours per week', options:['—','Full-time (37.5)','Part-time (24)','Part-time (16)','Variable'] }
+        ]},
+        { title:'DBS · Standard', lede:'Standard DBS for residents-adjacent non-clinical roles.', fields:[
+          { key:'dbsType', type:'select', label:'DBS type', required:true, options:['—','Standard','Enhanced','Update Service'] },
+          { key:'dbsNumber', type:'text', label:'DBS certificate number' },
+          { key:'dbsIssued', type:'date', label:'Issued date' }
+        ]},
+        { title:'Mandatory training', lede:'Acknowledge each item.', fields:[
+          { key:'trainPack', type:'multi', label:'Mandatory training acknowledgements', required:true, options:[
+            'Safeguarding adults · Level 1', 'Equality, diversity & inclusion', 'Manual handling',
+            'Infection prevention & control', 'Fire safety', 'Health & safety at work',
+            'Food hygiene · Level 2 (cooks only)', 'Information governance',
+            'Customer service / dignity in care'
+          ]}
+        ]}
+      ]
+    },
+    'agency-bank': {
+      kicker:'Pathway 03', label:'Agency · bank',
+      avg:'5 min average · 4 sections',
+      sections: [
+        { title:'Personal & agency details', fields:[
+          { key:'firstName', type:'text', label:'First name', required:true },
+          { key:'lastName',  type:'text', label:'Family name', required:true },
+          { key:'agency', type:'text', label:'Agency / framework', placeholder:'e.g. Hello Care, NHS Workforce Alliance', required:true },
+          { key:'agencyId', type:'text', label:'Worker ID at agency' },
+          { key:'mobile', type:'tel', label:'Mobile', required:true },
+          { key:'personalEmail', type:'email', label:'Personal email', required:true }
+        ]},
+        { title:'Framework + day-rate', fields:[
+          { key:'frameworkCode', type:'text', label:'Framework code', help:'e.g. NHS-WA-2024-CARE-CRG-A' },
+          { key:'dayRate', type:'text', label:'Agreed day-rate (£)', placeholder:'e.g. 145.00' },
+          { key:'shifts', type:'select', label:'Shift pattern willing to cover', options:['—','Day only','Night only','Both'] }
+        ]},
+        { title:'DBS verified by agency', lede:'For agency / bank workers, your agency holds the DBS — we just need confirmation it is current.', fields:[
+          { key:'dbsHeldBy', type:'text', label:'DBS held by (agency name)', required:true },
+          { key:'dbsConfirmed', type:'select', label:'Confirmed within last 12 months', options:['—','Yes','No'] }
+        ]},
+        { title:'Mandatory training', fields:[
+          { key:'trainPack', type:'multi', label:'Mandatory training acknowledgements', required:true, options:[
+            'Safeguarding adults · Level 1', 'Manual handling', 'Infection prevention & control',
+            'Fire safety', 'Mental Capacity Act + DoLS', 'Information governance'
+          ]}
+        ]}
+      ]
+    },
+    'volunteer': {
+      kicker:'Pathway 04 · Light', label:'Volunteer · student',
+      avg:'4 min average · 3 sections',
+      sections: [
+        { title:'Personal details', fields:[
+          { key:'firstName', type:'text', label:'First name', required:true },
+          { key:'lastName',  type:'text', label:'Family name', required:true },
+          { key:'dob',       type:'date', label:'Date of birth' },
+          { key:'mobile', type:'tel', label:'Mobile', required:true },
+          { key:'personalEmail', type:'email', label:'Personal email', required:true },
+          { key:'placementKind', type:'select', label:'Placement type', required:true, options:['—','Volunteer carer','Nursing student','University placement','Sixth-form placement'] }
+        ]},
+        { title:'Supervisor & study', fields:[
+          { key:'supervisor', type:'text', label:'Named supervisor', required:true },
+          { key:'supervisorEmail', type:'email', label:'Supervisor email', required:true },
+          { key:'university', type:'text', label:'University / school', condition:{field:'placementKind', equals:['Nursing student','University placement','Sixth-form placement']} },
+          { key:'placementWeeks', type:'text', label:'Placement length (weeks)' }
+        ]},
+        { title:'Mandatory training (light)', fields:[
+          { key:'trainPack', type:'multi', label:'Acknowledge each', required:true, options:[
+            'Safeguarding adults · Level 1', 'Confidentiality + dignity',
+            'Fire safety', 'Manual handling (basic)', 'Infection prevention & control'
+          ]}
+        ]}
+      ]
+    }
+  };
+
+  // ---- Storage ----
+  function load(k, fb){ try{var raw=localStorage.getItem(k); return raw?JSON.parse(raw):fb;}catch(e){return fb;} }
+  function save(k, v){ try{localStorage.setItem(k, JSON.stringify(v));}catch(e){} }
+
+  // Per-pathway draft so a candidate can save & resume
+  function draftKey(pid){ return 'kooper:onboarding:draft:' + pid; }
+  function getDraft(pid){ return load(draftKey(pid), {}); }
+  function setDraft(pid, data){ save(draftKey(pid), data); }
+
+  // Submitted records — viewable by HR admin
+  function getSubmissions(){ return load('kooper:onboarding:submissions', seedSubmissions()); }
+  function setSubmissions(list){ save('kooper:onboarding:submissions', list); }
+
+  function seedSubmissions(){
+    var existing = load('kooper:onboarding:submissions', null);
+    if (existing) return existing;
+    var seeds = [
+      { id:'sub_seed1', pathway:'perm-clinical',     candidate:'Aisha Patel',      role:'RGN · clinical lead',     submittedAt: new Date(Date.now()-1*86400000).toISOString(), status:'awaiting-review', auditHash:'a7f2b3c1' },
+      { id:'sub_seed2', pathway:'perm-non-clinical', candidate:'Ben Whittaker',    role:'Maintenance',             submittedAt: new Date(Date.now()-2*86400000).toISOString(), status:'awaiting-review', auditHash:'b9d4e2a8' },
+      { id:'sub_seed3', pathway:'agency-bank',       candidate:'Joy Munemo',       role:'Agency · day cover',      submittedAt: new Date(Date.now()-12*3600000).toISOString(), status:'awaiting-review', auditHash:'c1e5f7d2' },
+      { id:'sub_seed4', pathway:'volunteer',         candidate:'Olivia Greenway',  role:'Nursing student · King\'s', submittedAt: new Date(Date.now()-5*86400000).toISOString(), status:'approved', auditHash:'d8a3b6c5' }
+    ];
+    save('kooper:onboarding:submissions', seeds);
+    return seeds;
+  }
+
+  // ---- Live demo: render pathway 01 inline ----
+  function renderInlineDemo() {
+    var host = document.getElementById('formHost'); if (!host) return;
+    host.innerHTML =
+      '<div class="form-shell">' +
+        '<div class="form-progress" id="onbInlineProgress"></div>' +
+        '<div id="onbInlineBody"></div>' +
+        '<div class="flex justify-between mt-5 gap-2 flex-wrap">' +
+          '<button class="btn-secondary btn-sm" onclick="onbInlinePrev()">← Previous section</button>' +
+          '<div class="flex gap-2">' +
+            '<button class="btn-secondary btn-sm" onclick="onbInlineSaveDraft()">Save draft</button>' +
+            '<button class="btn-yellow btn-sm" onclick="onbInlineNext()">Next →</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    INLINE.pathway = 'perm-clinical';
+    INLINE.section = 0;
+    INLINE.data = getDraft('inline-' + INLINE.pathway) || {};
+    renderInlineProgress();
+    renderInlineSection();
+  }
+  var INLINE = { pathway:'perm-clinical', section:0, data:{} };
+  function inlinePathway(){ return PATHWAYS[INLINE.pathway]; }
+  function renderInlineProgress() {
+    var p = inlinePathway();
+    var host = document.getElementById('onbInlineProgress'); if (!host) return;
+    host.innerHTML = p.sections.map(function(s, i){
+      var cls = 'progress-step' + (i === INLINE.section ? ' active' : '') + (i < INLINE.section ? ' done' : '');
+      return '<button type="button" class="' + cls + '" onclick="onbInlineGo(' + i + ')">' + (i+1) + ' · ' + s.title + '</button>' + (i < p.sections.length - 1 ? '<span class="progress-line"></span>' : '');
+    }).join('');
+  }
+  window.onbInlineGo = function(i){ INLINE.section = i; renderInlineProgress(); renderInlineSection(); };
+  window.onbInlinePrev = function(){ if (INLINE.section > 0){ INLINE.section--; renderInlineProgress(); renderInlineSection(); } };
+  window.onbInlineNext = function(){ var p = inlinePathway(); if (INLINE.section < p.sections.length - 1){ INLINE.section++; renderInlineProgress(); renderInlineSection(); } else { kooperToast('Reached end of demo · click Submit on a real pathway to lock in'); } };
+  window.onbInlineSaveDraft = function(){ setDraft('inline-' + INLINE.pathway, INLINE.data); kooperToast('Draft saved · resume any time on this device'); };
+  function renderInlineSection() {
+    var p = inlinePathway(); var s = p.sections[INLINE.section];
+    var host = document.getElementById('onbInlineBody'); if (!host) return;
+    host.innerHTML = '<div class="form-section">' +
+      '<h3>' + esc(s.title) + '</h3>' +
+      (s.lede ? '<p class="section-lede">' + esc(s.lede) + '</p>' : '') +
+      s.fields.map(fieldHTML.bind(null, INLINE.data, 'inline-')).join('') +
+    '</div>';
+    wireInlineFields();
+  }
+  function wireInlineFields() {
+    var s = inlinePathway().sections[INLINE.section];
+    s.fields.forEach(function(f) {
+      var id = 'inline-' + f.key;
+      var el = document.getElementById(id); if (!el) return;
+      el.addEventListener('input', function(){ INLINE.data[f.key] = readField(el, f); evalConditions(INLINE.data, 'inline-', s.fields); });
+      el.addEventListener('change', function(){ INLINE.data[f.key] = readField(el, f); evalConditions(INLINE.data, 'inline-', s.fields); });
+      // multi-checkboxes
+      if (f.type === 'multi') {
+        f.options.forEach(function(opt, oi){
+          var cb = document.getElementById(id + '-' + oi);
+          if (!cb) return;
+          cb.addEventListener('change', function(){
+            INLINE.data[f.key] = (f.options || []).filter(function(o, oi2){
+              var c = document.getElementById(id + '-' + oi2);
+              return c && c.checked;
+            });
+          });
+        });
+      }
+    });
+    evalConditions(INLINE.data, 'inline-', s.fields);
+  }
+
+  // ---- Modal pathway flow ----
+  var MODAL = { pathway:null, section:0, data:{} };
+  window.openPathway = function(pid) {
+    if (!PATHWAYS[pid]) return;
+    MODAL.pathway = pid;
+    MODAL.section = 0;
+    MODAL.data = getDraft(pid) || {};
+    var p = PATHWAYS[pid];
+    document.getElementById('onbModalKicker').textContent = p.kicker;
+    document.getElementById('onbModalTitle').textContent = p.label;
+    renderModalSection();
+    document.getElementById('onbScrim').classList.add('on');
+    document.getElementById('onbModal').classList.add('on');
+    document.body.style.overflow = 'hidden';
+  };
+  window.closePathway = function() {
+    if (MODAL.pathway) setDraft(MODAL.pathway, MODAL.data);
+    document.getElementById('onbScrim').classList.remove('on');
+    document.getElementById('onbModal').classList.remove('on');
+    document.body.style.overflow = '';
+    MODAL.pathway = null;
+  };
+  window.onbPrev = function(){ if (MODAL.section > 0){ MODAL.section--; renderModalSection(); } };
+  window.onbNext = function() {
+    if (!MODAL.pathway) return;
+    var p = PATHWAYS[MODAL.pathway];
+    if (MODAL.section < p.sections.length - 1) {
+      MODAL.section++; renderModalSection();
+    } else {
+      submitPathway();
+    }
+  };
+  function renderModalSection() {
+    var p = PATHWAYS[MODAL.pathway]; var s = p.sections[MODAL.section];
+    var prog = p.sections.map(function(sec, i){
+      var cls = 'progress-step' + (i === MODAL.section ? ' active' : '') + (i < MODAL.section ? ' done' : '');
+      return '<button type="button" class="' + cls + '" onclick="onbModalGo(' + i + ')">' + (i+1) + '</button>' + (i < p.sections.length - 1 ? '<span class="progress-line"></span>' : '');
+    }).join('');
+    document.getElementById('onbModalBody').innerHTML =
+      '<div class="form-progress">' + prog + '</div>' +
+      '<div class="form-section">' +
+        '<h3>' + esc(s.title) + '</h3>' +
+        (s.lede ? '<p class="section-lede">' + esc(s.lede) + '</p>' : '') +
+        s.fields.map(fieldHTML.bind(null, MODAL.data, 'mdl-')).join('') +
+      '</div>';
+    wireModalFields();
+    var nextBtn = document.getElementById('onbNextBtn');
+    nextBtn.textContent = (MODAL.section === p.sections.length - 1) ? 'Submit & lock' : 'Next →';
+    document.getElementById('onbPrevBtn').disabled = MODAL.section === 0;
+  }
+  window.onbModalGo = function(i){ MODAL.section = i; renderModalSection(); };
+  function wireModalFields() {
+    var s = PATHWAYS[MODAL.pathway].sections[MODAL.section];
+    s.fields.forEach(function(f){
+      var id = 'mdl-' + f.key;
+      var el = document.getElementById(id); if (!el) return;
+      el.addEventListener('input', function(){ MODAL.data[f.key] = readField(el, f); setDraft(MODAL.pathway, MODAL.data); evalConditions(MODAL.data, 'mdl-', s.fields); });
+      el.addEventListener('change', function(){ MODAL.data[f.key] = readField(el, f); setDraft(MODAL.pathway, MODAL.data); evalConditions(MODAL.data, 'mdl-', s.fields); });
+      if (f.type === 'multi') {
+        f.options.forEach(function(opt, oi){
+          var cb = document.getElementById(id + '-' + oi);
+          if (!cb) return;
+          cb.addEventListener('change', function(){
+            MODAL.data[f.key] = (f.options || []).filter(function(o, oi2){
+              var c = document.getElementById(id + '-' + oi2);
+              return c && c.checked;
+            });
+            setDraft(MODAL.pathway, MODAL.data);
+          });
+        });
+      }
+    });
+    evalConditions(MODAL.data, 'mdl-', s.fields);
+  }
+  function submitPathway() {
+    if (!MODAL.pathway) return;
+    var subs = getSubmissions();
+    var p = PATHWAYS[MODAL.pathway];
+    var candidate = (MODAL.data.firstName || '') + ' ' + (MODAL.data.lastName || '');
+    candidate = candidate.trim() || 'Anonymous candidate';
+    var hash = 'a' + Math.abs((MODAL.pathway + candidate + Date.now()).split('').reduce(function(a,c){return ((a<<5)-a + c.charCodeAt(0))|0;}, 0)).toString(36);
+    subs.unshift({
+      id:'sub_'+Date.now().toString(36),
+      pathway:MODAL.pathway, candidate:candidate, role:p.label,
+      submittedAt:new Date().toISOString(), status:'awaiting-review',
+      auditHash:hash, payload:MODAL.data
+    });
+    setSubmissions(subs.slice(0, 60));
+    closePathway();
+    kooperToast('Submitted · audit hash ' + hash + ' · HR queue updated');
+    renderQueue();
+  }
+
+  // ---- Field rendering + condition eval ----
+  function fieldHTML(data, prefix, f) {
+    var id = prefix + f.key;
+    var v = data[f.key];
+    var hidden = false;
+    if (f.condition) {
+      var cv = data[f.condition.field];
+      if (f.condition.equals) hidden = !((cv != null) && f.condition.equals.indexOf(cv) >= 0);
+      if (f.condition.notEquals) hidden = (cv != null && f.condition.notEquals.indexOf(cv) >= 0);
+    }
+    var wrapAttr = ' data-fld="' + id + '" data-key="' + f.key + '"';
+    if (hidden) wrapAttr += ' style="display:none"';
+    var lblHTML = '<span class="lbl"><span>' + esc(f.label) + '</span>' + (f.required ? '<span class="req">required</span>' : '') + '</span>';
+    var ctrl = '';
+    if (f.type === 'text' || f.type === 'tel' || f.type === 'email' || f.type === 'date') {
+      ctrl = '<input id="' + id + '" type="' + f.type + '" ' + (f.placeholder ? 'placeholder="' + esc(f.placeholder) + '"' : '') + ' value="' + esc(v || '') + '" />';
+    } else if (f.type === 'textarea') {
+      ctrl = '<textarea id="' + id + '" rows="' + (f.rows || 3) + '" ' + (f.placeholder ? 'placeholder="' + esc(f.placeholder) + '"' : '') + '>' + esc(v || '') + '</textarea>';
+    } else if (f.type === 'select') {
+      ctrl = '<select id="' + id + '">' + (f.options || []).map(function(o){ var sel = (v === o ? ' selected' : ''); return '<option' + sel + '>' + esc(o) + '</option>'; }).join('') + '</select>';
+    } else if (f.type === 'multi') {
+      ctrl = '<div id="' + id + '">' + (f.options || []).map(function(o, oi){
+        var checked = (v && v.indexOf && v.indexOf(o) >= 0) ? ' checked' : '';
+        return '<div class="check-row"><input id="' + id + '-' + oi + '" type="checkbox"' + checked + '><label for="' + id + '-' + oi + '">' + esc(o) + '</label></div>';
+      }).join('') + '</div>';
+    }
+    return '<label class="fld"' + wrapAttr + '>' + lblHTML + ctrl + (f.help ? '<div class="fld-help">' + esc(f.help) + '</div>' : '') + '</label>';
+  }
+  function readField(el, f) {
+    if (f.type === 'multi') {
+      return (f.options || []).filter(function(o, oi){
+        var c = document.getElementById(el.id + '-' + oi);
+        return c && c.checked;
+      });
+    }
+    return el.value;
+  }
+  function evalConditions(data, prefix, fields) {
+    fields.forEach(function(f) {
+      if (!f.condition) return;
+      var wrap = document.querySelector('[data-fld="' + prefix + f.key + '"]');
+      if (!wrap) return;
+      var cv = data[f.condition.field];
+      var hidden = false;
+      if (f.condition.equals) hidden = !((cv != null) && f.condition.equals.indexOf(cv) >= 0);
+      if (f.condition.notEquals) hidden = (cv != null && f.condition.notEquals.indexOf(cv) >= 0);
+      wrap.style.display = hidden ? 'none' : '';
+    });
+  }
+  function esc(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+
+  // ---- Queue rendering (HR admin view) ----
+  function fmtDate(iso){ var d=new Date(iso); return d.toLocaleDateString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}); }
+  function pathwayInits(pid){ return ({ 'perm-clinical':'PC', 'perm-non-clinical':'PN', 'agency-bank':'AB', 'volunteer':'VS' })[pid] || '··'; }
+  function pathwayTone(pid){ return ({ 'perm-clinical':'#FFD400', 'perm-non-clinical':'#FFFFFF', 'agency-bank':'#FFFFFF', 'volunteer':'#86EFAC' })[pid] || '#fff'; }
+
+  function renderQueue() {
+    var host = document.getElementById('onbQueueList'); if (!host) return;
+    var subs = getSubmissions();
+    var awaiting = subs.filter(function(s){ return s.status === 'awaiting-review'; });
+    document.getElementById('onbQueueCount').textContent = awaiting.length + ' awaiting review';
+    if (!subs.length) { host.innerHTML = '<div class="px-5 py-12 text-center text-sm text-kapture-mist">No submissions yet · open a pathway and submit to populate this queue</div>'; return; }
+    host.innerHTML = subs.slice(0, 12).map(function(s) {
+      var statusChip = s.status === 'approved' ? '<span class="chip chip-ok">Approved</span>' : (s.status === 'returned' ? '<span class="chip" style="background:#FEE2E2;color:#B42318">Returned</span>' : '<span class="chip chip-warn">Awaiting</span>');
+      return '<div class="px-5 py-4 flex items-center gap-3 border-t border-kapture-fog flex-wrap">' +
+        '<input type="checkbox" class="onb-q-check" data-id="' + s.id + '" style="accent-color:#FFD400;width:1rem;height:1rem">' +
+        '<span style="width:32px;height:32px;border-radius:8px;background:' + pathwayTone(s.pathway) + ';color:#0A0A0A;display:flex;align-items:center;justify-content:center;font-family:Space Grotesk,sans-serif;font-weight:700;font-size:0.6875rem;flex-shrink:0">' + pathwayInits(s.pathway) + '</span>' +
+        '<div class="flex-1 min-w-0">' +
+          '<div class="font-medium text-sm">' + esc(s.candidate) + '</div>' +
+          '<div class="text-xs text-kapture-mist font-mono">' + esc(s.role) + ' · ' + fmtDate(s.submittedAt) + ' · audit ' + esc(s.auditHash) + '</div>' +
+        '</div>' +
+        statusChip +
+        '<div class="flex gap-1">' +
+          '<button class="btn-secondary btn-sm" onclick="approveOne(\'' + s.id + '\')">Approve</button>' +
+          '<button class="btn-secondary btn-sm" onclick="returnOne(\'' + s.id + '\')">Return</button>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+  window.approveOne = function(id){ var subs = getSubmissions(); var hit = subs.find(function(s){return s.id===id;}); if (hit){ hit.status = 'approved'; setSubmissions(subs); renderQueue(); kooperToast(hit.candidate + ' approved'); } };
+  window.returnOne  = function(id){ var subs = getSubmissions(); var hit = subs.find(function(s){return s.id===id;}); if (hit){ hit.status = 'returned'; setSubmissions(subs); renderQueue(); kooperToast(hit.candidate + ' returned for changes'); } };
+  window.approveAll = function(){ var subs = getSubmissions(); var changed = 0; document.querySelectorAll('.onb-q-check:checked').forEach(function(cb){ var id = cb.getAttribute('data-id'); var hit = subs.find(function(s){return s.id===id;}); if (hit){ hit.status='approved'; changed++; } }); if (!changed){ kooperToast('Tick a row to approve in bulk'); return; } setSubmissions(subs); renderQueue(); kooperToast(changed + ' approved'); };
+  window.exportAll = function(){
+    var subs = getSubmissions();
+    var csv = ['id,pathway,candidate,role,submittedAt,status,auditHash'];
+    subs.forEach(function(s){ csv.push([s.id, s.pathway, '"' + s.candidate.replace(/"/g,'""') + '"', '"' + s.role.replace(/"/g,'""') + '"', s.submittedAt, s.status, s.auditHash].join(',')); });
+    download('kooper-onboarding-queue.csv', csv.join('\n'), 'text/csv');
+    kooperToast('Queue exported as CSV');
+  };
+
+  // ---- Export ----
+  window.onbExport = function(format) {
+    var subs = getSubmissions();
+    var rec = subs[0]; if (!rec) { kooperToast('Submit a form first to demo export'); return; }
+    if (format === 'pdf') {
+      var html = buildSubmissionDoc(rec);
+      var w = window.open(); if (w) { w.document.write(html); w.document.close(); kooperToast('PDF preview opened · ⌘P to save as PDF'); }
+    } else if (format === 'docx') {
+      kooperToast('DOCX · £9 add-on · sample download starting');
+      download((rec.candidate || 'submission') + '.docx-spec.txt', JSON.stringify(rec, null, 2), 'text/plain');
+    } else if (format === 'html') {
+      var h = buildSubmissionDoc(rec);
+      download((rec.candidate || 'submission') + '.html', h, 'text/html');
+      kooperToast('Self-contained HTML downloaded · embed anywhere');
+    } else if (format === 'csv') {
+      window.exportAll();
+    } else if (format === 'gforms') {
+      var spec = { title: rec.role + ' · ' + rec.candidate, sections: PATHWAYS[rec.pathway].sections, payload: rec.payload || {} };
+      download((rec.candidate || 'form') + '-google-forms.json', JSON.stringify(spec, null, 2), 'application/json');
+      kooperToast('Google Forms spec downloaded · £12 pack · paste into Forms importer');
+    } else if (format === 'web') {
+      kooperToast('Hosted web form · £29/mo · trial starts at sign-up');
+      window.location.href = 'kooper-sign-in.html#book';
+    }
+  };
+  function buildSubmissionDoc(rec) {
+    var p = PATHWAYS[rec.pathway] || { sections:[] };
+    var rows = '';
+    (p.sections || []).forEach(function(s) {
+      rows += '<h2>' + esc(s.title) + '</h2><table>';
+      s.fields.forEach(function(f) {
+        var val = (rec.payload || {})[f.key];
+        if (Array.isArray(val)) val = val.join('; ');
+        if (val == null || val === '') return;
+        rows += '<tr><td class="k">' + esc(f.label) + '</td><td class="v">' + esc(val) + '</td></tr>';
+      });
+      rows += '</table>';
+    });
+    return '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>' + esc(rec.candidate) + ' — onboarding</title>' +
+      '<style>@page{size:A4;margin:18mm 16mm}body{font-family:Source Serif 4,Georgia,serif;color:#0A0A0A;max-width:760px;margin:24px auto;padding:0 24px}h1{font-family:Inter,system-ui,sans-serif;font-weight:700}h2{font-family:Inter,system-ui,sans-serif;font-weight:600;font-size:1rem;margin:1.5rem 0 0.5rem;border-bottom:1px solid #eee;padding-bottom:0.25rem}table{width:100%;border-collapse:collapse;font-size:0.875rem}td.k{font-family:JetBrains Mono,monospace;font-size:0.75rem;color:#6B7280;padding:0.4rem 0;width:34%;vertical-align:top}td.v{padding:0.4rem 0;font-weight:500}.foot{margin-top:2rem;padding-top:1rem;border-top:1px solid #eee;font-family:JetBrains Mono,monospace;font-size:0.625rem;color:#6B7280}</style></head><body>' +
+      '<h1>' + esc(rec.candidate) + '</h1>' +
+      '<div style="font-family:JetBrains Mono,monospace;font-size:0.6875rem;color:#6B7280;margin-bottom:1rem">' + esc(p.label || rec.pathway) + ' · submitted ' + fmtDate(rec.submittedAt) + ' · audit ' + esc(rec.auditHash) + '</div>' +
+      rows +
+      '<div class="foot">kooper · onboarding · doc ' + esc(rec.id) + ' · audit-hashed · immutable · powered by Forms</div>' +
+    '</body></html>';
+  }
+  function download(filename, contents, mime) {
+    var blob = new Blob([contents], { type: mime || 'text/plain' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    document.body.appendChild(a); a.click();
+    setTimeout(function(){ document.body.removeChild(a); URL.revokeObjectURL(a.href); }, 200);
+  }
+
+  // ---- Role switching (visual cue only for the demo) ----
+  window.setRole = function(role){
+    save('kooper:onboarding:role', role);
+    var label = ({ admin:'HR admin', hire:'New hire', inspector:'CQC inspector' })[role] || role;
+    var el = document.getElementById('onbCurrentRole');
+    if (el) el.innerHTML = 'Active role: <strong>' + label + '</strong>';
+    kooperToast('Role switched · ' + label + ' view');
+  };
+
+  // ---- Toast ----
+  function toast(text){ var t=document.getElementById('onbToast'); if(!t)return; t.textContent=text; t.classList.add('on'); setTimeout(function(){ t.classList.remove('on'); }, 2200); }
+  window.kooperToast = toast;
+
+  // ---- Boot ----
+  function boot(){
+    seedSubmissions();
+    renderInlineDemo();
+    renderQueue();
+    setRole(load('kooper:onboarding:role','admin'));
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
+})();
+</script>
+
+<script src="kooper-nav.js" defer></script>
+</body>
+</html>
