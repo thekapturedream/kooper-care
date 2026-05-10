@@ -821,9 +821,10 @@ function switchView(btn, key){
 // Keyboard shortcuts
 document.addEventListener('keydown', e => {
   if (e.target.matches('input, textarea, select')) return;
-  if (e.key.toLowerCase() === 'm') { var b = document.querySelector('section[data-view="my"]'); if (b) switchView(b,'my'); }
-  if (e.key.toLowerCase() === 't') { var b = document.querySelector('[data-view="team"]'); if (b) switchView(b,'team'); }
-  if (e.key.toLowerCase() === 'r') { var b = document.querySelector('[data-view="manage"]'); if (b && b.style.display !== 'none') switchView(b,'manage'); }
+  // Keyboard shortcuts target the pill BUTTONS (not section panels) — switchView reads .classList from the clicked element
+  if (e.key.toLowerCase() === 'm') { var b = document.querySelector('button[data-view="my"]');     if (b && b.style.display !== 'none') switchView(b,'my'); }
+  if (e.key.toLowerCase() === 't') { var b = document.querySelector('button[data-view="team"]');   if (b && b.style.display !== 'none') switchView(b,'team'); }
+  if (e.key.toLowerCase() === 'r') { var b = document.querySelector('button[data-view="manage"]'); if (b && b.style.display !== 'none') switchView(b,'manage'); }
 });
 
 // ============================================================
