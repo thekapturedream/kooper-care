@@ -171,7 +171,9 @@
       <div class="flex items-center gap-2 flex-wrap">
         <span class="chip chip-warn text-[0.6875rem]"><span class="w-1.5 h-1.5 rounded-full" style="background:#FFD400"></span> NEWS2 = 2 (low risk)</span>
         <span class="chip chip-outline-light text-[0.6875rem]">Plan v4 · current</span>
-        <button onclick="kooperToast('Switch resident — opens picker')" class="btn-yellow text-xs py-1.5">Switch resident</button>
+        <button onclick="exportClinicalPDF()" class="btn-yellow text-xs py-1.5" title="Open editorial PDF in a new tab">Export PDF</button>
+        <button onclick="shareClinicalToStaff()" class="btn-secondary text-xs py-1.5" style="background:transparent;color:#fff;border-color:rgba(255,255,255,0.3)" title="Send this clinical summary to every staff member">Send to all staff</button>
+        <button onclick="kooperToast('Switch resident — opens picker')" class="btn-yellow text-xs py-1.5" style="background:transparent;color:#FFD400;border-color:rgba(255,212,0,0.5)">Switch resident</button>
       </div>
     </div>
   </div>
@@ -575,6 +577,58 @@ function selectDoLS(){
 }
 </script>
 <script src="kooper-tour.js" defer></script>
+<script src="kooper-report-template.js" defer></script>
+<script>
+// Active resident on this page — defaults to Edward Banda. The
+// page can later read ?resident= to switch, matching how
+// recording-demo and care-plans behave.
+function getClinicalResidentId() {
+  try {
+    var p = new URLSearchParams(window.location.search);
+    return p.get('resident') || 'eb';
+  } catch(e) { return 'eb'; }
+}
+window.exportClinicalPDF = function () {
+  if (!window.KooperReport || !window.KooperReport.openClinical) {
+    kooperToast('Report engine still loading · try again in a moment'); return;
+  }
+  window.KooperReport.openClinical(getClinicalResidentId());
+  kooperToast('Editorial clinical summary opened · ⌘P to save · Send to all staff in toolbar');
+};
+window.shareClinicalToStaff = function () {
+  var pid = getClinicalResidentId();
+  var sender = (window.KooperReport && window.KooperReport.getSender) ? window.KooperReport.getSender() : { name:'Sister Anne', role:'Nurse' };
+  // Resolve patient name for notification
+  var patientName = 'Mr Edward Banda';
+  try {
+    var roster = JSON.parse(localStorage.getItem('kooper:carePlans:patients') || 'null');
+    if (roster && roster.length) {
+      var hit = roster.find(function(r){ return r.id === pid; });
+      if (hit) patientName = hit.name;
+    }
+  } catch(e){}
+  if (window.KooperReport && window.KooperReport.shareReport) {
+    window.KooperReport.shareReport({
+      scope: 'clinical',
+      title: patientName + ' · clinical summary',
+      patientId: pid,
+      sender: sender
+    });
+  }
+  // Also push a notification visible in care plans / dashboards
+  try {
+    var notif = JSON.parse(localStorage.getItem('kooper:carePlans:notif') || '[]');
+    notif.unshift({
+      id:'cln_'+Date.now().toString(36),
+      type:'review', patientId:pid,
+      section:'Clinical summary shared with all staff',
+      by:sender.name, at:new Date().toISOString(), seen:false
+    });
+    localStorage.setItem('kooper:carePlans:notif', JSON.stringify(notif.slice(0,60)));
+  } catch(e){}
+  kooperToast(patientName + ' clinical summary shared · all staff notified');
+};
+</script>
 <script src="kooper-session.js" defer></script>
 </body>
 </html>

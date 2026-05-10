@@ -456,7 +456,8 @@
         <h2 class="h-section mt-3">Every event captured. Every report ready.</h2>
         <p class="text-kapture-smoke mt-3 text-base max-w-2xl">Tap any event below to expand the structured detail. Hit <strong class="text-kapture-coal">Generate Report</strong> and a print-ready file opens in a new tab — already formatted for the CQC, family, GP, or insurer.</p>
       </div>
-      <div class="lg:col-span-5 flex flex-wrap gap-2 justify-start lg:justify-end">
+      <div class="lg:col-span-5 flex flex-wrap gap-2 justify-start lg:justify-end items-center">
+        <button onclick="compileShiftReport()" class="px-3 py-1.5 rounded-lg bg-kapture-yellow text-kapture-black text-xs font-semibold hover:bg-amber-400 transition mr-1" title="Compile every event today into one editorial shift report">📋 Compile shift report</button>
         <span class="text-[0.6875rem] uppercase tracking-widest text-kapture-mist font-mono mr-2">Filter</span>
         <button class="filter-pill active" data-event-filter="all" onclick="filterEvents(this,'all')">All <span id="evCountAll" class="ml-1">8</span></button>
         <button class="filter-pill" data-event-filter="locked" onclick="filterEvents(this,'locked')">Locked</button>
@@ -1356,11 +1357,38 @@ function filterEvents(btn, type) {
 }
 
 // ============================================================
-// GENERATE REPORT — opens a print-ready HTML in a new tab
+// GENERATE REPORT — opens an editorial print-ready report via
+// the shared kooper-report-template.js engine. The legacy inline
+// generator is kept below as a fallback in case the script
+// hasn't loaded yet.
 // ============================================================
+
+// Map event resident strings → care-plans patient IDs so the
+// editorial report can pull the right identity banner + plan.
+const EVENT_RESIDENT_ID = {
+  'ev-1':'eb','ev-2':'cc','ev-3':'mh','ev-4':null,
+  'ev-5':'cc','ev-6':'eb','ev-7':'mr','ev-8':null
+};
+
 function generateReport(eventId) {
   const data = EVENT_DATA[eventId];
   if (!data) { kooperToast('Event not found'); return; }
+
+  // Preferred path: shared editorial engine
+  if (window.KooperReport && window.KooperReport.openIncident) {
+    var pid = EVENT_RESIDENT_ID[eventId] || null;
+    var enriched = Object.assign({}, data, {
+      id: eventId,
+      residentId: pid,
+      dateISO: new Date('2026-05-06T' + (data.startedAt || '08:00') + ':00').toISOString()
+    });
+    window.KooperReport.openIncident(enriched);
+    kooperToast('Editorial report opened · ⌘P to save as PDF · or Send to all staff');
+    return;
+  }
+
+  // Legacy fallback (unchanged) — only fires if template script
+  // is missing for any reason.
   const today = '6 May 2026';
   const html = `<!DOCTYPE html>
 <html lang="en">
@@ -1527,6 +1555,49 @@ function generateReport(eventId) {
 }
 </script>
 <script src="kooper-tour.js" defer></script>
+<script src="kooper-report-template.js" defer></script>
+
+<!-- ============================================================ -->
+<!-- COMPILE SHIFT REPORT — fires from header button, builds a    -->
+<!-- single editorial report compiling all events in EVENT_DATA   -->
+<!-- and opens it via KooperReport.openShift().                    -->
+<!-- ============================================================ -->
+<script>
+window.compileShiftReport = function () {
+  if (!window.KooperReport || !window.KooperReport.openShift) {
+    kooperToast('Report engine still loading · try again in a moment');
+    return;
+  }
+  var sender = window.KooperReport.getSender();
+  var todayISO = new Date('2026-05-06T07:00:00').toISOString();
+  var endISO   = new Date('2026-05-06T19:00:00').toISOString();
+  var events = Object.keys(EVENT_DATA).map(function (id) {
+    var e = EVENT_DATA[id];
+    return Object.assign({}, e, { id: id, residentId: EVENT_RESIDENT_ID[id] || null });
+  });
+  window.KooperReport.openShift({
+    label: 'Day shift · 6 May 2026',
+    start: todayISO, end: endISO,
+    lead: sender.name,
+    unitsCovered: 3,
+    staff: [
+      { name:'Sister Anne Whitfield', role:'Nurse · Lead' },
+      { name:'Rebecca Adesina',       role:'Senior Carer' },
+      { name:'Craig Musara',          role:'Carer' },
+      { name:'Daniel Kowalski',       role:'Activities' },
+      { name:'Mary Chen',             role:'Cook' },
+      { name:'Joy Munemo',            role:'Carer · Agency' }
+    ],
+    handoverNotes: [
+      'Mr Banda — bright today, music helping. Continue jazz playlist evenings.',
+      'Mrs Cross — sacral dressing changed at 13:30, next due 19:30 — handed to night nurse.',
+      'Mr H — NEWS2 = 5 escalation at 09:18, GP visited, plan v4 stable since.',
+      'Mr R — sundowning at 16:30 settled in 10 min. Pattern day 4 — recommend extend afternoon activity.'
+    ]
+  }, events);
+  kooperToast('Shift report compiled · review and Send to all staff from the toolbar');
+};
+</script>
 
 </body>
 </html>

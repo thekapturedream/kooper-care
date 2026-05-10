@@ -644,7 +644,8 @@
       <a href="?view=list" class="btn-secondary btn-sm">← Patient list</a>
       <div class="flex gap-2 flex-wrap">
         <button id="cpReaderEditBtn"   onclick="cpReaderOpenEditor()" class="btn-primary btn-sm">Edit plan</button>
-        <button onclick="cpReaderPrint()" class="btn-secondary btn-sm">Print / PDF</button>
+        <button onclick="cpReaderPrint()" class="btn-yellow btn-sm">Export PDF · editorial</button>
+        <button onclick="cpReaderShareToStaff()" class="btn-secondary btn-sm">Send to all staff</button>
         <button id="cpReaderDeleteBtn" onclick="cpReaderDelete()" class="btn-danger-outline btn-sm hidden">Delete plan</button>
       </div>
     </div>
@@ -2495,7 +2496,29 @@
     if (resident) window.location.href = '?view=edit&patient=' + resident;
   };
   window.cpReaderPrint = function () {
-    window.print();
+    var resident = getParam('resident');
+    if (!resident) { window.print(); return; }
+    if (window.KooperReport && window.KooperReport.openCarePlan) {
+      window.KooperReport.openCarePlan(resident);
+      kooperToast('Editorial PDF opened · Cmd/Ctrl+P to save');
+    } else {
+      window.print();
+    }
+  };
+  window.cpReaderShareToStaff = function () {
+    var resident = getParam('resident');
+    if (!resident) { kooperToast('Open a plan first'); return; }
+    var p = patientById(resident); var plan = planFor(resident);
+    if (!p || !plan) { kooperToast('No plan to share'); return; }
+    var sender = (window.KooperReport && window.KooperReport.getSender) ? window.KooperReport.getSender() : { name: CURRENT_USER, role: 'Care team' };
+    window.KooperReport && window.KooperReport.shareReport({
+      scope: 'care plan',
+      title: (p.pref || p.name) + '\'s care plan',
+      patientId: p.id,
+      sender: sender
+    });
+    pushNotif({ type:'review', patientId: p.id, patientName: p.name, section: 'Care plan shared with all staff', by: sender.name });
+    kooperToast(p.name + '\'s plan shared with all staff · they will see it on their dashboard');
   };
   window.cpReaderDelete = function () {
     if (!CURRENT_PERMS.canApprove) { kooperToast('Only admins can delete a plan'); return; }
@@ -2688,6 +2711,7 @@
 }
 </script>
 <script src="kooper-tour.js" defer></script>
+<script src="kooper-report-template.js" defer></script>
 <script src="kooper-session.js" defer></script>
 </body>
 </html>
