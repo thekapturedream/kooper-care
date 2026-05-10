@@ -171,6 +171,11 @@
             <button class="user-pill" data-user="activities" onclick="switchUser(this,'activities')"><span class="up-avatar">DM</span><span class="up-name">Daniel · Activities</span></button>
           </div>
         </div>
+        <!-- RESIDENT PICKER · ties the recording to a real patient -->
+        <div class="mt-4">
+          <div class="text-[0.6875rem] uppercase tracking-widest text-kapture-mist font-mono mb-2">For resident</div>
+          <div class="flex flex-wrap gap-2" id="residentRail"></div>
+        </div>
       </div>
       <div class="lg:col-span-4">
         <div class="bg-kapture-coal border border-kapture-ash rounded-2xl p-5">
@@ -674,9 +679,48 @@ const STATE = {
   durationMin: 22,
   voice: '',
   carer: 'Craig Musara',
-  resident: 'Mr Banda',
-  residentFirst: 'Edward'
+  resident: 'Mr Edward Banda',
+  residentFirst: 'Edward',
+  residentTitle: 'Mr Banda',
+  residentRoom: '12',
+  residentCondition: 'Vascular dementia · falls history',
+  residentId: 'eb'
 };
+
+// ============================================================
+// RESIDENTS · same source of truth as kooper-care-plans.html
+// Reads from localStorage if the user has been on care-plans;
+// otherwise seeds with the same 8 sample residents.
+// ============================================================
+const RESIDENT_DATA = (function () {
+  try {
+    var raw = localStorage.getItem('kooper:carePlans:patients');
+    if (raw) return JSON.parse(raw);
+  } catch (e) {}
+  return [
+    { id:'eb', name:'Mr Edward Banda',     pref:'Eddie',  age:78, room:'12', nhs:'485 777 3456', condition:'Vascular dementia · falls history',  funding:'NHS CHC' },
+    { id:'cc', name:'Mrs Catherine Cross', pref:'Cathy',  age:84, room:'07', nhs:'485 222 1180', condition:'End-of-life · diabetic + soft diet', funding:'Self-fund' },
+    { id:'mh', name:'Mr Hubert Robinson',  pref:'Mr H',   age:81, room:'15', nhs:'485 909 4422', condition:'MUAC <22 · high-protein · frailty',  funding:'LA' },
+    { id:'mr', name:'Mr Reginald Asare',   pref:'Mr R',   age:73, room:'04', nhs:'485 113 9087', condition:'Post-stroke · rehab phase',          funding:'NHS CHC' },
+    { id:'jl', name:'Mrs Joyce Lambert',   pref:'Joyce',  age:88, room:'19', nhs:'485 660 2244', condition:'Late-stage dementia · BPSD',         funding:'LA' },
+    { id:'sn', name:'Ms Sophia Nakamura',  pref:'Sophia', age:69, room:'21', nhs:'485 401 5588', condition:'Respite · 2 week stay · MS',         funding:'Self-fund' },
+    { id:'av', name:'Mrs Anika Verma',     pref:'Anika',  age:91, room:'02', nhs:'485 232 0006', condition:'Frailty · falls · arrhythmia',       funding:'Mixed' }
+  ];
+})();
+function residentTitle(name) {
+  // "Mr Edward Banda" → "Mr Banda"; "Mrs Catherine Cross" → "Mrs Cross"; "Ms Sophia Nakamura" → "Ms Nakamura"
+  var parts = (name || '').split(' ');
+  if (parts.length < 2) return name;
+  return parts[0] + ' ' + parts[parts.length - 1];
+}
+function residentFirstName(name) {
+  // "Mr Edward Banda" → "Edward"; "Mrs Catherine Cross" → "Catherine"
+  var parts = (name || '').split(' ');
+  return parts.length > 1 ? parts[1] : (parts[0] || '');
+}
+function residentInitials(name) {
+  return (name || '').split(' ').map(function (p) { return p[0]; }).join('').slice(-2).toUpperCase();
+}
 
 const SUPPORT_LABEL = { independent:'Independent', prompted:'Prompted', assisted:'assisted', full:'full hands-on' };
 const SUPPORT_VERB = { independent:'completed independently', prompted:'completed with verbal prompts', assisted:'received hand-over-hand support', full:'received full hands-on care' };
@@ -836,9 +880,14 @@ function switchDomain(pillEl, key) {
   document.querySelectorAll('.domain-pill').forEach(p => p.classList.remove('active'));
   pillEl.classList.add('active');
 
-  // Step 1 panel content
+  // Step 1 panel content — substitute the resident's first name in the question
   document.getElementById('step1Heading').textContent = cfg.heading;
-  document.getElementById('step1Sub').textContent = cfg.sub;
+  document.getElementById('step1Sub').textContent = (cfg.sub || '').replace(/Edward/g, STATE.residentFirst || 'Edward');
+  // Step 2 sub also uses the resident's first name
+  var step2Sub = document.querySelector('.step-num-2-sub') || (function(){ var el = document.querySelectorAll('.text-xs.text-kapture-smoke')[1]; return el; })();
+  if (step2Sub && /\bindicate consent\b/.test(step2Sub.textContent || '')) {
+    step2Sub.textContent = 'How did ' + (STATE.residentFirst || 'the resident') + ' indicate consent? Was dignity maintained?';
+  }
   document.getElementById('step1Baseline').innerHTML =
     '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>' +
     'Care plan baseline: <strong class="text-kapture-coal mx-1">' + cfg.baseline + '</strong> · ' + cfg.baselineNote;
@@ -881,17 +930,32 @@ function selectTile(el, step){
 }
 
 function rerender(){
-  // Narrative
-  const support = SUPPORT_VERB[STATE.step1] || 'received care';
-  const consent = CONSENT_PHRASE[STATE.step2a] || '';
-  const dignity = DIGNITY_PHRASE[STATE.step2b] || '';
-  const outcome = OUTCOME_PHRASE[STATE.step3] || '';
+  // Live-template driven by STATE — every prose token comes from the picked patient + carer
+  const support   = SUPPORT_VERB[STATE.step1]    || 'received care';
+  const consent   = CONSENT_PHRASE[STATE.step2a] || '';
+  const dignity   = DIGNITY_PHRASE[STATE.step2b] || '';
+  const outcome   = OUTCOME_PHRASE[STATE.step3]  || '';
   const voiceLine = STATE.voice ? ' Carer added: "' + STATE.voice + '"' : '';
-  const careType = STATE.careType || 'personal care';
-  const task = STATE.task || 'the wash, shave and oral care';
-  const supportTone = STATE.step1 === 'full' ? 'full hands-on ' + careType : (STATE.step1 === 'assisted' ? 'assisted ' + careType : (STATE.step1 === 'prompted' ? 'prompted ' + careType : 'independent ' + careType + ' with light supervision'));
+  const careType  = STATE.careType || 'personal care';
+  const task      = STATE.task || 'the wash, shave and oral care';
+  const supportTone = STATE.step1 === 'full' ? 'full hands-on ' + careType
+                     : STATE.step1 === 'assisted' ? 'assisted ' + careType
+                     : STATE.step1 === 'prompted' ? 'prompted ' + careType
+                     : 'independent ' + careType + ' with light supervision';
 
-  const prose = 'At ' + STATE.startedAt + ' on 6 May 2026, <strong>Mr Banda</strong> received <strong>' + supportTone + '</strong> from carer <strong>' + STATE.carer + '</strong>. He ' + consent + '. Edward ' + support + ' with ' + task + '. ' + dignity + ' His preferred talc and body wash were used. ' + outcome + voiceLine + ' Care concluded at ' + STATE.endedAt + ' (<strong>' + STATE.durationMin + ' minutes</strong>) with Edward dressed, comfortable and seated for breakfast.';
+  // Pull the patient identity from STATE — all hardcoded "Mr Banda" / "Edward" replaced
+  const title = STATE.residentTitle || 'Mr Banda';
+  const first = STATE.residentFirst || 'Edward';
+  // Pronoun is best-effort from honorific — prevents 'He' for Mrs/Ms residents
+  const pronoun = /^(Mrs|Ms|Miss)\b/i.test(STATE.resident || '') ? 'She' : 'He';
+  const possessive = pronoun === 'She' ? 'her' : 'his';
+
+  const prose = 'At ' + STATE.startedAt + ' on 6 May 2026, <strong>' + title + '</strong> received <strong>' + supportTone +
+    '</strong> from carer <strong>' + STATE.carer + '</strong>. ' + pronoun + ' ' + consent +
+    '. ' + first + ' ' + support + ' with ' + task + '. ' + dignity +
+    ' ' + pronoun + ' was offered ' + possessive + ' preferred routine. ' + outcome + voiceLine +
+    ' Care concluded at ' + STATE.endedAt + ' (<strong>' + STATE.durationMin + ' minutes</strong>) with ' +
+    first + ' comfortable and settled for the next part of the day.';
   const proseEl = document.getElementById('aiProse');
   proseEl.innerHTML = prose;
 
@@ -918,14 +982,33 @@ function generateNote(){
 
 // Voice button — fake transcript
 document.addEventListener('DOMContentLoaded', function(){
+  // ----------------------------------------------------------
+  // Boot from URL params (?resident=ID, ?user=NAME) so navigation
+  // from care-plans / dashboards lands on the right context.
+  // Falls back to localStorage from a previous session.
+  // ----------------------------------------------------------
+  (function bootContext () {
+    try {
+      var p = new URLSearchParams(window.location.search);
+      var rid = p.get('resident') || localStorage.getItem('kooper:reporting:resident');
+      if (rid && RESIDENT_DATA.find(function (x) { return x.id === rid; })) {
+        switchResident(null, rid);
+      }
+    } catch (e) {}
+    buildResidentRail();
+    // Voice samples should reference the active resident's first name
+    rerender();
+  })();
   const voiceBtn = Array.from(document.querySelectorAll('button')).find(b => (b.textContent||'').includes('Hold to add voice'));
   if (voiceBtn) {
     voiceBtn.addEventListener('click', function(){
+      var first = STATE.residentFirst || 'the resident';
       const samples = [
-        'Edward sang along to a Sinatra track during the shave',
-        'He asked twice when his daughter Sarah is visiting',
+        first + ' was bright today and engaged easily with cueing',
+        first + ' asked about family — the team made a note for the digest',
         'Pressure-relief cushion repositioned per protocol',
-        'Carer noticed mild dryness around left ankle, photo to wound care app'
+        'Carer noticed mild dryness around left ankle, photo to wound care app',
+        first + ' settled quickly with familiar music; mood lifted noticeably'
       ];
       STATE.voice = samples[Math.floor(Math.random()*samples.length)];
       rerender();
@@ -1008,6 +1091,55 @@ function switchUser(btn, key) {
   // Build a clearer toast that says how many events that persona will see
   const visibleCount = countVisibleEvents();
   kooperToast('Reporting as ' + u.role + ' · ' + visibleCount + ' event' + (visibleCount === 1 ? '' : 's') + ' in your feed');
+}
+
+// ============================================================
+// RESIDENT PICKER · ties recording to a specific patient
+// ============================================================
+function buildResidentRail() {
+  var rail = document.getElementById('residentRail');
+  if (!rail) return;
+  rail.innerHTML = RESIDENT_DATA.map(function (r) {
+    var isActive = r.id === STATE.residentId;
+    var initials = residentInitials(r.name);
+    return '<button class="user-pill' + (isActive ? ' active' : '') + '" data-resident="' + r.id +
+      '" onclick="switchResident(this,\'' + r.id + '\')" title="' + r.condition + '">' +
+      '<span class="up-avatar">' + initials + '</span>' +
+      '<span class="up-name">' + (r.pref || r.name.split(' ')[1]) + ' · room ' + r.room + '</span>' +
+    '</button>';
+  }).join('');
+}
+function switchResident(btn, id) {
+  var r = RESIDENT_DATA.find(function (x) { return x.id === id; });
+  if (!r) return;
+  document.querySelectorAll('#residentRail .user-pill').forEach(function (p) { p.classList.remove('active'); });
+  if (btn) btn.classList.add('active');
+  // Hydrate STATE from real patient data
+  STATE.residentId       = r.id;
+  STATE.resident         = r.name;
+  STATE.residentFirst    = residentFirstName(r.name);
+  STATE.residentTitle    = residentTitle(r.name);
+  STATE.residentRoom     = r.room;
+  STATE.residentCondition= r.condition;
+  // Update the active context card
+  var rEl = document.getElementById('ctxResident'); if (rEl) rEl.textContent = r.name;
+  // Re-fire the active domain so questions get re-templated with the new first name
+  var activeDomainPill = document.querySelector('.domain-pill.active');
+  if (activeDomainPill) {
+    var dKey = activeDomainPill.dataset.domain;
+    // Run switchDomain again to refresh sub strings + tiles
+    switchDomain(activeDomainPill, dKey);
+  } else {
+    rerender();
+  }
+  // Update care-evidence rollup label
+  var roll = document.querySelector('.narrative-card ~ * .text-xs.text-kapture-smoke, .text-xs.text-kapture-smoke');
+  document.querySelectorAll('.text-xs.text-kapture-smoke').forEach(function (el) {
+    if (/last 30 days/.test(el.textContent || '')) el.textContent = r.name + ' · last 30 days';
+  });
+  // Persist
+  try { localStorage.setItem('kooper:reporting:resident', r.id); } catch (e) {}
+  kooperToast('Now reporting on ' + r.name);
 }
 
 function countVisibleEvents() {
@@ -1314,7 +1446,7 @@ function generateReport(eventId) {
   <footer>
     kooper · reporting · v0.1 · Draycott Demo House · No PII · Mock data · Page 1 of 1
   </footer>
-<script src="kooper-session.js" defer></script>
+<` + `script src="kooper-session.js" defer></` + `script>
 </body>
 </html>`;
   // Open in new tab via blob URL — print-ready immediately
