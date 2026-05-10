@@ -198,16 +198,48 @@
   .cp-sec-textarea { width: 100%; padding: 0.625rem 0.75rem; border: 1px solid #ECEAE3; border-radius: 10px; font-family: 'Inter', sans-serif; font-size: 0.875rem; line-height: 1.55; resize: vertical; min-height: 96px; background: #FFFFFF; color: #0A0A0A; transition: border-color 0.12s ease; }
   .cp-sec-textarea:focus { outline: 0; border-color: #0A0A0A; }
   .cp-sec-textarea.dirty { border-color: #FFD400; background: #FFFEF7; }
+  .cp-sec-readonly { padding: 0.625rem 0.75rem; border: 1px dashed #ECEAE3; border-radius: 10px; font-size: 0.875rem; line-height: 1.55; color: #1A1A1A; background: #FAFAF7; min-height: 60px; white-space: pre-wrap; }
+  .cp-sec-title-input { border: 0; background: transparent; font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 1rem; line-height: 1.25; color: #0A0A0A; padding: 0.125rem 0.25rem; border-radius: 6px; margin-left: -0.25rem; width: 100%; max-width: 32rem; }
+  .cp-sec-title-input:hover { background: #FAFAF7; }
+  .cp-sec-title-input:focus { background: #FFFEF7; outline: 1px solid #FFD400; }
+  .cp-sec-del { width: 26px; height: 26px; border-radius: 6px; border: 1px solid #ECEAE3; background: #FFFFFF; color: #6B7280; cursor: pointer; font-size: 1rem; line-height: 1; display: inline-flex; align-items: center; justify-content: center; transition: all 0.12s ease; flex-shrink: 0; }
+  .cp-sec-del:hover { background: #FEE2E2; color: #B42318; border-color: #FECACA; }
+  .cp-add-section { width: 100%; padding: 0.875rem 1rem; background: #FFFFFF; border: 2px dashed #ECEAE3; border-radius: 14px; color: #6B7280; cursor: pointer; font-family: inherit; font-size: 0.875rem; font-weight: 500; display: flex; align-items: center; gap: 0.625rem; justify-content: center; transition: all 0.15s ease; }
+  .cp-add-section:hover { border-color: #0A0A0A; background: #FAFAF7; color: #0A0A0A; }
+  .cp-add-section .cp-add-icon { width: 24px; height: 24px; border-radius: 50%; background: #FFD400; color: #0A0A0A; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; }
 
-  /* Notification rows */
-  .cp-notif-row { display: flex; align-items: flex-start; gap: 0.75rem; padding: 0.625rem 0.75rem; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; transition: background 0.12s ease; cursor: pointer; text-decoration: none; color: #fff; }
-  .cp-notif-row:hover { background: rgba(255,255,255,0.08); }
-  .cp-notif-row.unseen { background: rgba(255,212,0,0.06); border-color: rgba(255,212,0,0.2); }
-  .cp-notif-row.unseen .cp-notif-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #FFD400; flex-shrink: 0; margin-top: 0.4375rem; box-shadow: 0 0 0 4px rgba(255,212,0,0.15); }
-  .cp-notif-dot { display: none; }
-  .cp-notif-icon { width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; flex-shrink: 0; font-family: 'JetBrains Mono', monospace; font-weight: 700; letter-spacing: 0.04em; }
-  .cp-notif-text { flex: 1; min-width: 0; font-size: 0.8125rem; line-height: 1.4; }
-  .cp-notif-time { font-family: 'JetBrains Mono', monospace; font-size: 0.6875rem; color: rgba(255,255,255,0.55); flex-shrink: 0; white-space: nowrap; }
+  /* Modal · Create Care Plan */
+  .cp-modal-scrim { position: fixed; inset: 0; background: rgba(10,10,10,0.55); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); z-index: 90; opacity: 0; pointer-events: none; transition: opacity 0.18s ease; }
+  .cp-modal-scrim.on { opacity: 1; pointer-events: auto; }
+  .cp-modal { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -48%); background: #FFFFFF; border-radius: 18px; max-width: min(640px, 92vw); width: 100%; max-height: 88vh; overflow: hidden; z-index: 95; opacity: 0; pointer-events: none; transition: opacity 0.18s ease, transform 0.18s ease; box-shadow: 0 30px 60px -20px rgba(0,0,0,0.35); display: flex; flex-direction: column; }
+  .cp-modal.on { opacity: 1; pointer-events: auto; transform: translate(-50%, -50%); }
+  .cp-modal-head { padding: 1.125rem 1.25rem; border-bottom: 1px solid #ECEAE3; display: flex; align-items: flex-start; justify-content: space-between; gap: 0.75rem; flex-shrink: 0; }
+  .cp-modal-body { padding: 1.125rem 1.25rem; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 0.75rem; }
+  .cp-modal-foot { padding: 0.875rem 1.25rem; border-top: 1px solid #ECEAE3; display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; background: #FAFAF7; flex-shrink: 0; flex-wrap: wrap; }
+
+  /* Notification rows · clinical white */
+  .cp-notif-row { display: flex; align-items: center; gap: 0.875rem; padding: 0.875rem 1.125rem; border-bottom: 1px solid #ECEAE3; transition: background 0.12s ease; cursor: pointer; text-decoration: none; color: #0A0A0A; }
+  .cp-notif-row:last-child { border-bottom: 0; }
+  .cp-notif-row:hover { background: #FAFAF7; }
+  .cp-notif-row.unseen { background: #FFFEF7; border-left: 3px solid #FFD400; padding-left: calc(1.125rem - 3px); }
+  .cp-notif-row.unseen:hover { background: #FFFAE7; }
+  .cp-notif-avatar { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 0.6875rem; flex-shrink: 0; }
+  .cp-notif-text { flex: 1; min-width: 0; font-size: 0.8125rem; line-height: 1.4; color: #1A1A1A; }
+  .cp-notif-text strong { color: #0A0A0A; font-weight: 600; }
+  .cp-notif-text .cp-notif-verb { color: #6B7280; }
+  .cp-notif-text .cp-notif-subject { display: inline-block; padding: 0.0625rem 0.4375rem; border-radius: 6px; background: #FAFAF7; color: #1A1A1A; font-size: 0.6875rem; margin-left: 0.25rem; font-weight: 500; vertical-align: 1px; }
+  .cp-notif-text .cp-role { display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 0.5625rem; color: #6B7280; text-transform: uppercase; letter-spacing: 0.05em; margin-left: 0.25rem; }
+  .cp-notif-type { display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 0.5625rem; font-weight: 700; padding: 0.125rem 0.4375rem; border-radius: 4px; letter-spacing: 0.06em; flex-shrink: 0; }
+  .cp-notif-type.t-edit   { background: #DBEAFE; color: #1E40AF; }
+  .cp-notif-type.t-create { background: #DCFCE7; color: #047857; }
+  .cp-notif-type.t-review { background: #FFFBEB; color: #876300; }
+  .cp-notif-type.t-pending{ background: #FFD400; color: #0A0A0A; }
+  .cp-notif-time { font-family: 'JetBrains Mono', monospace; font-size: 0.6875rem; color: #6B7280; flex-shrink: 0; white-space: nowrap; }
+  /* Approval queue rows */
+  .cp-approval-row { display: flex; align-items: center; gap: 0.875rem; padding: 0.75rem 1rem; background: #FFFFFF; border: 1px solid #FDE68A; border-radius: 10px; margin: 0.375rem 0; }
+  .cp-approval-row .cp-ap-text { flex: 1; min-width: 0; font-size: 0.8125rem; line-height: 1.4; color: #1A1A1A; }
+  .cp-approval-row .cp-ap-meta { font-size: 0.6875rem; color: #876300; font-family: 'JetBrains Mono', monospace; margin-top: 0.125rem; }
+  .cp-approval-row .cp-ap-btns { display: flex; gap: 0.375rem; flex-shrink: 0; }
 
   /* Patient row visual distinctions for NEW + UPDATED plans */
   .cp-patient-row.is-new { background: linear-gradient(90deg, rgba(255,212,0,0.08), transparent 60%); border-left: 3px solid #FFD400; padding-left: calc(1.125rem - 3px); }
@@ -278,14 +310,19 @@
       <span class="chip chip-yellow text-[0.625rem] font-mono uppercase tracking-widest">Care Plans · workspace</span>
       <h1 class="font-display font-semibold text-3xl lg:text-4xl tracking-tight text-kapture-black mt-3">What do you need to do?</h1>
       <p class="text-kapture-smoke text-sm mt-2 max-w-xl mx-auto">Build a new care plan or open an existing one. Every plan stays linked to clinical, recording, and family privacy.</p>
+      <!-- Role switcher (demo) — see how the page changes per signed-in user -->
+      <div class="mt-5 inline-flex items-center gap-2 bg-white border border-kapture-fog rounded-full px-3 py-1.5 text-xs">
+        <span class="font-mono text-kapture-mist text-[0.625rem] uppercase tracking-widest">Viewing as</span>
+        <select id="cpRoleSwitcher" data-persona-switcher class="bg-transparent border-0 text-xs font-medium text-kapture-black focus:outline-none cursor-pointer pr-2"></select>
+      </div>
     </div>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-3xl mx-auto">
-      <a href="?view=create" class="cp-cta cp-cta-primary group">
+      <button onclick="cpOpenCreateModal()" class="cp-cta cp-cta-primary group" style="text-align:left;font-family:inherit;border:0">
         <div class="cp-cta-icon" style="background:#FFD400;color:#0A0A0A">+</div>
         <div class="cp-cta-name">Create Care Plan</div>
-        <div class="cp-cta-desc">Pick a patient — or add a new one — and build their first plan in under 5 minutes. Templates per condition.</div>
+        <div class="cp-cta-desc">Pick a patient — or add a new one — fill the essentials, choose a template. Plan is ready to edit in seconds.</div>
         <div class="cp-cta-arrow">→</div>
-      </a>
+      </button>
       <a href="?view=list" class="cp-cta">
         <div class="cp-cta-icon" style="background:#0A0A0A;color:#FFD400">📋</div>
         <div class="cp-cta-name">View Care Plans</div>
@@ -294,20 +331,28 @@
       </a>
     </div>
 
-    <!-- ----- NOTIFICATIONS FEED · what other users have done ----- -->
+    <!-- ----- NOTIFICATIONS FEED · clinical white card ----- -->
     <div id="cpNotifWrap" class="hidden max-w-4xl mx-auto mt-8">
-      <div class="bg-kapture-black text-white rounded-2xl p-5 relative overflow-hidden">
-        <div class="absolute -right-16 -top-16 w-48 h-48 rounded-full bg-kapture-yellow/15 blur-3xl pointer-events-none"></div>
-        <div class="relative">
-          <div class="flex items-center justify-between flex-wrap gap-2 mb-3">
-            <div class="flex items-center gap-2">
-              <span class="ed-kicker on-dark">TEAM ACTIVITY</span>
-              <span id="cpNotifBadge" class="chip text-[0.625rem]" style="background:rgba(255,212,0,0.2);color:#FFD400;border-color:rgba(255,212,0,0.4)">0 new</span>
-            </div>
-            <button onclick="cpMarkAllSeen()" class="text-[0.6875rem] text-white/60 hover:text-white">Mark all seen</button>
+      <div class="bg-white rounded-2xl border border-kapture-fog overflow-hidden">
+        <div class="px-5 py-3.5 border-b border-kapture-fog bg-[#FAFAF7] flex items-center justify-between flex-wrap gap-2">
+          <div class="flex items-center gap-2">
+            <span class="ed-kicker">TEAM ACTIVITY</span>
+            <span id="cpNotifBadge" class="chip text-[0.625rem]" style="background:#FFFBEB;color:#876300;border-color:#FDE68A">0 new</span>
           </div>
-          <div id="cpNotifList" class="space-y-2 text-sm"></div>
+          <button onclick="cpMarkAllSeen()" class="text-[0.6875rem] muted hover:text-kapture-black">Mark all as seen</button>
         </div>
+        <!-- ----- PENDING APPROVAL QUEUE · admin only, shows above the activity feed ----- -->
+        <div id="cpApprovalQueue" class="hidden border-b border-kapture-fog bg-[#FFFBEB]">
+          <div class="px-5 py-3 flex items-center justify-between flex-wrap gap-2">
+            <div class="flex items-center gap-2">
+              <span class="ed-kicker">PENDING APPROVAL</span>
+              <span id="cpApprovalBadge" class="chip text-[0.625rem]" style="background:#FFD400;color:#0A0A0A;border-color:#F5B400">0 awaiting</span>
+            </div>
+            <span class="text-[0.6875rem] muted">Submitted by carers · admin must approve before changes go live</span>
+          </div>
+          <div id="cpApprovalList" class="px-2 pb-2"></div>
+        </div>
+        <div id="cpNotifList"></div>
       </div>
     </div>
 
@@ -380,6 +425,110 @@
     </div>
   </div>
 </section>
+
+<!-- ============================================== -->
+<!-- CREATE CARE PLAN · MODAL POPUP                   -->
+<!-- ============================================== -->
+<div id="cpCreateScrim" class="cp-modal-scrim" onclick="cpCloseCreateModal()"></div>
+<div id="cpCreateModal" class="cp-modal" role="dialog" aria-label="Create care plan">
+  <div class="cp-modal-head">
+    <div style="flex:1;min-width:0">
+      <div class="ed-kicker mb-1">NEW CARE PLAN</div>
+      <div style="font-family:Space Grotesk,sans-serif;font-weight:600;font-size:1.0625rem;color:#0A0A0A">Set up the plan in one form</div>
+      <div class="text-xs muted mt-0.5">Pick the patient (or add a new one), choose a template, set the basics. The editor opens with sections pre-filled.</div>
+    </div>
+    <button onclick="cpCloseCreateModal()" aria-label="Close" style="border:0;background:transparent;cursor:pointer;color:#6B7280;font-size:1.25rem;line-height:1;padding:0.25rem">×</button>
+  </div>
+  <div class="cp-modal-body">
+    <label class="ob-field">
+      <span class="ob-label">Patient *</span>
+      <select id="cpModalPatient" class="ob-input" onchange="cpModalOnPatientChange()"></select>
+    </label>
+    <button id="cpModalAddPatientBtn" onclick="cpModalToggleNewPatient()" class="cp-add-patient">
+      <span class="cp-add-icon">+</span>
+      <span class="text-left flex-1"><span class="block font-medium text-sm">Add new patient/client</span><span class="block text-[0.6875rem] muted">Quick form · returns here automatically.</span></span>
+      <span class="text-kapture-mist">→</span>
+    </button>
+
+    <div id="cpModalNewPatient" class="hidden border border-dashed border-kapture-fog rounded-xl p-3 space-y-2.5">
+      <div class="ed-kicker">NEW PATIENT · QUICK ADD</div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+        <label class="ob-field"><span class="ob-label">Full name *</span><input id="cpModalNpName" class="ob-input" placeholder="Mr / Mrs · full legal"></label>
+        <label class="ob-field"><span class="ob-label">Preferred name</span><input id="cpModalNpPref" class="ob-input" placeholder="optional"></label>
+        <label class="ob-field"><span class="ob-label">Date of birth *</span><input id="cpModalNpDob" type="date" class="ob-input"></label>
+        <label class="ob-field"><span class="ob-label">NHS number</span><input id="cpModalNpNhs" class="ob-input" placeholder="123 456 7890"></label>
+        <label class="ob-field"><span class="ob-label">Room</span><input id="cpModalNpRoom" class="ob-input" placeholder="e.g. 14"></label>
+        <label class="ob-field"><span class="ob-label">Funding</span><select id="cpModalNpFunding" class="ob-input"><option>Self-funded</option><option>Local Authority</option><option>NHS Continuing Healthcare</option><option>Mixed</option></select></label>
+        <label class="ob-field md:col-span-2"><span class="ob-label">Primary condition</span><input id="cpModalNpCondition" class="ob-input" placeholder="e.g. dementia · post-stroke · frailty"></label>
+      </div>
+      <div class="flex justify-end gap-2 pt-1">
+        <button onclick="cpModalToggleNewPatient()" class="chip text-xs">Cancel</button>
+        <button onclick="cpModalSaveNewPatient()" class="btn-primary text-xs">Save patient</button>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+      <label class="ob-field">
+        <span class="ob-label">Plan title *</span>
+        <input id="cpModalTitle" class="ob-input" placeholder="e.g. Edward · primary care plan">
+      </label>
+      <label class="ob-field">
+        <span class="ob-label">Template *</span>
+        <select id="cpModalTemplate" class="ob-input">
+          <option value="dementia">Dementia + cognition</option>
+          <option value="frailty">Frailty + falls</option>
+          <option value="end-life">End of life</option>
+          <option value="post-acute">Post-acute · post-stroke / post-fall</option>
+          <option value="respite">Respite · short stay</option>
+          <option value="blank">Blank · build from scratch</option>
+        </select>
+      </label>
+      <label class="ob-field">
+        <span class="ob-label">Lead clinician</span>
+        <select id="cpModalLead" class="ob-input">
+          <option>Sister Anne</option>
+          <option>Rae Okonkwo</option>
+          <option>Yvonne Patel</option>
+          <option>Rebecca Adesina</option>
+        </select>
+      </label>
+      <label class="ob-field">
+        <span class="ob-label">Review schedule</span>
+        <select id="cpModalReview" class="ob-input">
+          <option>Monthly</option>
+          <option selected>Quarterly</option>
+          <option>Six-monthly</option>
+          <option>Annually</option>
+          <option>On change of condition</option>
+        </select>
+      </label>
+      <label class="ob-field">
+        <span class="ob-label">Priority</span>
+        <select id="cpModalPriority" class="ob-input">
+          <option value="standard">Standard</option>
+          <option value="enhanced">Enhanced (high needs)</option>
+          <option value="critical">Critical (active risk)</option>
+        </select>
+      </label>
+      <label class="ob-field">
+        <span class="ob-label">Start date</span>
+        <input id="cpModalStart" type="date" class="ob-input">
+      </label>
+    </div>
+
+    <label class="ob-field">
+      <span class="ob-label">Initial summary / context</span>
+      <textarea id="cpModalSummary" rows="3" class="ob-input" placeholder="One paragraph · what this plan is set up to address. The editor will let you build out every section after."></textarea>
+    </label>
+  </div>
+  <div class="cp-modal-foot">
+    <span class="text-xs muted">Submitting opens the editor with template sections pre-seeded.</span>
+    <div class="flex gap-2">
+      <button onclick="cpCloseCreateModal()" class="chip text-xs">Cancel</button>
+      <button onclick="cpModalSubmit()" class="btn-primary text-xs">Create + open editor →</button>
+    </div>
+  </div>
+</div>
 
 <!-- ============================================== -->
 <!-- CARE PLAN EDITOR — opens after Create flow OR  -->
@@ -1382,10 +1531,53 @@
 <!-- ============================================================ -->
 <script>
 (function(){
-  // Sister Anne is the signed-in user when viewing care plans (per top-nav).
-  // Other "users" simulate cross-user activity for the notifications feed.
-  var CURRENT_USER = 'Sister Anne';
-  var OTHER_USERS = ['Rae Okonkwo', 'Rebecca Adesina', 'Daniel Kowalski', 'Craig Musara'];
+  // ---------- USERS + ROLES ----------
+  // Source of truth for who can do what on care plans.
+  var USERS = {
+    'Rae Okonkwo':     { role:'Registered Manager', short:'Manager',     init:'RO', bg:'#0A0A0A', fg:'#FFD400' },
+    'Sister Anne':     { role:'Clinical Lead',      short:'Clinical Lead',init:'SA',bg:'#1A1A1A', fg:'#FFD400' },
+    'Rebecca Adesina': { role:'Senior Carer',       short:'Senior Carer',init:'RA', bg:'#FFD400', fg:'#0A0A0A' },
+    'Yvonne Patel':    { role:'Nurse',              short:'Nurse',       init:'YP', bg:'#FCD34D', fg:'#0A0A0A' },
+    'Craig Musara':    { role:'Carer',              short:'Carer',       init:'CM', bg:'#FCD34D', fg:'#0A0A0A' },
+    'Daniel Kowalski': { role:'Activities Coordinator', short:'Activities', init:'DK', bg:'#A5B4FC', fg:'#0A0A0A' },
+    'Mary Chen':       { role:'Cook',               short:'Cook',        init:'MC', bg:'#FDA4AF', fg:'#0A0A0A' },
+    'Tomas Bauer':     { role:'Maintenance',        short:'Maintenance', init:'TB', bg:'#FCD34D', fg:'#0A0A0A' },
+    'Joy Munemo':      { role:'Carer · Agency',     short:'Agency',      init:'JM', bg:'#FFE39A', fg:'#0A0A0A' },
+    'Ben Pearce':      { role:'Volunteer',          short:'Volunteer',   init:'BP', bg:'#86EFAC', fg:'#064E3B' },
+    'kooper · ai':     { role:'AI assistant',       short:'AI',          init:'AI', bg:'#0A0A0A', fg:'#FFD400' }
+  };
+  // Role permission profiles
+  var ROLE_PERMS = {
+    'Registered Manager':       { tier:'admin',      canEdit:true,  canApprove:true,  directSave:true,  label:'Admin · full edit + approve' },
+    'Clinical Lead':            { tier:'admin',      canEdit:true,  canApprove:true,  directSave:true,  label:'Admin · full edit + approve' },
+    'Nurse':                    { tier:'authorised', canEdit:true,  canApprove:false, directSave:true,  label:'Authorised · direct edit' },
+    'Senior Carer':             { tier:'authorised', canEdit:true,  canApprove:false, directSave:true,  label:'Authorised · direct edit' },
+    'Carer':                    { tier:'submitter',  canEdit:true,  canApprove:false, directSave:false, label:'Submit edits · admin must approve' },
+    'Activities Coordinator':   { tier:'submitter',  canEdit:true,  canApprove:false, directSave:false, label:'Submit edits · admin must approve' },
+    'Cook':                     { tier:'view',       canEdit:false, canApprove:false, directSave:false, label:'View only' },
+    'Maintenance':              { tier:'view',       canEdit:false, canApprove:false, directSave:false, label:'View only' },
+    'Carer · Agency':           { tier:'view',       canEdit:false, canApprove:false, directSave:false, label:'View only · agency staff' },
+    'Volunteer':                { tier:'view',       canEdit:false, canApprove:false, directSave:false, label:'View only · volunteer' },
+    'AI assistant':             { tier:'authorised', canEdit:false, canApprove:false, directSave:false, label:'AI · suggestions only' }
+  };
+
+  function userInfo(name) {
+    return USERS[name] || { role:'Unknown', short:'Unknown', init:(name||'?').slice(0,2).toUpperCase(), bg:'#E5E5E5', fg:'#1A1A1A' };
+  }
+
+  // Current user — read from URL ?user=Name OR localStorage. Sister Anne by default.
+  var CURRENT_USER = (function () {
+    try {
+      var p = new URLSearchParams(window.location.search);
+      var u = p.get('user');
+      if (u && USERS[u]) { localStorage.setItem('kooper:carePlans:currentUser', u); return u; }
+      var saved = localStorage.getItem('kooper:carePlans:currentUser');
+      if (saved && USERS[saved]) return saved;
+    } catch (e) {}
+    return 'Sister Anne';
+  })();
+  var CURRENT_ROLE = (USERS[CURRENT_USER] || {}).role || 'Carer';
+  var CURRENT_PERMS = ROLE_PERMS[CURRENT_ROLE] || ROLE_PERMS['Carer'];
 
   // ---------- TEMPLATES — drive the section spine of a new plan ----------
   var TEMPLATES = {
@@ -1501,13 +1693,16 @@
   function save(key, value) {
     try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {}
   }
-  var PATIENTS      = load('kooper:carePlans:patients', SAMPLE_PATIENTS);
-  var PLANS         = load('kooper:carePlans:plans',    seedPlans());
-  var NOTIFICATIONS = load('kooper:carePlans:notif',    seedNotifications());
+  var PATIENTS        = load('kooper:carePlans:patients', SAMPLE_PATIENTS);
+  var PLANS           = load('kooper:carePlans:plans',    seedPlans());
+  var NOTIFICATIONS   = load('kooper:carePlans:notif',    seedNotifications());
+  // Pending changes — submitted by carers, awaiting admin approval
+  window.PENDING_CHANGES = load('kooper:carePlans:pending', []);
 
   function savePatients() { save('kooper:carePlans:patients', PATIENTS); }
   function savePlans()    { save('kooper:carePlans:plans',    PLANS); }
   function saveNotif()    { save('kooper:carePlans:notif',    NOTIFICATIONS); }
+  function savePending()  { save('kooper:carePlans:pending',  window.PENDING_CHANGES); }
 
   // Helpers
   function patientById(id) { return PATIENTS.find(function (x) { return x.id === id; }) || null; }
@@ -1533,6 +1728,18 @@
   // ---------- Routing ----------
   function getParam(k) { var p = new URLSearchParams(window.location.search); return p.get(k); }
   function activate() {
+    // Populate role switcher (once)
+    var rs = document.getElementById('cpRoleSwitcher');
+    if (rs && !rs.options.length) {
+      rs.innerHTML = Object.keys(USERS).filter(function(n){ return n !== 'kooper · ai'; }).map(function(name){
+        var u = USERS[name];
+        return '<option value="' + name + '"' + (name === CURRENT_USER ? ' selected' : '') + '>' + name + ' · ' + u.short + '</option>';
+      }).join('');
+      rs.addEventListener('change', function (e) {
+        try { localStorage.setItem('kooper:carePlans:currentUser', e.target.value); } catch (er) {}
+        window.location.search = '?user=' + encodeURIComponent(e.target.value);
+      });
+    }
     var landing    = document.getElementById('cpLanding');
     var work       = document.getElementById('cpWorkspace');
     var editor     = document.getElementById('cpEditor');
@@ -1613,31 +1820,67 @@
     }).join('');
   }
 
-  // ---------- View · notifications feed (top of landing) ----------
+  // ---------- View · notifications feed (top of landing, clinical white) ----------
   function renderNotifFeed() {
-    var host = document.getElementById('cpNotifList');
+    var host  = document.getElementById('cpNotifList');
     var badge = document.getElementById('cpNotifBadge');
     if (!host) return;
     var unseen = NOTIFICATIONS.filter(function (n) { return !n.seen; });
     if (badge) badge.textContent = unseen.length === 0 ? 'all caught up' : unseen.length + ' new';
     if (NOTIFICATIONS.length === 0) {
-      host.innerHTML = '<div class="text-xs text-white/55">No team activity yet · edits and new plans show up here.</div>';
-      return;
+      host.innerHTML = '<div class="px-5 py-4 text-xs muted">No team activity yet · edits and new plans show up here.</div>';
+    } else {
+      host.innerHTML = NOTIFICATIONS.slice(0, 6).map(function (n) {
+        var p = patientById(n.patientId);
+        var name = p ? p.name : (n.patientName || 'Unknown patient');
+        var byInfo = userInfo(n.by);
+        var verb = n.type === 'create' ? 'created a plan for' :
+                   n.type === 'review' ? 'flagged a review on' :
+                   n.type === 'pending'? 'submitted edits for' :
+                                         'edited';
+        var typeChip = '<span class="cp-notif-type t-' + n.type + '">' +
+          (n.type === 'create' ? 'NEW' : n.type === 'review' ? 'REV' : n.type === 'pending' ? 'PEND' : 'EDIT') + '</span>';
+        var sectionChip = n.section ? '<span class="cp-notif-subject">' + n.section + '</span>' : '';
+        var href = (p && planFor(p.id)) ? '?view=edit&patient=' + p.id : '?view=list';
+        return '<a href="' + href + '" onclick="cpMarkNotifSeen(\'' + n.id + '\')" class="cp-notif-row ' + (n.seen ? '' : 'unseen') + '">' +
+          '<span class="cp-notif-avatar" style="background:' + byInfo.bg + ';color:' + byInfo.fg + '">' + byInfo.init + '</span>' +
+          '<span class="cp-notif-text">' +
+            '<strong>' + n.by + '</strong>' +
+            '<span class="cp-role">· ' + byInfo.role + '</span>' +
+            ' <span class="cp-notif-verb">' + verb + '</span> ' +
+            '<strong>' + name + '</strong>' +
+            sectionChip +
+          '</span>' +
+          typeChip +
+          '<span class="cp-notif-time">' + timeAgo(n.at) + '</span>' +
+        '</a>';
+      }).join('');
     }
-    host.innerHTML = NOTIFICATIONS.slice(0, 6).map(function (n) {
-      var p = patientById(n.patientId);
-      var name = p ? p.name : (n.patientName || 'Unknown patient');
-      var verb = n.type === 'create' ? 'created a new plan for' : (n.type === 'review' ? 'flagged a review on' : 'edited');
-      var iconBg = n.type === 'create' ? '#DCFCE7;color:#047857' : n.type === 'review' ? '#FFFBEB;color:#876300' : '#DBEAFE;color:#1E40AF';
-      var iconLabel = n.type === 'create' ? 'NEW' : n.type === 'review' ? 'REV' : 'EDIT';
-      var sectionLine = n.section ? ' · <span style="color:rgba(255,255,255,0.65)">' + n.section + '</span>' : '';
-      var href = (p && planFor(p.id)) ? '?view=edit&patient=' + p.id : '?view=list';
-      return '<a href="' + href + '" onclick="cpMarkNotifSeen(\'' + n.id + '\')" class="cp-notif-row ' + (n.seen ? '' : 'unseen') + '">' +
-        '<span class="cp-notif-dot"></span>' +
-        '<span class="cp-notif-icon" style="background:' + iconBg + '">' + iconLabel + '</span>' +
-        '<span class="cp-notif-text"><strong>' + n.by + '</strong> ' + verb + ' <strong>' + name + '</strong>' + sectionLine + '</span>' +
-        '<span class="cp-notif-time">' + timeAgo(n.at) + '</span>' +
-      '</a>';
+    renderApprovalQueue();
+  }
+
+  // ---------- Approval queue (admin-only — pending changes from carers) ----------
+  function renderApprovalQueue() {
+    var wrap  = document.getElementById('cpApprovalQueue');
+    var host  = document.getElementById('cpApprovalList');
+    var badge = document.getElementById('cpApprovalBadge');
+    if (!wrap || !host) return;
+    var pending = (window.PENDING_CHANGES || []).filter(function (p) { return !p.resolved; });
+    var canApprove = ROLE_PERMS[CURRENT_ROLE] && ROLE_PERMS[CURRENT_ROLE].canApprove;
+    if (!canApprove || pending.length === 0) { wrap.classList.add('hidden'); return; }
+    wrap.classList.remove('hidden');
+    badge.textContent = pending.length + ' awaiting';
+    host.innerHTML = pending.map(function (pc) {
+      var pat = patientById(pc.patientId);
+      var byInfo = userInfo(pc.by);
+      return '<div class="cp-approval-row">' +
+        '<span class="cp-notif-avatar" style="background:' + byInfo.bg + ';color:' + byInfo.fg + '">' + byInfo.init + '</span>' +
+        '<div class="cp-ap-text"><strong>' + pc.by + '</strong> wants to update <strong>' + (pat ? pat.name : '?') + '</strong> · <span class="cp-notif-subject">' + pc.section + '</span><div class="cp-ap-meta">submitted ' + timeAgo(pc.at) + ' · ' + pc.preview + '</div></div>' +
+        '<div class="cp-ap-btns">' +
+          '<button onclick="cpApproveChange(\'' + pc.id + '\')" class="btn-primary text-xs">Approve</button>' +
+          '<button onclick="cpRejectChange(\'' + pc.id + '\')" class="chip text-xs">Reject</button>' +
+        '</div>' +
+      '</div>';
     }).join('');
   }
 
@@ -1646,12 +1889,21 @@
     var p = patientById(patientId); var plan = planFor(patientId);
     if (!p || !plan) { window.location.href = '?view=list'; return; }
     var tpl = TEMPLATES[plan.template] || TEMPLATES.blank;
+    var canEdit = CURRENT_PERMS.canEdit;
+    var directSave = CURRENT_PERMS.directSave;
 
     // Header
     var av = document.getElementById('cpEdAvatar');
     av.textContent = (p.pref || p.name.split(' ')[1] || '?').slice(0,2).toUpperCase();
     document.getElementById('cpEdTitle').textContent = p.name + ' · care plan';
+
+    var roleBanner = '<span class="chip text-[0.625rem]" style="background:' +
+      (directSave ? '#DCFCE7;color:#047857;border-color:rgba(4,120,87,0.18)'
+       : canEdit  ? '#FFFBEB;color:#876300;border-color:#FDE68A'
+       :            '#F5F5F5;color:#6B7280;border-color:#ECEAE3') +
+      '">' + CURRENT_USER + ' · ' + CURRENT_PERMS.label + '</span>';
     document.getElementById('cpEdMeta').innerHTML =
+      roleBanner +
       '<span><strong>' + tpl.label + '</strong> template</span>' +
       '<span class="text-kapture-fog">·</span>' +
       '<span>' + p.condition + '</span>' +
@@ -1659,7 +1911,6 @@
       '<span>Created ' + timeAgo(plan.createdAt) + ' by ' + plan.createdBy + '</span>' +
       '<span class="text-kapture-fog">·</span>' +
       '<span>Last edit ' + timeAgo(plan.lastEditedAt) + ' by <strong>' + plan.lastEditedBy + '</strong></span>';
-
     document.getElementById('cpEdProgress').textContent = plan.progress + '% complete';
 
     // Activity log
@@ -1669,21 +1920,110 @@
       return '<div class="flex items-center gap-2"><span style="width:6px;height:6px;border-radius:50%;background:' + (isOther ? '#FFD400' : '#10B981') + ';display:inline-block;flex-shrink:0"></span><span class="font-mono">' + timeAgo(h.at) + '</span> · <strong style="color:' + (isOther ? '#876300' : '#0A0A0A') + '">' + h.by + '</strong> · ' + h.msg + '</div>';
     }).join('') || '<div class="text-xs muted italic">No prior edits.</div>';
 
-    // Sections — each one editable
+    // Build the live section list — start from template, overlay any plan sections, then any custom-added
+    var sectionKeys = [];
+    tpl.sections.forEach(function (s) { if (plan.sections[s.key] !== undefined) sectionKeys.push(s.key); });
+    Object.keys(plan.sections).forEach(function (k) { if (sectionKeys.indexOf(k) < 0) sectionKeys.push(k); });
+
+    // Section pending-changes lookup (so we can show a yellow strip when a carer has submitted edits)
+    var pendingMap = {};
+    (window.PENDING_CHANGES || []).forEach(function (pc) {
+      if (pc.patientId === patientId && !pc.resolved) (pendingMap[pc.sectionKey] = pendingMap[pc.sectionKey] || []).push(pc);
+    });
+
     var secsHost = document.getElementById('cpEdSections');
-    secsHost.innerHTML = tpl.sections.map(function (sDef) {
-      var s = plan.sections[sDef.key] || { title: sDef.title, content: sDef.seed, lastEditedAt: plan.createdAt, lastEditedBy: plan.createdBy };
+    secsHost.innerHTML = sectionKeys.map(function (key) {
+      var s = plan.sections[key] || { title: key, content: '', lastEditedAt: plan.createdAt, lastEditedBy: plan.createdBy };
       var editorOther = s.lastEditedBy !== CURRENT_USER;
       var safeContent = (s.content || '').replace(/&/g,'&amp;').replace(/</g,'&lt;');
+      var pendingHere = (pendingMap[key] || []);
+      var pendingBanner = pendingHere.length
+        ? '<div style="background:#FFFBEB;border:1px solid #FDE68A;color:#876300;padding:0.5rem 0.75rem;border-radius:8px;font-size:0.75rem;margin-bottom:0.5rem">' +
+          '⏳ <strong>' + pendingHere.length + ' edit' + (pendingHere.length>1?'s':'') + ' awaiting approval</strong> from ' + pendingHere.map(function(pc){return pc.by;}).join(', ') +
+          (CURRENT_PERMS.canApprove ? ' · review in the approval queue at the top' : ' · admin must approve before they go live') +
+        '</div>'
+        : '';
+      var titleDisplay = canEdit
+        ? '<input class="cp-sec-title-input" data-section="' + key + '" value="' + s.title.replace(/"/g,'&quot;') + '" onchange="cpRenameSection(\'' + key + '\', this.value)"><span class="cp-sec-title-text" style="display:none">' + s.title + '</span>'
+        : '<div class="cp-sec-title-text">' + s.title + '</div>';
+      var deleteBtn = canEdit
+        ? '<button class="cp-sec-del" onclick="cpDeleteSection(\'' + key + '\')" title="Delete section" aria-label="Delete">×</button>'
+        : '';
+      var textarea = canEdit
+        ? '<textarea class="cp-sec-textarea" data-section="' + key + '" oninput="cpMarkDirty(this)">' + safeContent + '</textarea>'
+        : '<div class="cp-sec-readonly">' + safeContent + '</div>';
       return '<div class="cp-section">' +
+        pendingBanner +
         '<div class="cp-sec-head">' +
-          '<div class="cp-sec-title">' + s.title + '</div>' +
-          '<div class="cp-sec-meta">' + (editorOther ? '✎ ' : '') + 'Edited ' + timeAgo(s.lastEditedAt) + ' by ' + s.lastEditedBy + '</div>' +
+          '<div class="cp-sec-title flex-1 min-w-0">' + titleDisplay + '</div>' +
+          '<div class="flex items-center gap-2">' +
+            '<div class="cp-sec-meta">' + (editorOther ? '✎ ' : '') + 'Edited ' + timeAgo(s.lastEditedAt) + ' by ' + s.lastEditedBy + '</div>' +
+            deleteBtn +
+          '</div>' +
         '</div>' +
-        '<textarea class="cp-sec-textarea" data-section="' + sDef.key + '" oninput="cpMarkDirty(this)">' + safeContent + '</textarea>' +
+        textarea +
       '</div>';
     }).join('');
+
+    // + Add section row (only if user can edit)
+    if (canEdit) {
+      secsHost.innerHTML += '<button class="cp-add-section" onclick="cpAddSection()"><span class="cp-add-icon">+</span><span>Add a custom section</span></button>';
+    }
   }
+
+  // ---------- Section CRUD ----------
+  window.cpRenameSection = function (key, newTitle) {
+    var patientId = getParam('patient');
+    var plan = planFor(patientId); if (!plan || !plan.sections[key]) return;
+    if (!CURRENT_PERMS.canEdit) return;
+    plan.sections[key].title = (newTitle || '').trim() || plan.sections[key].title;
+    if (CURRENT_PERMS.directSave) {
+      plan.sections[key].lastEditedAt = nowISO();
+      plan.sections[key].lastEditedBy = CURRENT_USER;
+      savePlans();
+      kooperToast('Title updated');
+    } else {
+      kooperToast('Title staged · click Save changes to submit for approval');
+    }
+  };
+  window.cpDeleteSection = function (key) {
+    var patientId = getParam('patient');
+    var plan = planFor(patientId); if (!plan || !plan.sections[key]) return;
+    if (!CURRENT_PERMS.canEdit) { kooperToast('View-only · cannot delete'); return; }
+    if (!CURRENT_PERMS.directSave) { kooperToast('Carers cannot delete sections · ask admin'); return; }
+    if (!confirm('Delete section "' + plan.sections[key].title + '"? The content will be removed from this plan.')) return;
+    delete plan.sections[key];
+    plan.lastEditedAt = nowISO();
+    plan.lastEditedBy = CURRENT_USER;
+    plan.history = (plan.history || []);
+    plan.history.unshift({ at: nowISO(), by: CURRENT_USER, msg: 'Deleted section: ' + key });
+    savePlans();
+    pushNotif({ type:'edit', patientId: patientId, patientName: patientById(patientId).name, section: key + ' (deleted)', by: CURRENT_USER });
+    kooperToast('Section deleted');
+    renderEditor(patientId);
+  };
+  window.cpAddSection = function () {
+    var patientId = getParam('patient');
+    var plan = planFor(patientId); if (!plan) return;
+    if (!CURRENT_PERMS.canEdit) return;
+    var title = prompt('Title for the new section:');
+    if (!title) return;
+    var key = 'custom_' + Date.now();
+    plan.sections[key] = { title: title.trim(), content: '', lastEditedAt: nowISO(), lastEditedBy: CURRENT_USER };
+    if (CURRENT_PERMS.directSave) {
+      plan.lastEditedAt = nowISO();
+      plan.lastEditedBy = CURRENT_USER;
+      plan.history = (plan.history || []);
+      plan.history.unshift({ at: nowISO(), by: CURRENT_USER, msg: 'Added section: ' + title });
+      savePlans();
+      pushNotif({ type:'edit', patientId: patientId, patientName: patientById(patientId).name, section: title + ' (added)', by: CURRENT_USER });
+      kooperToast('Section added');
+    } else {
+      // Carer added — keep locally but warn
+      kooperToast('Section added · contents will need approval on save');
+    }
+    renderEditor(patientId);
+  };
 
   // ---------- Actions ----------
   window.cpMarkDirty = function (el) { el.classList.add('dirty'); };
@@ -1692,31 +2032,89 @@
     var patientId = getParam('patient');
     var plan = planFor(patientId);
     if (!plan) return;
-    var changed = [];
+    if (!CURRENT_PERMS.canEdit) { kooperToast('Your role is view-only · ask a carer or manager to make edits'); return; }
+    // Diff what changed
+    var changes = [];
     document.querySelectorAll('#cpEdSections textarea').forEach(function (t) {
       var key = t.getAttribute('data-section');
       var newContent = t.value;
       var sec = plan.sections[key];
-      if (!sec || sec.content !== newContent) {
-        if (!sec) sec = plan.sections[key] = { title: t.closest('.cp-section').querySelector('.cp-sec-title').textContent };
-        sec.content = newContent;
-        sec.lastEditedAt = nowISO();
-        sec.lastEditedBy = CURRENT_USER;
-        changed.push(sec.title);
-        t.classList.remove('dirty');
+      var oldContent = sec ? sec.content : '';
+      if (oldContent !== newContent) {
+        var title = t.closest('.cp-section').querySelector('.cp-sec-title-text').textContent;
+        changes.push({ key: key, title: title, before: oldContent, after: newContent });
       }
     });
-    if (changed.length === 0) { kooperToast('No changes to save'); return; }
+    if (changes.length === 0) { kooperToast('No changes to save'); return; }
+
+    // SUBMIT-FOR-APPROVAL path · tier:'submitter'
+    if (!CURRENT_PERMS.directSave) {
+      changes.forEach(function (ch) {
+        var pc = {
+          id: 'pc_' + Date.now() + '_' + Math.random().toString(36).slice(2,7),
+          patientId: patientId, sectionKey: ch.key, section: ch.title,
+          before: ch.before, after: ch.after,
+          by: CURRENT_USER, role: CURRENT_ROLE,
+          at: nowISO(), resolved: false,
+          preview: (ch.after || '').replace(/\s+/g,' ').slice(0, 80) + ((ch.after||'').length > 80 ? '…' : '')
+        };
+        window.PENDING_CHANGES.unshift(pc);
+      });
+      savePending();
+      pushNotif({ type:'pending', patientId: patientId, patientName: patientById(patientId).name, section: changes[0].title, by: CURRENT_USER });
+      kooperToast(changes.length + ' edit(s) submitted to admin for approval');
+      renderEditor(patientId);
+      return;
+    }
+
+    // DIRECT SAVE path · admin or authorised
+    changes.forEach(function (ch) {
+      if (!plan.sections[ch.key]) plan.sections[ch.key] = { title: ch.title };
+      plan.sections[ch.key].content      = ch.after;
+      plan.sections[ch.key].lastEditedAt = nowISO();
+      plan.sections[ch.key].lastEditedBy = CURRENT_USER;
+    });
     plan.lastEditedAt = nowISO();
     plan.lastEditedBy = CURRENT_USER;
-    plan.progress = Math.min(100, plan.progress + Math.min(8, changed.length * 3));
+    plan.progress = Math.min(100, plan.progress + Math.min(8, changes.length * 3));
     plan.history = (plan.history || []);
-    plan.history.unshift({ at: nowISO(), by: CURRENT_USER, msg: 'Edited ' + changed.length + ' section(s): ' + changed.slice(0,3).join(', ') + (changed.length > 3 ? '…' : '') });
+    plan.history.unshift({ at: nowISO(), by: CURRENT_USER, msg: 'Edited ' + changes.length + ' section(s): ' + changes.map(function(c){return c.title;}).slice(0,3).join(', ') + (changes.length > 3 ? '…' : '') });
     plan.history = plan.history.slice(0, 20);
     savePlans();
-    pushNotif({ type:'edit', patientId: patientId, patientName: patientById(patientId).name, section: changed[0], by: CURRENT_USER });
-    kooperToast(changed.length + ' section(s) saved · team notified');
+    pushNotif({ type:'edit', patientId: patientId, patientName: patientById(patientId).name, section: changes[0].title, by: CURRENT_USER });
+    kooperToast(changes.length + ' section(s) saved · team notified');
     renderEditor(patientId);
+  };
+
+  // ---------- APPROVAL workflow ----------
+  window.cpApproveChange = function (id) {
+    var pc = (window.PENDING_CHANGES || []).find(function (p) { return p.id === id; });
+    if (!pc) return;
+    var plan = planFor(pc.patientId); if (!plan) return;
+    if (!plan.sections[pc.sectionKey]) plan.sections[pc.sectionKey] = { title: pc.section };
+    plan.sections[pc.sectionKey].content      = pc.after;
+    plan.sections[pc.sectionKey].lastEditedAt = nowISO();
+    plan.sections[pc.sectionKey].lastEditedBy = pc.by + ' (approved by ' + CURRENT_USER + ')';
+    plan.lastEditedAt = nowISO();
+    plan.lastEditedBy = CURRENT_USER + ' (approving ' + pc.by + ')';
+    plan.progress = Math.min(100, plan.progress + 3);
+    plan.history = (plan.history || []);
+    plan.history.unshift({ at: nowISO(), by: CURRENT_USER, msg: 'Approved ' + pc.by + '\'s edit to ' + pc.section });
+    plan.history = plan.history.slice(0, 20);
+    pc.resolved = true; pc.resolvedAt = nowISO(); pc.resolvedBy = CURRENT_USER;
+    savePlans(); savePending();
+    pushNotif({ type:'edit', patientId: pc.patientId, patientName: patientById(pc.patientId).name, section: pc.section, by: pc.by + ' (approved)' });
+    kooperToast('Approved · ' + pc.by + ' edit applied · team notified');
+    renderApprovalQueue();
+    renderNotifFeed();
+  };
+  window.cpRejectChange = function (id) {
+    var pc = (window.PENDING_CHANGES || []).find(function (p) { return p.id === id; });
+    if (!pc) return;
+    pc.resolved = true; pc.resolvedAt = nowISO(); pc.resolvedBy = CURRENT_USER; pc.rejected = true;
+    savePending();
+    kooperToast('Rejected · ' + pc.by + ' notified · change discarded');
+    renderApprovalQueue();
   };
 
   window.cpOpenWorkspace = function () {
@@ -1794,6 +2192,96 @@
     document.getElementById('cpPatientPicker').value = newP.id;
     window.cpPickPatient(newP.id);
   };
+  // ---------- Create Care Plan modal ----------
+  window.cpOpenCreateModal = function () {
+    if (!CURRENT_PERMS.canEdit) { kooperToast('Your role is view-only · ask a carer or manager to create plans'); return; }
+    var sel = document.getElementById('cpModalPatient');
+    sel.innerHTML = '<option value="">— Choose a patient —</option>' +
+      PATIENTS.map(function (p) {
+        var hasPlan = !!planFor(p.id);
+        return '<option value="' + p.id + '"' + (hasPlan ? ' disabled' : '') + '>' + p.name + (hasPlan ? ' (already has a plan)' : ' · ' + p.condition) + '</option>';
+      }).join('');
+    document.getElementById('cpModalTitle').value = '';
+    document.getElementById('cpModalSummary').value = '';
+    document.getElementById('cpModalStart').value = new Date().toISOString().slice(0,10);
+    document.getElementById('cpCreateScrim').classList.add('on');
+    document.getElementById('cpCreateModal').classList.add('on');
+    setTimeout(function(){ sel.focus(); }, 80);
+  };
+  window.cpCloseCreateModal = function () {
+    document.getElementById('cpCreateScrim').classList.remove('on');
+    document.getElementById('cpCreateModal').classList.remove('on');
+    var f = document.getElementById('cpModalNewPatient'); if (f) f.classList.add('hidden');
+  };
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') window.cpCloseCreateModal && window.cpCloseCreateModal(); });
+
+  window.cpModalOnPatientChange = function () {
+    var id = document.getElementById('cpModalPatient').value;
+    var p = patientById(id);
+    var titleEl = document.getElementById('cpModalTitle');
+    if (p && !titleEl.value) titleEl.value = (p.pref || p.name.split(' ').slice(-1)[0]) + ' · primary care plan';
+  };
+  window.cpModalToggleNewPatient = function () { document.getElementById('cpModalNewPatient').classList.toggle('hidden'); };
+  window.cpModalSaveNewPatient = function () {
+    var name = document.getElementById('cpModalNpName').value.trim();
+    if (!name) { kooperToast('Patient name is required'); return; }
+    var newP = {
+      id: 'p_' + Date.now(),
+      name: name,
+      pref: document.getElementById('cpModalNpPref').value.trim() || name.split(' ').slice(-1)[0],
+      age:  '?',
+      room: document.getElementById('cpModalNpRoom').value.trim() || '—',
+      nhs:  document.getElementById('cpModalNpNhs').value.trim()  || '—',
+      condition: document.getElementById('cpModalNpCondition').value.trim() || 'Newly admitted · awaiting full assessment',
+      funding: document.getElementById('cpModalNpFunding').value
+    };
+    PATIENTS.unshift(newP);
+    savePatients();
+    // Repopulate picker, select new patient
+    cpOpenCreateModal();
+    document.getElementById('cpModalPatient').value = newP.id;
+    cpModalOnPatientChange();
+    document.getElementById('cpModalNewPatient').classList.add('hidden');
+    kooperToast(newP.name + ' added · finish the form to create their plan');
+  };
+  window.cpModalSubmit = function () {
+    var patientId = document.getElementById('cpModalPatient').value;
+    var p = patientById(patientId);
+    if (!p)  { kooperToast('Pick a patient first'); return; }
+    if (planFor(patientId)) { kooperToast('This patient already has a plan · open it from the list'); return; }
+    var templateKey = document.getElementById('cpModalTemplate').value || 'blank';
+    var tpl = TEMPLATES[templateKey] || TEMPLATES.blank;
+    var title = document.getElementById('cpModalTitle').value.trim() || (p.name + ' · care plan');
+    var lead = document.getElementById('cpModalLead').value;
+    var review = document.getElementById('cpModalReview').value;
+    var priority = document.getElementById('cpModalPriority').value;
+    var start = document.getElementById('cpModalStart').value || nowISO().slice(0,10);
+    var summary = document.getElementById('cpModalSummary').value.trim();
+
+    var sections = {};
+    if (summary) {
+      sections['summary'] = { title:'Plan summary · context', content: summary, lastEditedAt: nowISO(), lastEditedBy: CURRENT_USER };
+    }
+    tpl.sections.forEach(function (s) {
+      sections[s.key] = { title: s.title, content: s.seed, lastEditedAt: nowISO(), lastEditedBy: CURRENT_USER };
+    });
+    PLANS[patientId] = {
+      patientId: patientId, title: title, template: templateKey,
+      lead: lead, reviewSchedule: review, priority: priority, startDate: start,
+      status: priority === 'critical' ? 'review' : 'active',
+      progress: summary ? 10 : 5,
+      createdAt: nowISO(), createdBy: CURRENT_USER,
+      lastEditedAt: nowISO(), lastEditedBy: CURRENT_USER,
+      sections: sections,
+      history: [{ at: nowISO(), by: CURRENT_USER, msg: 'Plan created · ' + tpl.label + ' template · lead ' + lead + ' · ' + review + ' reviews · priority ' + priority }]
+    };
+    savePlans();
+    pushNotif({ type:'create', patientId: patientId, patientName: p.name, by: CURRENT_USER });
+    cpCloseCreateModal();
+    kooperToast(title + ' · created · opening editor');
+    window.location.href = '?view=edit&patient=' + patientId;
+  };
+
   window.cpStartPlan = function (templateKey) {
     var pickerVal = document.getElementById('cpPatientPicker').value;
     var p = PATIENTS.find(function (x) { return x.id === pickerVal; });
