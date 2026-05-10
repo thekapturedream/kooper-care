@@ -241,6 +241,49 @@
   .cp-approval-row .cp-ap-meta { font-size: 0.6875rem; color: #876300; font-family: 'JetBrains Mono', monospace; margin-top: 0.125rem; }
   .cp-approval-row .cp-ap-btns { display: flex; gap: 0.375rem; flex-shrink: 0; }
 
+  /* ============================================================
+     CLINICAL BUTTON SYSTEM · single source of truth
+     All actionable buttons share the 10px radius, weight, padding.
+     Variants: btn-primary (black), btn-yellow (action), btn-secondary
+     (outline), btn-danger-outline. Chips are info-only labels only.
+     ============================================================ */
+  .btn-primary, .btn-yellow, .btn-secondary, .btn-danger-outline {
+    display: inline-flex; align-items: center; gap: 0.4375rem;
+    padding: 0.4375rem 0.75rem;
+    border-radius: 10px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    line-height: 1.1;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    text-decoration: none;
+    white-space: nowrap;
+    border: 1px solid transparent;
+  }
+  .btn-primary  { background: #0A0A0A; color: #FFFFFF; border-color: #0A0A0A; }
+  .btn-primary:hover  { background: #1A1A1A; }
+  .btn-yellow   { background: #FFD400; color: #0A0A0A; border-color: #FFD400; }
+  .btn-yellow:hover   { background: #F5B400; border-color: #F5B400; }
+  .btn-secondary{ background: #FFFFFF; color: #0A0A0A; border-color: #ECEAE3; }
+  .btn-secondary:hover{ background: #FAFAF7; border-color: #0A0A0A; }
+  .btn-danger-outline { background: #FFFFFF; color: #B42318; border-color: #FECACA; }
+  .btn-danger-outline:hover { background: #FEE2E2; border-color: #B42318; }
+  /* Size modifiers — keep one font-size baseline, only the padding changes */
+  .btn-sm { padding: 0.3125rem 0.625rem; font-size: 0.75rem; border-radius: 8px; }
+  .btn-lg { padding: 0.625rem 1rem; font-size: 0.875rem; border-radius: 12px; }
+  .btn-block { width: 100%; justify-content: center; }
+  /* Chips are info-only — never use as action buttons */
+  .chip { display: inline-flex; align-items: center; gap: 0.375rem; padding: 0.1875rem 0.5rem; border-radius: 999px; font-size: 0.75rem; font-weight: 500; line-height: 1; background: #F5F5F5; color: #1A1A1A; border: 1px solid #ECEAE3; white-space: nowrap; }
+  .chip-yellow { background: #FFFBEB; color: #876300; border-color: #FDE68A; }
+  .chip-ok { background: #DCFCE7; color: #047857; border-color: rgba(4,120,87,0.18); }
+  .chip-warn { background: #FFFBEB; color: #876300; border-color: #FDE68A; }
+  .chip-danger { background: #FEE2E2; color: #B42318; border-color: #FECACA; }
+  .chip-dark { background: #0A0A0A; color: #FFD400; border-color: #0A0A0A; }
+  /* Backwards compat — old `chip text-xs` button-styled spots get the same radius too */
+  button.chip { cursor: pointer; }
+  button.chip:hover { background: #ECEAE3; }
+
   /* Patient row visual distinctions for NEW + UPDATED plans */
   .cp-patient-row.is-new { background: linear-gradient(90deg, rgba(255,212,0,0.08), transparent 60%); border-left: 3px solid #FFD400; padding-left: calc(1.125rem - 3px); }
   .cp-patient-row.is-updated { background: linear-gradient(90deg, rgba(165,180,252,0.08), transparent 60%); border-left: 3px solid #818CF8; padding-left: calc(1.125rem - 3px); }
@@ -284,13 +327,15 @@
           <span>Find</span>
           <span class="font-mono text-[0.6875rem] bg-kapture-ash px-1.5 py-0.5 rounded">⌘K</span>
         </button>
-        <div class="hidden md:flex items-center gap-2 pl-3 border-l border-kapture-ash">
-          <div class="w-8 h-8 rounded-full bg-kapture-ash flex items-center justify-center font-mono text-xs">SA</div>
-          <div class="text-xs">
-            <div class="font-medium">Sister Anne</div>
-            <div class="text-kapture-mist">Nurse · Draycott</div>
+        <button id="cpNavUserPill" data-persona-switcher type="button" onclick="cpToggleUserMenu()" class="hidden md:flex items-center gap-2 pl-3 border-l border-kapture-ash bg-transparent border-0 cursor-pointer relative" style="padding:0.25rem 0.5rem 0.25rem 0.75rem;border-radius:10px;transition:background 0.12s ease" aria-haspopup="menu" aria-label="Switch user">
+          <div id="cpNavUserAvatar" class="w-8 h-8 rounded-full flex items-center justify-center font-mono text-xs" style="background:#1A1A1A;color:#FFD400">SA</div>
+          <div class="text-xs text-left">
+            <div id="cpNavUserName" class="font-medium text-white">Sister Anne</div>
+            <div id="cpNavUserRole" class="text-kapture-mist">Clinical Lead · Draycott</div>
           </div>
-        </div>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-kapture-mist ml-1"><polyline points="6 9 12 15 18 9"/></svg>
+          <!-- Hidden dropdown · attached at the end of body for layering -->
+        </button>
         <button id="kooperHintsBtn" type="button" aria-label="Toggle hints"><span class="kt-hint-dot-mini" aria-hidden="true"></span><span data-kt-label>Hints</span></button> <a href="kooper-sign-in.html" class="hidden md:inline-flex p-1.5 rounded text-kapture-mist hover:text-white hover:bg-kapture-coal transition" title="Sign out" aria-label="Sign out">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
         </a>
@@ -310,10 +355,14 @@
       <span class="chip chip-yellow text-[0.625rem] font-mono uppercase tracking-widest">Care Plans · workspace</span>
       <h1 class="font-display font-semibold text-3xl lg:text-4xl tracking-tight text-kapture-black mt-3">What do you need to do?</h1>
       <p class="text-kapture-smoke text-sm mt-2 max-w-xl mx-auto">Build a new care plan or open an existing one. Every plan stays linked to clinical, recording, and family privacy.</p>
-      <!-- Role switcher (demo) — see how the page changes per signed-in user -->
-      <div class="mt-5 inline-flex items-center gap-2 bg-white border border-kapture-fog rounded-full px-3 py-1.5 text-xs">
-        <span class="font-mono text-kapture-mist text-[0.625rem] uppercase tracking-widest">Viewing as</span>
-        <select id="cpRoleSwitcher" data-persona-switcher class="bg-transparent border-0 text-xs font-medium text-kapture-black focus:outline-none cursor-pointer pr-2"></select>
+      <!-- Role tier hint — single source of truth lives in the nav identity pill (top right) -->
+      <div id="cpRoleHint" class="mt-5 inline-flex items-center gap-2 text-xs muted">
+        <span class="font-mono text-[0.625rem] uppercase tracking-widest">Signed in as</span>
+        <span id="cpRoleHintName" class="font-medium text-kapture-black">Sister Anne</span>
+        <span class="text-kapture-fog">·</span>
+        <span id="cpRoleHintTier" class="chip text-[0.625rem]" style="background:#DCFCE7;color:#047857;border-color:rgba(4,120,87,0.18)">Authorised</span>
+        <span class="text-kapture-fog">·</span>
+        <button onclick="cpToggleUserMenu()" class="underline-offset-2 hover:underline text-kapture-black">Switch user</button>
       </div>
     </div>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-3xl mx-auto">
@@ -425,6 +474,14 @@
     </div>
   </div>
 </section>
+
+<!-- ============================================== -->
+<!-- USER SWITCHER DROPDOWN · single source of truth  -->
+<!-- ============================================== -->
+<div id="cpUserMenu" class="hidden" style="position:fixed;top:64px;right:1.5rem;z-index:60;background:#FFFFFF;border:1px solid #ECEAE3;border-radius:12px;box-shadow:0 18px 40px -12px rgba(0,0,0,0.25);min-width:280px;max-height:60vh;overflow-y:auto;padding:0.5rem">
+  <div class="px-3 py-2 text-[0.6875rem] uppercase tracking-widest font-mono muted">Switch signed-in user (demo)</div>
+  <div id="cpUserMenuList"></div>
+</div>
 
 <!-- ============================================== -->
 <!-- CREATE CARE PLAN · MODAL POPUP                   -->
@@ -1725,20 +1782,72 @@
     saveNotif();
   }
 
+  // ---------- Identity sync · single source of truth ----------
+  function syncNavIdentity() {
+    var u = USERS[CURRENT_USER] || USERS['Sister Anne'];
+    var perms = ROLE_PERMS[CURRENT_ROLE] || ROLE_PERMS['Carer'];
+    // Top-right nav pill
+    var av = document.getElementById('cpNavUserAvatar'); if (av) { av.textContent = u.init; av.style.background = u.bg; av.style.color = u.fg; }
+    var nm = document.getElementById('cpNavUserName');   if (nm) nm.textContent = CURRENT_USER;
+    var rl = document.getElementById('cpNavUserRole');   if (rl) rl.textContent = u.short + ' · Draycott';
+    // Landing role hint
+    var hn = document.getElementById('cpRoleHintName'); if (hn) hn.textContent = CURRENT_USER;
+    var ht = document.getElementById('cpRoleHintTier'); if (ht) {
+      var tier = perms.tier || 'view';
+      var tierLabel = tier === 'admin' ? 'Admin' : tier === 'authorised' ? 'Authorised' : tier === 'submitter' ? 'Submit changes' : 'View only';
+      var tierStyle = tier === 'admin' ? 'background:#FFD400;color:#0A0A0A;border-color:#F5B400'
+                    : tier === 'authorised' ? 'background:#DCFCE7;color:#047857;border-color:rgba(4,120,87,0.18)'
+                    : tier === 'submitter' ? 'background:#FFFBEB;color:#876300;border-color:#FDE68A'
+                    : 'background:#F5F5F5;color:#6B7280;border-color:#ECEAE3';
+      ht.style.cssText = 'border-radius:999px;padding:0.1875rem 0.5rem;font-size:0.6875rem;font-weight:500;line-height:1;display:inline-flex;align-items:center;gap:0.375rem;border:1px solid;font-family:Inter,sans-serif;' + tierStyle;
+      ht.textContent = tierLabel;
+    }
+  }
+  window.cpToggleUserMenu = function () {
+    var m = document.getElementById('cpUserMenu');
+    if (!m) return;
+    m.classList.toggle('hidden');
+  };
+  window.cpSwitchUser = function (name) {
+    if (!USERS[name]) return;
+    try { localStorage.setItem('kooper:carePlans:currentUser', name); } catch (e) {}
+    window.location.search = '?user=' + encodeURIComponent(name);
+  };
+  // Click outside closes the menu
+  document.addEventListener('click', function (e) {
+    var menu = document.getElementById('cpUserMenu');
+    var pill = document.getElementById('cpNavUserPill');
+    var hint = document.getElementById('cpRoleHint');
+    if (!menu || menu.classList.contains('hidden')) return;
+    if (menu.contains(e.target) || (pill && pill.contains(e.target)) || (hint && hint.contains(e.target))) return;
+    menu.classList.add('hidden');
+  });
+
   // ---------- Routing ----------
   function getParam(k) { var p = new URLSearchParams(window.location.search); return p.get(k); }
   function activate() {
-    // Populate role switcher (once)
-    var rs = document.getElementById('cpRoleSwitcher');
-    if (rs && !rs.options.length) {
-      rs.innerHTML = Object.keys(USERS).filter(function(n){ return n !== 'kooper · ai'; }).map(function(name){
+    // Hydrate the single nav identity pill (top right) + role hint on landing
+    syncNavIdentity();
+    // Populate the dropdown menu list (once)
+    var menuList = document.getElementById('cpUserMenuList');
+    if (menuList && !menuList.childNodes.length) {
+      menuList.innerHTML = Object.keys(USERS).filter(function(n){ return n !== 'kooper · ai'; }).map(function(name){
         var u = USERS[name];
-        return '<option value="' + name + '"' + (name === CURRENT_USER ? ' selected' : '') + '>' + name + ' · ' + u.short + '</option>';
+        var perms = ROLE_PERMS[u.role] || {};
+        var tierColor = perms.tier === 'admin' ? '#FFD400;color:#0A0A0A' :
+                        perms.tier === 'authorised' ? '#DCFCE7;color:#047857' :
+                        perms.tier === 'submitter' ? '#FFFBEB;color:#876300' :
+                        '#F5F5F5;color:#6B7280';
+        var active = name === CURRENT_USER;
+        return '<button onclick="cpSwitchUser(\'' + name.replace(/\'/g,"\\'") + '\')" style="display:flex;align-items:center;gap:0.625rem;padding:0.5rem 0.625rem;border-radius:8px;border:0;background:' + (active ? '#FAFAF7' : 'transparent') + ';width:100%;text-align:left;cursor:pointer;font-family:inherit;margin-bottom:0.125rem">' +
+          '<span style="width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:Space Grotesk,sans-serif;font-weight:600;font-size:0.6875rem;flex-shrink:0;background:' + u.bg + ';color:' + u.fg + '">' + u.init + '</span>' +
+          '<div style="flex:1;min-width:0">' +
+            '<div style="font-size:0.8125rem;font-weight:500;color:#0A0A0A">' + name + (active ? ' <span style="font-size:0.625rem;color:#047857;margin-left:0.25rem">● signed in</span>' : '') + '</div>' +
+            '<div style="font-size:0.6875rem;color:#6B7280">' + u.role + '</div>' +
+          '</div>' +
+          '<span style="font-family:JetBrains Mono,monospace;font-size:0.5625rem;font-weight:700;letter-spacing:0.06em;padding:0.125rem 0.4375rem;border-radius:4px;background:' + tierColor + '">' + (perms.tier || 'view').toUpperCase() + '</span>' +
+        '</button>';
       }).join('');
-      rs.addEventListener('change', function (e) {
-        try { localStorage.setItem('kooper:carePlans:currentUser', e.target.value); } catch (er) {}
-        window.location.search = '?user=' + encodeURIComponent(e.target.value);
-      });
     }
     var landing    = document.getElementById('cpLanding');
     var work       = document.getElementById('cpWorkspace');
@@ -1877,8 +1986,8 @@
         '<span class="cp-notif-avatar" style="background:' + byInfo.bg + ';color:' + byInfo.fg + '">' + byInfo.init + '</span>' +
         '<div class="cp-ap-text"><strong>' + pc.by + '</strong> wants to update <strong>' + (pat ? pat.name : '?') + '</strong> · <span class="cp-notif-subject">' + pc.section + '</span><div class="cp-ap-meta">submitted ' + timeAgo(pc.at) + ' · ' + pc.preview + '</div></div>' +
         '<div class="cp-ap-btns">' +
-          '<button onclick="cpApproveChange(\'' + pc.id + '\')" class="btn-primary text-xs">Approve</button>' +
-          '<button onclick="cpRejectChange(\'' + pc.id + '\')" class="chip text-xs">Reject</button>' +
+          '<button onclick="cpApproveChange(\'' + pc.id + '\')" class="btn-primary btn-sm">Approve</button>' +
+          '<button onclick="cpRejectChange(\'' + pc.id + '\')" class="btn-secondary btn-sm">Reject</button>' +
         '</div>' +
       '</div>';
     }).join('');

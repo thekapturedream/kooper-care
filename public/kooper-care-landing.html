@@ -496,13 +496,13 @@
       <div class="divide-y divide-kapture-fog" id="personaTable">
         <!-- Operator side -->
         <div class="persona-row" data-persona="owner" data-route="kooper-hr.html">
-          <div class="pr-name"><span class="pr-avatar">LO</span><span class="pr-title">Owner / Director</span></div>
+          <div class="pr-name"><span class="pr-avatar">RO</span><span class="pr-title">Owner / Director</span></div>
           <div class="pr-stack" data-stack="hr|required,multi-site,estate,reports,ai,compliance"></div>
           <div class="pr-wants">CQC pass + cost control</div>
           <div class="pr-arrow" aria-hidden="true">→</div>
         </div>
         <div class="persona-row" data-persona="manager" data-route="kooper-hr.html">
-          <div class="pr-name"><span class="pr-avatar">LO</span><span class="pr-title">Registered Manager</span></div>
+          <div class="pr-name"><span class="pr-avatar">RO</span><span class="pr-title">Registered Manager</span></div>
           <div class="pr-stack" data-stack="hr|required,care plans,recording,mar,charts,reports,audit,compliance,operations,ai"></div>
           <div class="pr-wants">Zero compliance gaps</div>
           <div class="pr-arrow" aria-hidden="true">→</div>
@@ -796,8 +796,8 @@
 
     // ===== HERO PERSONA SWITCHER ============================================
     var PERSONAS = [
-      { id:'manager',       name:'Rae Okonkwo',      first:'Rae',     role:'Manager',         init:'LO', stack:['hr','reports','operations','audit','compliance','recording'],         route:'kooper-hr.html',                 label:'/hr launcher' },
-      { id:'owner',         name:'Rae Okonkwo',      first:'Rae',     role:'Owner',           init:'LO', stack:['multi-site','reports','audit','compliance','operations'],              route:'kooper-hr.html',                 label:'/hr launcher' },
+      { id:'manager',       name:'Rae Okonkwo',      first:'Rae',     role:'Manager',         init:'RO', stack:['hr','reports','operations','audit','compliance','recording'],         route:'kooper-hr.html',                 label:'/hr launcher' },
+      { id:'owner',         name:'Rae Okonkwo',      first:'Rae',     role:'Owner',           init:'RO', stack:['multi-site','reports','audit','compliance','operations'],              route:'kooper-hr.html',                 label:'/hr launcher' },
       { id:'clinical-lead', name:'Sister Anne',       first:'Sister Anne', role:'Clinical Lead', init:'SA', stack:['care plans','clinical','charts','mar','recording','risk'],            route:'kooper-staff.html?as=sa',        label:'/staff · sa' },
       { id:'nurse',         name:'Sister Anne',       first:'Sister Anne', role:'Nurse',         init:'SA', stack:['clinical','charts','mar','recording','care plans'],                   route:'kooper-staff.html?as=sa',        label:'/staff · sa' },
       { id:'senior-carer',  name:'Rebecca Adesina',   first:'Rebecca',  role:'Senior Carer',    init:'RA', stack:['recording','care plans','charts','mar','activities'],                 route:'kooper-staff.html?as=ra',        label:'/staff · ra' },

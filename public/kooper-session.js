@@ -34,7 +34,7 @@
     tb: { id:'tb', name:'Tomas Bauer',           first:'Tomas',       role:'Maintenance',   init:'TB', dashRoute:'kooper-staff.html?as=tb', avatarBg:'#FCD34D', avatarFg:'#0A0A0A' },
     jm: { id:'jm', name:'Joy Munemo',            first:'Joy',         role:'Carer · Agency',init:'JM', dashRoute:'kooper-staff.html?as=jm', avatarBg:'#FFE39A', avatarFg:'#0A0A0A' },
     bp: { id:'bp', name:'Ben Pearce',            first:'Ben',         role:'Volunteer',     init:'BP', dashRoute:'kooper-staff.html?as=bp', avatarBg:'#86EFAC', avatarFg:'#064E3B' },
-    lo: { id:'lo', name:'Rae Okonkwo',          first:'Rae',        role:'Manager',       init:'LO', dashRoute:'kooper-hr.html',          avatarBg:'#0A0A0A', avatarFg:'#FFD400' }
+    lo: { id:'lo', name:'Rae Okonkwo',          first:'Rae',        role:'Manager',       init:'RO', dashRoute:'kooper-hr.html',          avatarBg:'#0A0A0A', avatarFg:'#FFD400' }
   };
 
   var LS_KEY = 'kooper:session:as';
