@@ -172,6 +172,18 @@
   else init();
 
   // ============================================================
+  // Auto-load shared nav tidier — responsive cleanup, marketing
+  // vs app pattern, mobile drawer, kooper · ai marketing link.
+  // Loads BEFORE the AI widget so the nav is normalised first.
+  // ============================================================
+  if (!document.querySelector('script[src$="kooper-nav.js"]')) {
+    var nv = document.createElement('script');
+    nv.src = 'kooper-nav.js';
+    nv.defer = true;
+    document.head.appendChild(nv);
+  }
+
+  // ============================================================
   // Auto-load the kooper · ai widget so every page that includes
   // kooper-session.js gets the persistent AI assistant for free.
   // No-op if the widget is already loaded.

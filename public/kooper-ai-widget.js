@@ -374,14 +374,29 @@
   }
 
   // ----------------------------------------------------------
+  //  SURFACE DETECTION — marketing vs app
+  //  The floating FAB only renders on app surfaces. Marketing
+  //  pages (landing, apps catalogue, ai product deep-dive,
+  //  app deep-dive, sign-in) get a regular nav link to the
+  //  ai product page instead.
+  // ----------------------------------------------------------
+  function isMarketingSurface() {
+    var name = pageKey();
+    var marketing = ['care-landing','apps','app','ai','sign-in'];
+    return marketing.indexOf(name) >= 0;
+  }
+
+  // ----------------------------------------------------------
   //  BOOT
   // ----------------------------------------------------------
   function boot() {
-    if (document.body && document.body.tagName === 'BODY') {
-      injectStyles();
-      injectMarkup();
-      injectNavLink();
-    }
+    if (!document.body || document.body.tagName !== 'BODY') return;
+    if (isMarketingSurface()) return; // no FAB / no nav-pill on marketing pages
+    injectStyles();
+    injectMarkup();
+    // injectNavLink() intentionally NOT called — the floating FAB is the
+    // only AI entry point on app surfaces; the duplicate nav pill is
+    // removed for navigation clarity.
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
   else boot();
